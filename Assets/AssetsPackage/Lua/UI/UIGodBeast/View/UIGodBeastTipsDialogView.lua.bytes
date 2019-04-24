@@ -1,0 +1,162 @@
+local UIUtil = UIUtil
+local UILogicUtil = UILogicUtil
+local GodBeastMgr = Player:GetInstance():GetGodBeastMgr()
+local string_split = CUtil.SplitString
+local string_format = string.format
+local math_ceil = math.ceil
+local UIGodBeastTipsDialogView = BaseClass("UIGodBeastTipsDialogView", UIBaseView)
+base = UIBaseView
+
+local ShowTypeArr = {
+    NewTalent = 1,
+    ForgetTalent = 2,
+    Awaken = 3,
+    NewAwaken = 4,
+    Max = 5,
+}
+
+function UIGodBeastTipsDialogView:OnCreate()
+    base.OnCreate(self)
+
+    self:InitView()
+end
+
+function UIGodBeastTipsDialogView:InitView()
+
+    local sureBtnText, cancelBtnText, titleText, forgetText, awakeText, newTitleText, explainText
+    sureBtnText, cancelBtnText, titleText, forgetText, awakeText, newTitleText, explainText, 
+    self.m_talentNameText, self.m_detailsText = UIUtil.GetChildTexts(self.transform, {
+        "BgRoot/Top/BottomBtn/sureBtn/sureBtnText",
+        "BgRoot/Top/BottomBtn/cancelBtn/cancelBtnText",
+        "BgRoot/Top/titleContent/titleText",
+        "BgRoot/Top/forgetText",
+        "BgRoot/Top/awakeText",
+        "BgRoot/Top/newAwakeContent/newTitleText",
+        "BgRoot/Top/newAwakeContent/explainText",
+        "BgRoot/Top/talentContent/talentNameText",
+        "BgRoot/Top/detailsText",
+    })
+
+    self.m_closeBtn, self.m_sureBtn, self.m_cancelBtn, self.m_titleContent, self.m_talentContent, self.m_forgetContent,
+    self.m_newAwakeContent, self.m_awakeContent, self.m_detailsContent = UIUtil.GetChildTransforms(self.transform, {
+        "closeBtn",
+        "BgRoot/Top/BottomBtn/sureBtn",
+        "BgRoot/Top/BottomBtn/cancelBtn",
+        "BgRoot/Top/titleContent",
+        "BgRoot/Top/talentContent",
+        "BgRoot/Top/forgetText",
+        "BgRoot/Top/newAwakeContent",
+        "BgRoot/Top/awakeText",
+        "BgRoot/Top/detailsText",
+    })
+
+    self.m_talentIcon = UIUtil.AddComponent(UIImage, self, "BgRoot/Top/talentContent/talentBg/talentIcon", ImageConfig.GodBeast)
+
+    sureBtnText.text = Language.GetString(10)
+    cancelBtnText.text = Language.GetString(50)
+    titleText.text = Language.GetString(3620)
+    forgetText.text = Language.GetString(3621)
+    awakeText.text = Language.GetString(3622)
+    newTitleText.text = Language.GetString(3623)
+    explainText.text = Language.GetString(3624)
+    self.m_sureCallback = nil
+end
+
+function UIGodBeastTipsDialogView:OnEnable(...)
+    base.OnEnable(self, ...)
+    local initOrder, data = ...
+    self:HandleClick()
+    if data then
+        self.m_showType = data.showType
+        self.m_godBeastId = data.godBeastId
+        self.m_talentInfo = data.talentInfo
+        if self.m_showType then
+            self:UpdateData()
+        end
+    end
+end
+
+function UIGodBeastTipsDialogView:UpdateData()
+    self.m_titleContent.gameObject:SetActive(false)
+    self.m_forgetContent.gameObject:SetActive(false)
+    self.m_awakeContent.gameObject:SetActive(false)
+    self.m_talentContent.gameObject:SetActive(false)
+    self.m_detailsContent.gameObject:SetActive(false)
+    self.m_cancelBtn.gameObject:SetActive(false)
+    self.m_newAwakeContent.gameObject:SetActive(false)
+    if self.m_showType == ShowTypeArr.NewTalent then
+        self:UpdateTalentData()
+        self.m_titleContent.gameObject:SetActive(true)
+        self.m_talentContent.gameObject:SetActive(true)
+        self.m_detailsContent.gameObject:SetActive(true)
+    elseif self.m_showType == ShowTypeArr.ForgetTalent then
+        self:UpdateTalentData()
+        self.m_forgetContent.gameObject:SetActive(true)
+        self.m_talentContent.gameObject:SetActive(true)
+        self.m_cancelBtn.gameObject:SetActive(true)
+    elseif self.m_showType == ShowTypeArr.Awaken then
+        self.m_awakeContent.gameObject:SetActive(true)
+        self.m_cancelBtn.gameObject:SetActive(true)
+    elseif self.m_showType == ShowTypeArr.NewAwaken then
+        self.m_newAwakeContent.gameObject:SetActive(true)
+    end
+end
+
+function UIGodBeastTipsDialogView:UpdateTalentData()
+    if self.m_talentInfo then
+        local talentCfg = ConfigUtil.GetGodBeastTalentCfgByID(self.m_talentInfo.talent_id)
+        if talentCfg then
+            local str = talentCfg.exdesc
+            local x1 = math_ceil(talentCfg.x + talentCfg.ax * self.m_talentInfo.talent_level)
+            local y1 = math_ceil(talentCfg.y + talentCfg.ay * self.m_talentInfo.talent_level)
+            str = str:gsub("{(.-)}", {x=x1, y=y1})
+            self.m_detailsText.text = str
+            self.m_talentNameText.text = string_format(string_split(Language.GetString(3630), ",")[self.m_talentInfo.talent_level],talentCfg.name)
+            self.m_talentIcon:SetAtlasSprite(talentCfg.sIcon, false)
+        end
+    end
+end
+
+function UIGodBeastTipsDialogView:OnDisable()
+    self:RemoveClick()
+
+end
+
+function UIGodBeastTipsDialogView:HandleClick()
+    local onClick = Bind(self, self.OnClick)
+    UIUtil.AddClickEvent(self.m_closeBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_sureBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_cancelBtn.gameObject, onClick)
+end
+
+function UIGodBeastTipsDialogView:RemoveClick()
+    UIUtil.RemoveClickEvent(self.m_closeBtn.gameObject)
+    UIUtil.RemoveClickEvent(self.m_sureBtn.gameObject)
+    UIUtil.RemoveClickEvent(self.m_cancelBtn.gameObject)
+end
+
+function UIGodBeastTipsDialogView:OnClick(go, x, y)
+    if go.name == "sureBtn" then
+        if self.m_showType == ShowTypeArr.ForgetTalent then
+            UIManagerInst:Broadcast(UIMessageNames.MN_GODBEAST_SURE_FORGET_TALENT)
+            self:CloseSelf()
+        elseif self.m_showType == ShowTypeArr.Awaken then
+            if self.m_godBeastId then
+                GodBeastMgr:ReqAwakening(self.m_godBeastId)
+            end
+        else
+            self:CloseSelf()
+        end
+    elseif go.name == "closeBtn" or go.name == "cancelBtn" then
+        self:CloseSelf()
+    end
+end
+
+function UIGodBeastTipsDialogView:OnDestroy()
+    if self.m_talentIcon then
+        self.m_talentIcon:Delete()
+        self.m_talentIcon = nil
+    end
+end
+
+return UIGodBeastTipsDialogView

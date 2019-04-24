@@ -1,0 +1,173 @@
+local UIUtil = UIUtil
+local UIImage = UIImage
+local tostring = tostring
+local Language = Language
+local ConfigUtil = ConfigUtil
+local AtlasConfig = AtlasConfig
+local string_format = string.format
+local Type_Image = typeof(CS.UnityEngine.UI.Image)
+local GameUtility = CS.GameUtility
+local FriendMgr = Player:GetInstance():GetFriendMgr()
+
+local FriendTaskItem = BaseClass("FriendTaskItem", UIBaseItem)
+local base = UIBaseItem
+
+function FriendTaskItem:OnCreate()
+    base.OnCreate(self)
+
+    self:InitView()
+
+    self:HandleClick()
+end
+
+function FriendTaskItem:InitView()
+    self.m_getAwardBtnTrans,
+    self.m_wujiangIconPos,
+    self.m_awardItemIconTrans,
+    self.m_acceptTaskBtnTrans
+    = UIUtil.GetChildRectTrans(self.transform, {
+        "getAwardBtn",
+        "wujiangIconPos",
+        "awardItemIcon",
+        "acceptTaskBtn",
+    })
+
+    self.m_getAwardBtnText,
+    self.m_taskStateText,
+    self.m_levelText,
+    self.m_taskDetailText,
+    self.m_taskProgressText,
+    self.m_awardInfoText,
+    self.m_awardNumText,
+    self.m_acceptTaskBtnText,
+    self.m_taskDescText
+    = UIUtil.GetChildTexts(self.transform, {
+        "getAwardBtn/getAwardBtnText",
+        "taskStateText",
+        "levelText",
+        "taskDetailText",
+        "taskProgressText",
+        "awardInfoBg/awardInfoText",
+        "awardNumBg/awardNumText",
+        "acceptTaskBtn/acceptTaskBtnText",
+        "taskDescText",
+    })
+
+    self.m_awardInfoText.text = Language.GetString(3037)
+    self.m_getAwardBtnText.text = Language.GetString(64)
+    self.m_acceptTaskBtnText.text = Language.GetString(3066)
+
+    self.m_awardItemIcon = UIUtil.AddComponent(UIImage, self, self.m_awardItemIconTrans, AtlasConfig.Commmon)
+    self.m_acceptTaskBtn = UIUtil.AddComponent(UIImage, self, self.m_acceptTaskBtnTrans, AtlasConfig.Commmon)
+    self.m_acceptTaskBtnImage = self.m_acceptTaskBtn.transform:GetComponent(Type_Image)
+
+    self.m_taskData = nil
+    self.m_friendUID = 0
+end
+
+function FriendTaskItem:OnDestroy()
+    self.m_getAwardBtnTrans = nil
+    self.m_wujiangIconPos = nil
+    self.m_awardItemIconTrans = nil
+    self.m_acceptTaskBtnTrans = nil
+
+    self.m_getAwardBtnText = nil
+    self.m_taskStateText = nil
+    self.m_levelText = nil
+    self.m_taskDetailText = nil
+    self.m_taskProgressText = nil
+    self.m_awardInfoText = nil
+    self.m_awardNumText = nil
+    self.m_acceptTaskBtnText = nil
+
+    if self.m_awardItemIcon then
+        self.m_awardItemIcon:Delete()
+        self.m_awardItemIcon = nil
+    end
+    if self.m_acceptTaskBtn then
+        self.m_acceptTaskBtn:Delete()
+        self.m_acceptTaskBtn = nil
+    end
+    self.m_acceptTaskBtnImage = nil
+    
+    self.m_taskData = nil
+
+    base.OnDestroy(self)
+end
+
+function FriendTaskItem:HandleClick()
+    local onClick = Bind(self, self.OnClick)
+
+    UIUtil.AddClickEvent(self.m_getAwardBtnTrans.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_acceptTaskBtnTrans.gameObject, onClick)
+end
+
+function FriendTaskItem:OnClick(go, x, y)
+    if not go then
+        return
+    end
+    local goName = go.name
+    if goName == "getAwardBtn" then
+        FriendMgr:ReqTakeTaskAward(self.m_taskData.id, self.m_friendUID, self.m_floor)
+    elseif goName == "acceptTaskBtn" then
+        FriendMgr:ReqAcceptTask(self.m_taskData.id, self.m_friendUID, self.m_floor)
+    end
+end
+
+function FriendTaskItem:UpdateData(taskData, friendUID, floor)
+    if not taskData then
+        return
+    end
+    self.m_taskData = taskData
+    self.m_friendUID = friendUID
+    self.m_floor = floor
+
+    local taskCfg = ConfigUtil.GetFriendTaskCfgByID(taskData.id)
+
+    print(taskData.id,"-----------")
+    print(taskCfg.task_desc, taskCfg.id,">>>>>>>>>>>>>>>")
+    if not taskCfg then
+        return
+    end 
+
+    self.m_taskProgressText.text = string_format(Language.GetString(3063), taskData.progress, taskCfg.cond)
+    self.m_levelText.text = string_format(Language.GetString(3064), taskCfg.friendship_level)
+    self.m_taskDetailText.text = taskCfg.task_name
+
+    local awardItemCfg = ConfigUtil.GetItemCfgByID(taskCfg.award_item_id)
+    if awardItemCfg then
+        self.m_awardItemIcon:SetAtlasSprite(awardItemCfg.sIcon, false, AtlasConfig[awardItemCfg.sAtlas])
+    end
+    self.m_awardNumText.text = tostring(taskCfg.award_item_count)
+
+    self.m_taskDescText.text = taskCfg.task_desc
+    
+    
+    if taskData.status == 0 then
+        self.m_getAwardBtnTrans.gameObject:SetActive(false)
+        self.m_acceptTaskBtnTrans.gameObject:SetActive(false)
+        self.m_taskStateText.text = Language.GetString(3065)
+    elseif taskData.status == 1 then
+        self.m_getAwardBtnTrans.gameObject:SetActive(true)
+        self.m_acceptTaskBtnTrans.gameObject:SetActive(false)
+        self.m_taskStateText.text = ""
+    elseif taskData.status == 2 then
+        self.m_getAwardBtnTrans.gameObject:SetActive(false)
+        self.m_acceptTaskBtnTrans.gameObject:SetActive(false)
+        self.m_taskStateText.text = Language.GetString(3068)
+    elseif taskData.status == 3 then
+        self.m_getAwardBtnTrans.gameObject:SetActive(false)
+        self.m_acceptTaskBtnTrans.gameObject:SetActive(true)
+        self.m_acceptTaskBtn:SetColor(Color.white)
+        GameUtility.SetRaycastTarget(self.m_acceptTaskBtnImage, true)
+        self.m_taskStateText.text = ""
+    else
+        self.m_getAwardBtnTrans.gameObject:SetActive(false)
+        self.m_acceptTaskBtnTrans.gameObject:SetActive(true)
+        self.m_acceptTaskBtn:SetColor(Color.black)
+        GameUtility.SetRaycastTarget(self.m_acceptTaskBtnImage, false)
+        self.m_taskStateText.text = ""
+    end
+end
+
+return FriendTaskItem

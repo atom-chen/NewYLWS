@@ -1,0 +1,69 @@
+SysIDs = {
+    INSCRIPTION = 1,            -- 命签
+    GUILD = 2,                                          
+    SHEN_BING = 3,              --神兵
+    HORSE = 5,              --坐骑
+    COPY_NORMAL = 7,            --普通副本
+    FIGHTWAR_NANZHENG = 8,      --南征北战
+    STAR_PANEL = 9,             --星运
+    DIANJIANGTAI = 11,
+    SHOP = 12,
+    ROLE_BAG = 13,              --武将背包
+    ITEM_BAG = 14,              --物品背包
+    EMAIL = 15,                 --邮件
+    CHAT = 16,                  --聊天
+    FRIEND = 17,                --好友
+    FULI = 18,                  --福利
+    ACTIVITY = 19,              --活动
+    SEVEN_DAYS = 20,            --七天
+    SHOU_CHONG = 21,            --首充
+
+    CAMPS_RUSH = 22,            --闯连营
+    ARENA = 23,                 --竞技场
+    SHENBING_COPY = 24,         --神兵副本
+    FIGHTWAR_YUANMEN = 25,      --辕门挑战
+    INSCRIPTION_COPY = 26,      --命签副本
+    GRAVE_COPY = 27,            --摸金副本
+    FIGHTWAR_WORLDBOSS = 28,    --上古巨兽
+    COPY_ELITE = 29,            --精英副本
+    TASK_DAILY = 30,            --日常任务
+    FIGHTWAR_SHENSHOU = 31,     --神兽试炼
+    -- FIGHTWAR_TONGQUE = 32,     --铜雀台
+    -- FIGHTWAR_HUARONG = 33,     --华容道
+    -- FIGHTWAR_SHENBING = 34,     --神兵台
+    -- FIGHTWAR_QIANLI = 35,     --千里走单骑
+
+
+    HUNT = 36,                  --猎苑
+    GOD_BEAST = 37,              --神兽
+    GUILD_WAR = 38,             --军团争霸
+    LIEZHUAN = 39,              --列傳
+    SHANG_CHENG = 40,           --商城  
+    YUE_KA = 41,                --月卡
+    BUY_STRENGTH = 42,          --购买体力
+    GUILD_HUSONG = 43,          --军团护送
+    ZHUANPAN = 44,              --转盘
+    DUOBAO = 45,                --夺宝
+    HORSERACE = 46,             --赛马
+    DOWNLOAD = 47,              --下载
+    JIXINGGAOZHAO = 48,         --吉星高照
+    LIEZHUAN_WEI = 103,              --三国列传 - 魏传
+    LIEZHUAN_SHU = 104,              --三国列传 - 蜀传
+    LIEZHUAN_WU = 105,              --三国列传 - 吴传
+    LIEZHUAN_QUN = 106,              --三国列传 - 群传
+    FRIEND_ASSITS = 107,           --好友互助
+    QUNXIONGZHULU = 108,         --群雄逐鹿
+    DRAGON_QINGLONG = 6,        --神兽 - 青龙
+    DRAGON_BAIHU = 101,         --神兽 - 白虎
+    DRAGON_ZHUQUE = 4,          --神兽 - 朱雀
+    DRAGON_XUANWU = 102,        --神兽 - 玄武
+    GUILD_BOSS = 49             --军团讨伐
+}
+
+SysOpenType = {
+    Level = 1,
+    GetDragon = 2,
+    CopyBeClear = 3,
+    GuildLevel = 4,
+    StarPanelLevel = 5,
+}

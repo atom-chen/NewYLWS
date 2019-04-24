@@ -1,0 +1,157 @@
+fileFormatVersion: 2
+guid: 67301b0c976b6344c9dc99e257cfa182
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: battle flag
+    100002: //RootNode
+    100004: battle_flag_bone001
+    100006: battle_flag_bone002
+    100008: battle_flag_bone003
+    100010: battle_flag_bone004
+    100012: battle_flag_bone005
+    100014: battle_flag_bone006
+    100016: battle_flag_bone007
+    100018: battle_flag_bone008
+    100020: battle_flag_bone009
+    100022: battle_flag_bone010
+    100024: battle_flag_bone011
+    100026: battle_flag_bone012
+    100028: battle_flag_bone013
+    100030: battle_flag_bone014
+    100032: battle_flag_bone015
+    400000: battle flag
+    400002: //RootNode
+    400004: battle_flag_bone001
+    400006: battle_flag_bone002
+    400008: battle_flag_bone003
+    400010: battle_flag_bone004
+    400012: battle_flag_bone005
+    400014: battle_flag_bone006
+    400016: battle_flag_bone007
+    400018: battle_flag_bone008
+    400020: battle_flag_bone009
+    400022: battle_flag_bone010
+    400024: battle_flag_bone011
+    400026: battle_flag_bone012
+    400028: battle_flag_bone013
+    400030: battle_flag_bone014
+    400032: battle_flag_bone015
+    4300000: battle flag
+    7400000: Take 001
+    9500000: //RootNode
+    13700000: battle flag
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations:
+    - serializedVersion: 16
+      name: Take 001
+      takeName: Take 001
+      firstFrame: 0
+      lastFrame: 50
+      wrapMode: 0
+      orientationOffsetY: 0
+      level: 0
+      cycleOffset: 0
+      loop: 0
+      loopTime: 0
+      loopBlend: 0
+      loopBlendOrientation: 0
+      loopBlendPositionY: 0
+      loopBlendPositionXZ: 0
+      keepOriginalOrientation: 0
+      keepOriginalPositionY: 1
+      keepOriginalPositionXZ: 0
+      heightFromFeet: 0
+      mirror: 0
+      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
+      curves: []
+      events: []
+      transformMask:
+      - path: 
+        weight: 1
+      - path: battle flag
+        weight: 1
+      - path: battle_flag_bone001
+        weight: 1
+      - path: battle_flag_bone001/battle_flag_bone005
+        weight: 1
+      - path: battle_flag_bone001/battle_flag_bone005/battle_flag_bone004
+        weight: 1
+      - path: battle_flag_bone001/battle_flag_bone005/battle_flag_bone004/battle_flag_bone003
+        weight: 1
+      - path: battle_flag_bone001/battle_flag_bone005/battle_flag_bone004/battle_flag_bone003/battle_flag_bone002
+        weight: 1
+      - path: battle_flag_bone001/battle_flag_bone009
+        weight: 1
+      - path: battle_flag_bone001/battle_flag_bone009/battle_flag_bone008
+        weight: 1
+      - path: battle_flag_bone001/battle_flag_bone009/battle_flag_bone008/battle_flag_bone007
+        weight: 1
+      - path: battle_flag_bone001/battle_flag_bone009/battle_flag_bone008/battle_flag_bone007/battle_flag_bone006
+        weight: 1
+      - path: battle_flag_bone001/battle_flag_bone012
+        weight: 1
+      - path: battle_flag_bone001/battle_flag_bone012/battle_flag_bone011
+        weight: 1
+      - path: battle_flag_bone001/battle_flag_bone012/battle_flag_bone011/battle_flag_bone010
+        weight: 1
+      - path: battle_flag_bone001/battle_flag_bone015
+        weight: 1
+      - path: battle_flag_bone001/battle_flag_bone015/battle_flag_bone014
+        weight: 1
+      - path: battle_flag_bone001/battle_flag_bone015/battle_flag_bone014/battle_flag_bone013
+        weight: 1
+      maskType: 0
+      maskSource: {instanceID: 0}
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: .00999999978
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 

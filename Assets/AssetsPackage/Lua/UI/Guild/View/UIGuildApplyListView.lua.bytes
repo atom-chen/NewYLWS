@@ -1,0 +1,130 @@
+local table_insert = table.insert
+local table_remove = table.remove
+local string_split = string.split
+local table_findIndex = table.findIndex
+
+local UIGuildApplyListView = BaseClass("UIGuildApplyListView", UIBaseView)
+local base = UIBaseView
+
+local GameObject = CS.UnityEngine.GameObject
+local GuildMgr = Player:GetInstance().GuildMgr
+local GuildApplyItem = require "UI.Guild.View.GuildApplyItem"
+
+function UIGuildApplyListView:OnCreate()
+
+    base.OnCreate(self)
+
+    self.m_applyItemList = {}
+
+    self:InitView()
+end
+
+
+function UIGuildApplyListView:OnEnable(...)
+   
+    base.OnEnable(self, ...)
+
+    GuildMgr:ReqApplyList()
+end
+
+function UIGuildApplyListView:OnDisable(...)
+   
+    for i, v in ipairs(self.m_applyItemList) do
+        v:Delete()
+    end
+    self.m_applyItemList = {}
+
+    self.m_applyList = nil
+
+    base.OnDisable(self)
+end
+
+
+function UIGuildApplyListView:InitView()
+    self.m_closeBtn, self.m_applyItemPrefab, self.m_itemContent = UIUtil.GetChildTransforms(self.transform, {
+        "CloseBtn",
+        "ApplyItemPrefab",
+        "Container/ItemScrollView/Viewport/ItemContent"
+    })
+
+    self.m_applyItemPrefab = self.m_applyItemPrefab.gameObject
+
+    local btnNameTexts = string_split(Language.GetString(1366), "|")
+    local titleText = UIUtil.FindText(self.transform, "Container/TitleBg/TitleText")
+    titleText.text = btnNameTexts[3]
+
+    self.m_scrollView = self:AddComponent(LoopScrowView, "Container/ItemScrollView/Viewport/ItemContent", Bind(self, self.UpdateApplyItem))
+
+    local function onClick(go, x, y)
+        if go.name == "CloseBtn" then
+            self:CloseSelf()   
+        end
+    end
+   
+    UIUtil.AddClickEvent(self.m_closeBtn.gameObject, onClick)
+end
+
+function UIGuildApplyListView:OnAddListener()
+	base.OnAddListener(self)
+	
+     self:AddUIListener(UIMessageNames.MN_GUILD_APPLY_LIST, self.UpdateApplyList)
+     self:AddUIListener(UIMessageNames.MN_EXAMINE_GUILD, self.ExamineBack)
+    
+end
+
+function UIGuildApplyListView:OnRemoveListener()
+	base.OnRemoveListener(self)
+	
+    self:RemoveUIListener(UIMessageNames.MN_GUILD_APPLY_LIST, self.UpdateApplyList)
+    self:RemoveUIListener(UIMessageNames.MN_EXAMINE_GUILD, self.ExamineBack)
+end
+
+function UIGuildApplyListView:UpdateApplyList(apply_list)
+
+    if not apply_list then
+        return 
+    end
+
+    self.m_applyList = apply_list
+
+    if #self.m_applyItemList == 0 then
+        for i = 1, 9 do
+            local go = GameObject.Instantiate(self.m_applyItemPrefab)
+            local applyItem = GuildApplyItem.New(go, self.m_itemContent)
+            table_insert(self.m_applyItemList, applyItem)
+        end
+        self.m_scrollView:UpdateView(true, self.m_applyItemList, self.m_applyList)
+    else
+        self.m_scrollView:UpdateView(false, self.m_applyItemList, self.m_applyList)
+    end
+
+end
+
+function UIGuildApplyListView:UpdateApplyItem(item, realIndex)
+    if self.m_applyList then
+        if item and realIndex > 0 and realIndex <= #self.m_applyList then
+            item:UpdateData(self.m_applyList[realIndex])
+        end
+    end
+end
+
+function UIGuildApplyListView:ExamineBack(uid, result)
+    if self.m_applyList then
+
+        if result == 0 then
+            local findIndex = table_findIndex(self.m_applyList, function(v)
+                return v.user_brief and v.user_brief.uid == uid
+            end)
+            
+            if findIndex > 0 then
+                table_remove(self.m_applyList, findIndex)
+            end
+        end
+
+
+        self.m_scrollView:UpdateView(false, self.m_applyItemList, self.m_applyList)
+    end
+end
+
+
+return UIGuildApplyListView

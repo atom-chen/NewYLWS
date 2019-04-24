@@ -1,0 +1,98 @@
+local table_insert = table.insert
+local string_format = string.format
+
+local UIGuildGetAwardView = BaseClass("UIGuildGetAwardView", UIBaseView)
+local base = UIBaseView
+
+local GameObject = CS.UnityEngine.GameObject
+local GuildAwardItem = require "UI.Guild.View.GuildAwardItem"
+
+local Award_Type_Worship = 1
+local Award_Type_GuildWar = 2
+
+function UIGuildGetAwardView:OnCreate()
+    base.OnCreate(self)
+
+    self.m_worshipAwardItemList = {}
+
+    self.m_closeBtn, self.m_beWorshipedAwardParent, self.m_awardItmePrefab = UIUtil.GetChildTransforms(self.transform, {
+        "CloseBtn",
+        "Container/Content/BeWorshipedAwardList",
+        "AwardItmePrefab"
+    })
+
+    local guildWarAwardText, getAwardBtnText
+    self.m_beWorshipedCountText, getAwardBtnText, guildWarAwardText = UIUtil.GetChildTexts(self.transform, {
+        "Container/Content/BeWorshipedCountText",
+        "Container/Content/GetAwardBtn/GetAwardBtnText",
+        "Container/Content/GuildWarAwardText"
+    })
+   
+    guildWarAwardText.text = Language.GetString(1383)
+    getAwardBtnText.text = Language.GetString(1380)
+
+    self.m_awardItmePrefab = self.m_awardItmePrefab.gameObject
+
+    local function onClick(go, x, y)
+        if go.name == "CloseBtn" then
+            self:CloseSelf()   
+        end
+    end
+    UIUtil.AddClickEvent(self.m_closeBtn.gameObject, onClick)
+end
+
+function UIGuildGetAwardView:OnEnable(...)
+   
+    base.OnEnable(self, ...)
+
+    _, awardList, be_worshiped_count = ...
+    
+    self:UpateData(awardList)
+end
+
+
+function UIGuildGetAwardView:UpateData(awardList, be_worshiped_count)
+    if not awardList then
+        return
+    end
+
+    self:UpdateWorshipAwardItemList()
+    self.m_beWorshipedCountText.text = string_format(Language.GetString(1381), be_worshiped_count)
+end
+
+function UIGuildGetAwardView:UpdateWorshipAwardItemList()
+    if #self.m_worshipAwardItemList == 0 then
+        for i = 1, 2 do
+            local go = GameObject.Instantiate(self.m_awardItmePrefab)
+            local awardItem = GuildAwardItem.New(go, self.m_beWorshipedAwardParent)
+            awardItem:SetAnchoredPosition(Vector3.New(345.2 * (i - 1), 0, 0))
+            table_insert(self.m_worshipAwardItemList, awardItem)
+        end
+    end
+
+    for i, v in ipairs(awardList) do
+        if v and v.type == Award_Type_Worship then
+            if v.item_list then
+                local item = v.item_list[1]
+                self.m_worshipAwardItemList[1]:UpdateData(item:GetItemID(), item:GetItemCount())
+            end
+            if v.award_yuanbao then
+                self.m_worshipAwardItemList[2]:UpdateData(ItemDefine.YuanBao_ID, award_yuanbao)
+            end
+            break
+        end
+    end
+end
+
+
+function UIGuildGetAwardView:OnDisable()
+	for i, v in ipairs(self.m_worshipAwardItemList) do
+        v:Delete()
+    end
+    self.m_worshipAwardItemList = {}
+
+	base.OnDisable(self)
+end
+
+
+return UIGuildGetAwardView

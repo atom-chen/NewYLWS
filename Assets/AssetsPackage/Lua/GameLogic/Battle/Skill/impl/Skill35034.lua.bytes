@@ -1,0 +1,6 @@
+
+local SkillBase = require "GameLogic.Battle.Skill.SkillBase"
+local Skill35034 = BaseClass("Skill35034", SkillBase)
+
+
+return Skill35034

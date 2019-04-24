@@ -1,0 +1,214 @@
+
+local ImageConfig = ImageConfig
+local UILogicUtil = UILogicUtil
+local UIUtil = UIUtil
+local Language = Language
+local GameUtility = CS.GameUtility
+local string_format = string.format
+local math_ceil = math.ceil
+local math_floor = math.floor
+local MountMgr = Player:GetInstance():GetMountMgr()
+local ItemMgr = Player:GetInstance():GetItemMgr()
+local UserMgr = Player:GetInstance():GetUserMgr()
+
+local GardenItem = BaseClass("GardenItem", UIBaseItem)
+local base = UIBaseItem
+
+function GardenItem:OnCreate()
+    base.OnCreate(self)
+
+    self.m_gardenNameText, self.m_levelUpTimeText = UIUtil.GetChildTexts(self.transform, {
+        "GardenBg/Text",
+        "LevelUpTiembg/Text",
+    })
+
+    self.m_redPointGo, self.m_maintainGo, self.m_LevelUpTimeGo, self.m_inputBtn = UIUtil.GetChildTransforms(self.transform, {
+        "GardenBg/redPoint",
+        "GardenBg/maintain",
+        "LevelUpTiembg",
+        "Input"
+    })
+    self.m_redPointGo = self.m_redPointGo.gameObject
+    self.m_maintainGo = self.m_maintainGo.gameObject
+    self.m_LevelUpTimeGo = self.m_LevelUpTimeGo.gameObject
+
+    self.m_redPointGo:SetActive(false)
+    self.m_maintainGo:SetActive(false)
+    self.m_LevelUpTimeGo:SetActive(false)
+    
+    self.m_gardenImg = UIUtil.AddComponent(UIImage, self, "", AtlasConfig.Common)
+
+    self.m_id = 0
+    self.m_level = 0
+    self.m_status = 0
+    self.m_finishTime = 0
+    self.m_isLevelUp = true
+
+    local function onClick(go)
+        if self.m_status == 1 then
+            return
+        end
+        if go.name == "Input" then
+
+            TimelineMgr:GetInstance():TriggerEvent(SequenceEventType.CLICK_UI, "GardenItem")
+
+            if self.m_status == 0 or  self.m_status == 10 then
+                UIManagerInst:OpenWindow(UIWindowNames.UIHuntTips, Language.GetString(3524), nil, Language.GetString(3523),
+                    Bind(self, self.LevelUpGarden), Language.GetString(3548), Bind(self, self.MountAttrClick))
+            elseif self.m_status == 4 then
+                UIManagerInst:OpenWindow(UIWindowNames.UIHuntTips, Language.GetString(3522), Bind(self, self.MaintainGarden),
+                    Language.GetString(3525), Bind(self, self.LevelUpGarden), Language.GetString(3548), Bind(self, self.MountAttrClick))
+            elseif self.m_status == 3 then
+                UIManagerInst:OpenWindow(UIWindowNames.UIHuntTips, Language.GetString(3524), nil, Language.GetString(3525),
+                    Bind(self, self.LevelUpGarden), Language.GetString(3548), Bind(self, self.MountAttrClick))
+            else
+                UIManagerInst:OpenWindow(UIWindowNames.UIHuntTips, Language.GetString(3522), Bind(self, self.MaintainGarden),
+                    Language.GetString(3523), Bind(self, self.LevelUpGarden), Language.GetString(3548), Bind(self, self.MountAttrClick))
+            end
+        end
+    end
+    UIUtil.AddClickEvent(self.m_inputBtn.gameObject, onClick)
+end
+
+function GardenItem:MaintainGarden()
+    if self.m_status == 4 then
+        UILogicUtil.FloatAlert(Language.GetString(3534))
+        return
+    end
+    UIManagerInst:OpenWindow(UIWindowNames.UIHuntMaintain, self.m_id * 100 + self.m_level, Bind(MountMgr, MountMgr.ReqMaintain, self.m_id))
+end
+
+function GardenItem:MountAttrClick()
+    UIManagerInst:OpenWindow(UIWindowNames.UIMountAttribute , self.m_id, self.m_level)
+end
+
+function GardenItem:LevelUpGarden()
+    if self.m_status == 3 or self.m_status == 4 then
+        local gameSetting = UserMgr:GetSettingData()
+        if gameSetting.hunt_levelup_reduce_cd_per_yuanbao == 0 then
+            return
+        end
+        local yuanbaoCount = math_ceil((self.m_finishTime - Player:GetInstance():GetServerTime()) / gameSetting.hunt_levelup_reduce_cd_per_yuanbao)
+        local data = {
+            titleMsg = Language.GetString(3537),
+            contentMsg = string_format(Language.GetString(3538), yuanbaoCount),
+            yuanbao = yuanbaoCount,
+            buyCallback = Bind(MountMgr, MountMgr.ReqClearLevelUpCD, self.m_id),
+        }
+        UIManagerInst:OpenWindow(UIWindowNames.UIBuyTipsDialog, data)
+    else
+        if self.m_level >= 5 then
+            UILogicUtil.FloatAlert(Language.GetString(3535))
+            return
+        end
+        local huntCfg = ConfigUtil.GetHuntCfgByID(self.m_id)
+        UIManagerInst:OpenWindow(UIWindowNames.UIHuntLevelUp, self.m_id * 100 + self.m_level, huntCfg.name, self.m_level, Bind(MountMgr, MountMgr.ReqHuntLevelUp, self.m_id))
+    end
+end
+
+function GardenItem:SetData(id, level, status, time)
+    if not id then
+        return
+    end
+    local huntCfg = ConfigUtil.GetHuntCfgByID(id)
+    if not huntCfg then
+        return
+    end
+    self.m_id = id
+    self.m_level = level or 0
+    self.m_status = status or 0
+    local levelUpCfg = ConfigUtil.GetHuntLevelUpCfgByID(id * 100 + level)
+    self.m_gardenImg:SetAtlasSprite(math_ceil(id)..".png", true, ImageConfig.Hunt)
+    GameUtility.SetUIGray(self.m_gardenImg.gameObject, false)
+    self.m_gardenNameText.text = string_format(Language.GetString(3528), huntCfg.name, level)
+    self.m_maintainGo:SetActive(false)
+    self.m_LevelUpTimeGo:SetActive(false)
+    self.m_redPointGo:SetActive(false)
+    if status == 1 then
+        GameUtility.SetUIGray(self.m_gardenImg.gameObject, true)
+        self.m_gardenNameText.text = Language.GetString(3527)
+    elseif status == 2 then
+        self.m_maintainGo:SetActive(true)
+    elseif status == 3 then
+        self.m_LevelUpTimeGo:SetActive(true)
+        self.m_finishTime = time 
+        self.m_isLevelUp = false
+    elseif status == 4 then
+        self.m_LevelUpTimeGo:SetActive(true)
+        self.m_finishTime = time 
+        self.m_isLevelUp = false
+    elseif status == 10 then
+        if self:CanLevelUp(levelUpCfg) then
+            self.m_redPointGo:SetActive(true)
+        else
+            self.m_redPointGo:SetActive(false)
+        end
+        self.m_maintainGo:SetActive(false)
+    elseif status == 12 then
+        self.m_maintainGo:SetActive(true)
+        self.m_redPointGo:SetActive(false)
+    end
+
+end
+
+function GardenItem:CanLevelUp(levelUpCfg)
+    local itemOneCount, itemTwoCount, itemThreeCount, needOneCount, needTwoCount, needThreeCount
+    local canLevelUp = true
+    if levelUpCfg.levelup_item_id1 > 0 then
+        itemOneCount = ItemMgr:GetItemCountByID(levelUpCfg.levelup_item_id1)
+        needOneCount = levelUpCfg.levelup_item_count1
+    end
+    if levelUpCfg.levelup_item_id2 > 0 then
+        itemTwoCount = ItemMgr:GetItemCountByID(levelUpCfg.levelup_item_id2)
+        needTwoCount = levelUpCfg.levelup_item_count2
+    end
+    if levelUpCfg.levelup_item_id3 > 0 then
+        itemThreeCount = ItemMgr:GetItemCountByID(levelUpCfg.levelup_item_id3)
+        needThreeCount = levelUpCfg.levelup_item_count3
+    end
+    if itemOneCount then
+        if needOneCount > itemOneCount then
+            canLevelUp = false
+        end
+    end
+    if itemTwoCount then
+        if needTwoCount > itemTwoCount then
+            canLevelUp = false
+        end
+    end
+    if itemThreeCount then
+        if needThreeCount > itemThreeCount then
+            canLevelUp = false
+        end
+    end
+    return canLevelUp
+end
+
+function GardenItem:Update()
+
+    if self.m_finishTime > 0 then
+        local curtime = Player:GetInstance():GetServerTime()
+        local leftTime = self.m_finishTime - curtime
+        self.m_levelUpTimeText.text = string_format(Language.GetString(3526), self:GetLeftTimeText(leftTime))
+    else
+        if not self.m_isLevelUp then
+            self.m_isLevelUp = true
+            MountMgr:ReqHuntPanel()
+        end
+    end
+end
+
+function GardenItem:GetLeftTimeText(time)
+    local hour = math_floor(time / 3600)
+    if hour < 24 then
+        return hour.."时"
+    else
+        if hour % 24 == 0 then
+            return math_floor(hour / 24).."天"
+        else
+            return math_floor(hour / 24).."天"..(hour % 24).."时"
+        end
+    end
+end
+
+return GardenItem

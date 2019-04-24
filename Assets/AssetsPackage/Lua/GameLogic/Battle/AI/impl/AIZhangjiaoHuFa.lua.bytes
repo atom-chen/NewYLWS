@@ -1,0 +1,106 @@
+local ConfigUtil = ConfigUtil
+local SkillCheckResult = SkillCheckResult
+local SkillUtil = SkillUtil
+local ActorManagerInst = ActorManagerInst
+local CtlBattleInst = CtlBattleInst
+
+local AIManual = require "GameLogic.Battle.AI.AIManual"
+local AIZhangjiaoHuFa = BaseClass("AIZhangjiaoHuFa", AIManual)
+
+function AIZhangjiaoHuFa:__init()
+    self.m_atkTargetID = 0
+end
+
+function AIZhangjiaoHuFa:GetAiType()
+    return BattleEnum.AITYPE_ZHANGJIAO_HUFA
+end
+
+function AIZhangjiaoHuFa:AI(deltaMS)
+    if not self:CheckSpecialState(deltaMS) then
+        return
+    end
+
+    if not self:CanAI() then
+        return
+    end
+
+    local currState = self.m_selfActor:GetCurrStateID()
+    if currState == BattleEnum.ActorState_IDLE or currState == BattleEnum.ActorState_MOVE then        
+        if self.m_currTargetActorID == 0 then
+            local tmpTarget = self:FindTarget()
+            if not tmpTarget then
+                self:OnNoTarget()
+            else
+                self:SetTarget(tmpTarget:GetActorID())
+            end
+        end
+
+        if self.m_currTargetActorID ~= 0 then
+            local target = ActorManagerInst:GetActor(self.m_currTargetActorID)
+            if not target or not target:IsLive() then
+                self:SetTarget(0)
+                return
+            end
+
+            local selfProf = self.m_selfActor:GetProf()
+            if selfProf == CommonDefine.PROF_1 or selfProf == CommonDefine.PROF_3 then
+                if target:GetProf() == CommonDefine.PROF_2 then
+                    local profTarget = CtlBattleInst:GetLogic():GetNearestProfTarget(self.m_selfActor)
+                    if profTarget then
+                        self:SetTarget(profTarget:GetActorID())
+                        target = profTarget
+
+                    end
+                end
+            end
+
+            local p = target:GetPosition()
+            local selectSkill, chkRet = self:SelectSkill(target, self:AutoSelectDazhao())
+
+           
+            if selectSkill and chkRet then
+                if chkRet.newTarget then
+                    self:SetTarget(chkRet.newTarget:GetActorID())
+                    target = chkRet.newTarget
+                end
+                p = chkRet.pos
+            end
+
+            local normalRet = SKILL_CHK_RESULT.ERR
+            if not selectSkill then
+                normalRet, selectSkill = self:SelectNormalSkill(target)
+                if selectSkill then
+                    local atkTarget = ActorManagerInst:GetActor(self.m_atkTargetID)
+                    if atkTarget and atkTarget:IsLive() then
+                        self.m_currTargetActorID = self.m_atkTargetID
+                        target = atkTarget
+                    end
+                end
+            end
+
+            if selectSkill then
+                self:PerformSkill(target, selectSkill, p, SKILL_PERFORM_MODE.AI)
+            else
+                if normalRet == SKILL_CHK_RESULT.TARGET_TYPE_UNFIT then
+                    self:SetTarget(0)
+                end
+
+                if self:ShouldFollowEnemy(normalRet) then
+                    
+                    self:Follow(target, deltaMS)
+                elseif self:ShouldBackAway(target) then
+                    local wujiangCfg = ConfigUtil.GetWujiangCfgByID(self.m_selfActor:GetWujiangID())
+                    self:BackAway(target, wujiangCfg.backaway_dis)                
+                else
+                    self:TryStop(target:GetPosition())
+                end
+            end
+        end
+    end
+end
+
+function AIZhangjiaoHuFa:SetAtkTargetID(targetID) -- 普攻集火对象
+    self.m_atkTargetID = targetID
+end
+
+return AIZhangjiaoHuFa

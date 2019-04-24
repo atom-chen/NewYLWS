@@ -1,0 +1,324 @@
+local guildWarMgr = Player:GetInstance():GetGuildWarMgr()
+local UIGameObjectLoaderInst = UIGameObjectLoader:GetInstance() 
+local GuildWarRankItemClass = require "UI.GuildWar.GuildWarRankItem"
+local GuildWarRankItemPrefab = "UI/Prefabs/Guild/UIGuildWarRankItem.prefab"
+local TypeToggle = typeof(CS.UnityEngine.UI.Toggle)
+local BagItem = require "UI.UIBag.View.BagItem"
+local ItemIconParam = require "DataCenter.ItemData.ItemIconParam"
+local BagItemPrefab = TheGameIds.CommonBagItemPrefab
+local string_format = string.format
+local LoopScrollView = LoopScrowView
+
+local GuildWarRankView = BaseClass("GuildWarRankView", UIBaseView)
+local base = UIBaseView 
+
+local TOGGLETYPE = {
+    CUR = 1,
+    SELF = 2,
+    ALL = 3,
+    NONE = 4,
+} 
+local ToggleName = "Toggle"
+
+function GuildWarRankView:OnCreate()
+    base.OnCreate(self)
+    self.m_rankItemList = {}
+    self.m_item1List = {} 
+    self.m_item2List = {} 
+    self.m_item3List = {} 
+ 
+    self:InitView()
+    self:HandleClick()
+end
+
+function GuildWarRankView:InitView()
+    local toggle1Tr, toggle2Tr, toggle3Tr
+
+    self.m_blackBgTr,
+    toggle1Tr,
+    toggle2Tr,
+    toggle3Tr,
+    self.m_itemContentTr,
+    self.m_rank1AwardContentTr,
+    self.m_rank2AwardContentTr,
+    self.m_rank3AwardContentTr = UIUtil.GetChildTransforms(self.transform, {
+        "BlackBg",
+        "Panel/RightPanel/Top/Toggles/Toggle1",
+        "Panel/RightPanel/Top/Toggles/Toggle2",
+        "Panel/RightPanel/Top/Toggles/Toggle3",
+        "Panel/RightPanel/ItemScrollView/Viewport/ItemContent",
+        "Panel/DownLeftPanel/RankContent/Rank1/AwardContent",
+        "Panel/DownLeftPanel/RankContent/Rank2/AwardContent",
+        "Panel/DownLeftPanel/RankContent/Rank3/AwardContent",
+    })
+    
+    local toggle1, toggle2, toggle3
+    toggle1 = toggle1Tr:GetComponent(TypeToggle)
+    toggle2 = toggle2Tr:GetComponent(TypeToggle)
+    toggle3 = toggle3Tr:GetComponent(TypeToggle)
+    self.m_toggleList = {toggle1, toggle2, toggle3}
+
+    self.m_titleTxt,
+    self.m_curToggleTxt,
+    self.m_selfToggleTxt,
+    self.m_allToggleTxt,
+    self.m_title1Txt,
+    self.m_title2Txt,
+    self.m_title3Txt,
+    self.m_title4Txt,
+    self.m_upLeftTitleTxt,
+    self.m_upLeftRoundDes1Txt,
+    self.m_upLeftRoundTimeDes1Txt,
+    self.m_upLeftTime1Txt,
+    self.m_upLeftRoundDes2Txt,
+    self.m_upLeftRoundTimeDes2Txt,
+    self.m_upLeftTime2Txt,
+    self.m_downLeftTitleTxt,
+    self.m_rank1NumTxt,
+    self.m_rank2NumTxt,
+    self.m_rank3NumTxt = UIUtil.GetChildTexts(self.transform, {  
+        "Panel/TitleBg/TitleTxt", 
+        "Panel/RightPanel/Top/Toggles/Toggle1/Label",
+        "Panel/RightPanel/Top/Toggles/Toggle2/Label",
+        "Panel/RightPanel/Top/Toggles/Toggle3/Label",
+        "Panel/RightPanel/Top/TitleContent/Title1",
+        "Panel/RightPanel/Top/TitleContent/Title2",
+        "Panel/RightPanel/Top/TitleContent/Title3",
+        "Panel/RightPanel/Top/TitleContent/Title4",
+        "Panel/UpLeftPanel/TitleContent/TitleTxt",
+        "Panel/UpLeftPanel/RoundDes1",
+        "Panel/UpLeftPanel/RoundTimeDes1",
+        "Panel/UpLeftPanel/RoundTimeDes1/RoundTime1",
+        "Panel/UpLeftPanel/RoundDes2",
+        "Panel/UpLeftPanel/RoundTimeDes2",
+        "Panel/UpLeftPanel/RoundTimeDes2/RoundTime2",
+        "Panel/DownLeftPanel/TitleBg/TitleTxt",
+        "Panel/DownLeftPanel/RankContent/Rank1/NumTxt",
+        "Panel/DownLeftPanel/RankContent/Rank2/NumTxt",
+        "Panel/DownLeftPanel/RankContent/Rank3/NumTxt",
+    })   
+
+    self.m_itemLoopScrollView = self:AddComponent(LoopScrollView, "Panel/RightPanel/ItemScrollView/Viewport/ItemContent", Bind(self, self.UpdateRankItem), false)
+
+    self.m_titleTxt.text = Language.GetString(2368)
+    self.m_curToggleTxt.text = Language.GetString(2361)
+    self.m_selfToggleTxt.text = Language.GetString(2362)
+    self.m_allToggleTxt.text = Language.GetString(2363)
+    self.m_title1Txt.text = Language.GetString(2364)
+    self.m_title2Txt.text = Language.GetString(2365)
+    self.m_title3Txt.text = Language.GetString(2366)
+    self.m_title4Txt.text = Language.GetString(2367) 
+    self.m_downLeftTitleTxt.text = Language.GetString(2357)
+end
+
+function GuildWarRankView:OnEnable(...)
+    base.OnEnable(self, ...)  
+
+    local _, panelInfo = ...
+    
+    if not panelInfo then
+        return
+    end
+    self.m_curWeekEndTime = panelInfo.curr_week_end_time
+    self.m_nextWeekStartTime = panelInfo.next_week_start_time
+    self.m_curRankCache = panelInfo.curr_match_rank_list
+    self.m_selfRankCache = panelInfo.self_server_rank_list
+    self.m_allRankCache = panelInfo.all_server_rank_list 
+ 
+    self.m_toggleType = TOGGLETYPE.CUR
+    self:SwitchToggleType(self.m_toggleType) 
+end
+
+function GuildWarRankView:SwitchToggleType(toggleType)  
+    if toggleType <= 0 or toggleType >= TOGGLETYPE.NONE then
+        return
+    end
+
+    if toggleType == TOGGLETYPE.CUR then
+        self.m_rankCacheList = self.m_curRankCache
+    elseif toggleType == TOGGLETYPE.SELF then
+        self.m_rankCacheList = self.m_selfRankCache
+    elseif toggleType == TOGGLETYPE.ALL then
+        self.m_rankCacheList = self.m_allRankCache
+    end 
+    self.m_toggleType = toggleType
+    self:UpdateData()
+end
+
+function GuildWarRankView:UpdateData() 
+    local warBriefData = guildWarMgr:GetWarBriefData()
+
+    if warBriefData then
+        local season = warBriefData.war_season
+        local round = warBriefData.war_week
+ 
+        self.m_upLeftTitleTxt.text = string_format(Language.GetString(2354), season)
+        
+        local roundDes1, roundDes2
+        if round == 3 then
+            roundDes1 = Language.GetString(2359)     
+
+            roundDes2 = Language.GetString(2360)     
+            self.m_upLeftRoundTimeDes2Txt.text = Language.GetString(2346)    
+        else
+            roundDes1 = string_format(Language.GetString(2355), round)
+
+            roundDes2 = string_format(Language.GetString(2356), round + 1)  
+            self.m_upLeftRoundTimeDes2Txt.text = Language.GetString(2347)    
+        end
+        self.m_upLeftRoundDes1Txt.text = Language.GetString(2348).." "..roundDes1 
+        self.m_upLeftRoundTimeDes1Txt.text = Language.GetString(2346)
+        self.m_upLeftTime1Txt.text = os.date("%Y-%m-%d  %H:%M",self.m_curWeekEndTime)
+ 
+        self.m_upLeftRoundDes2Txt.text = Language.GetString(2349).." "..roundDes2
+        self.m_upLeftTime2Txt.text = os.date("%Y-%m-%d  %H:%M",self.m_nextWeekStartTime)
+    end
+
+    self:CreateRankItem()
+    self:SetAward()
+end 
+
+function GuildWarRankView:CreateRankItem()
+    if not self.m_rankCacheList then
+        return
+    end 
+    local rank_list = self.m_rankCacheList or {} 
+    if #self.m_rankItemList <= 0 then
+        self.m_itemLoaderSeq = UIGameObjectLoaderInst:PrepareOneSeq()
+        UIGameObjectLoaderInst:GetGameObjects(self.m_itemLoaderSeq, GuildWarRankItemPrefab, 10, function(objs)
+            self.m_itemLoaderSeq = 0
+            if objs then
+                for i = 1, #objs do
+                    local item = GuildWarRankItemClass.New(objs[i], self.m_itemContentTr, GuildWarRankItemPrefab)
+                    table.insert(self.m_rankItemList, item)
+                end
+            end
+            self.m_itemLoopScrollView:UpdateView(true, self.m_rankItemList, rank_list)
+        end)
+    else
+        self.m_itemLoopScrollView:UpdateView(true, self.m_rankItemList, rank_list)
+    end
+end
+
+function GuildWarRankView:SetAward() 
+    local awardCfg1 = ConfigUtil.GetGuildWarRankAwardCfgByID(1) 
+    if awardCfg1 then 
+        self.m_rank1NumTxt.text = string_format(Language.GetString(2358), math.ceil(awardCfg1.rank_ceil), math.ceil(awardCfg1.rank_floor))
+        local awardItemList = awardCfg1.award_info
+        self:CreateAwardItem(awardItemList, self.m_rank1AwardContentTr, self.m_item1List)
+    end
+    local awardCfg2 = ConfigUtil.GetGuildWarRankAwardCfgByID(2)
+    if awardCfg2 then 
+        self.m_rank2NumTxt.text = string_format(Language.GetString(2358), math.ceil(awardCfg2.rank_ceil), math.ceil(awardCfg2.rank_floor))
+        local awardItemList = awardCfg2.award_info
+        self:CreateAwardItem(awardItemList, self.m_rank2AwardContentTr, self.m_item2List)
+    end
+    local awardCfg3 = ConfigUtil.GetGuildWarRankAwardCfgByID(3)
+    if awardCfg3 then 
+        self.m_rank3NumTxt.text = string_format(Language.GetString(2358), math.ceil(awardCfg3.rank_ceil), math.ceil(awardCfg3.rank_floor))
+        local awardItemList = awardCfg3.award_info
+        self:CreateAwardItem(awardItemList, self.m_rank3AwardContentTr, self.m_item3List)
+    end 
+end 
+
+function GuildWarRankView:CreateAwardItem(awardInfoList, parentTr, itemList)
+    if #itemList > 0 then
+        for i = 1, #itemList do
+            local awardInfo = awardInfoList[i]
+            if awardInfo then
+                local itemCfg = ConfigUtil.GetItemCfgByID(awardInfo[1])
+                local itemIconParam = ItemIconParam.New(itemCfg, awardInfo[2], nil, nil, nil, false) 
+                
+                itemList[i]:UpdateData(itemIconParam) 
+            end 
+        end
+    else
+        for _, awardInfo in pairs(awardInfoList) do
+            local awardSeq = UIGameObjectLoaderInst:PrepareOneSeq()
+            UIGameObjectLoaderInst:GetGameObject(awardSeq, BagItemPrefab, function(go)
+                if IsNull(go) then
+                    return
+                end
+    
+                local awardItem = BagItem.New(go, parentTr, BagItemPrefab)
+                awardItem:SetLocalScale(Vector3.New(0.5, 0.5, 0.5))
+                table.insert(itemList, awardItem)
+                
+                local itemCfg = ConfigUtil.GetItemCfgByID(awardInfo[1])
+                local itemIconParam = ItemIconParam.New(itemCfg, awardInfo[2], nil, nil, nil, false)
+                itemIconParam.onClickShowDetail = true
+                
+                awardItem:UpdateData(itemIconParam) 
+            end)
+        end
+    end
+end
+
+function GuildWarRankView:UpdateRankItem(item, realIndex)
+    if not item or not self.m_rankCacheList or realIndex < 1 or realIndex > #self.m_rankCacheList then
+        return
+    end
+    item:UpdateData(self.m_rankCacheList[realIndex])
+end
+
+function GuildWarRankView:HandleClick()
+    local onClick = Bind(self, self.OnClick)
+
+    UIUtil.AddClickEvent(self.m_blackBgTr.gameObject, onClick) 
+ 
+    for _, toggle in ipairs(self.m_toggleList) do
+        local toggleGo = toggle.gameObject
+        if toggleGo then 
+            UIUtil.AddClickEvent(toggleGo, onClick)
+        end
+    end
+end
+
+function GuildWarRankView:OnClick(go, x, y) 
+    if go.name == "BlackBg" then
+        self:CloseSelf()
+    elseif string.find(go.name, ToggleName) then 
+        local startIdx, endIdx = string.find(go.name, ToggleName)
+        local toggleType = string.sub(go.name, endIdx + 1, #go.name) 
+        toggleType = tonumber(toggleType) 
+        if self.m_toggleType == toggleType then
+            return
+        end
+        self:SwitchToggleType(toggleType)
+    end
+end 
+
+function GuildWarRankView:OnDisable()
+    UIGameObjectLoaderInst:CancelLoad(self.m_itemLoaderSeq)
+    if #self.m_rankItemList > 0 then
+        for _, v in ipairs(self.m_rankItemList) do
+            v:Delete()
+        end
+    end 
+    self.m_rankItemList = {}
+
+    if #self.m_item1List > 0 then
+        for i = 1, #self.m_item1List do
+            self.m_item1List[i]:Delete()
+        end
+    end
+    self.m_item1List = {}
+
+    if #self.m_item2List > 0 then
+        for i = 1, #self.m_item2List do
+            self.m_item2List[i]:Delete()
+        end
+    end
+    self.m_item2List = {}
+
+    if #self.m_item3List > 0 then
+        for i = 1, #self.m_item3List do
+            self.m_item3List[i]:Delete()
+        end
+    end
+    self.m_item3List = {}
+
+    base.OnDisable(self)
+end
+
+return GuildWarRankView

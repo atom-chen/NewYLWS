@@ -1,0 +1,84 @@
+local string_format = string.format
+local ConfigUtil = ConfigUtil
+
+local UserItemPrefab = TheGameIds.UserItemPrefab
+local UIGameObjectLoader = UIGameObjectLoader:GetInstance()
+local UserItemClass = require "UI.UIUser.UserItem"
+
+local LieZhuanMemberItem = BaseClass("LieZhuanMemberItem", UIBaseItem)
+local base = UIBaseItem
+
+function LieZhuanMemberItem:OnCreate()
+    base.OnCreate(self)
+    self:InitView()
+end
+
+function LieZhuanMemberItem:InitView()
+    self.m_nameText, self.m_serveText, self.m_waitText= UIUtil.GetChildTexts(self.transform, {
+        "nameText",
+        "serveText",
+        "waitText",
+    })
+    self.m_captain, self.m_addBtn, self.m_userHeadRoot = UIUtil.GetChildTransforms(self.transform, {
+        "captain",
+        "addBtn",
+        "userHeadRoot",
+    })
+
+    self.m_waitText.text = Language.GetString(3776)
+    self.m_userItemPrrefab = nil
+
+    local function onClick(go, x, y)
+        if go.name == "addBtn" then
+            UIManagerInst:OpenWindow(UIWindowNames.UILieZhuanInvitation)
+        end
+    end
+    UIUtil.AddClickEvent(self.m_addBtn.gameObject, onClick)
+end
+
+function LieZhuanMemberItem:SetData(isCaptain, userBrief)
+    
+    local haveMember = userBrief ~= nil
+    self.m_captain.gameObject:SetActive(isCaptain and haveMember)
+    self.m_nameText.gameObject:SetActive(haveMember)
+    self.m_serveText.gameObject:SetActive(haveMember)
+    self.m_userHeadRoot.gameObject:SetActive(haveMember)
+    self.m_waitText.gameObject:SetActive(not haveMember)
+    self.m_addBtn.gameObject:SetActive(not haveMember)
+
+    if haveMember then
+        self.m_nameText.text = userBrief.name
+        self.m_serveText.text = userBrief.dist_id
+
+        if not self.m_userItem then
+            self.m_Seq = UIGameObjectLoader:PrepareOneSeq()
+            UIGameObjectLoader:GetGameObject(self.m_Seq, UserItemPrefab, function(obj)
+                self.m_Seq = 0
+                if obj then
+                    local userItem = UserItemClass.New(obj, self.m_userHeadRoot, UserItemPrefab)
+                    if userItem then
+                        userItem:SetLocalScale(Vector3.New(1, 1, 1))
+                        self.m_userItem = userItem
+                        if userBrief.use_icon then
+                            self.m_userItem:UpdateData(userBrief.use_icon.icon, userBrief.use_icon.icon_box, userBrief.level)
+                        end
+                    end
+                end
+            end)
+        else
+            if userBrief.use_icon then
+                self.m_userItem:UpdateData(userBrief.use_icon.icon, userBrief.use_icon.icon_box, userBrief.level)
+            end
+        end
+    end
+end
+
+function LieZhuanMemberItem:OnDestroy()
+    base.OnDestroy(self)
+    if self.m_userItem then
+        self.m_userItem.Delete()
+        self.m_userItem = nil
+    end
+end
+
+return LieZhuanMemberItem

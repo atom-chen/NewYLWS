@@ -1,0 +1,241 @@
+local FixMul = FixMath.mul
+local FixFloor = FixMath.floor
+local FixSub = FixMath.sub
+local FixMod = FixMath.mod
+local FixAdd = FixMath.add
+local FixDiv = FixMath.div
+local FixIntMul = FixMath.muli
+local table_insert = table.insert
+local FixRand = BattleRander.Rand
+local SkillUtil = SkillUtil
+local GetSkillCfgByID = ConfigUtil.GetSkillCfgByID
+local BattleEnum = BattleEnum
+
+local SkillInscriptionContainer = BaseClass("SkillInscriptionContainer")
+
+function SkillInscriptionContainer:__init(actor)
+    self.m_insSkillList = {}
+    self.m_selfActor = actor
+end
+
+function SkillInscriptionContainer:__delete()
+    self.m_insSkillList = nil
+    self.m_selfActor = nil
+end
+
+function SkillInscriptionContainer:Update(deltaMS)
+    for _, skillItem in pairs(self.m_insSkillList) do
+        if skillItem then
+            skillItem:Update(deltaMS, self.m_selfActor)
+        end
+    end
+end
+
+function SkillInscriptionContainer:AddSkillItem(skillItem)
+    if not skillItem then return end
+    -- print( ' -----SkillInscriptionContainer AddSkillItem id', skillItem:GetID(), 'level', skillItem:GetSkillLevel())
+    table_insert(self.m_insSkillList, skillItem)
+end
+
+function SkillInscriptionContainer:GetInsSkillItemByIdx(index)
+    return self.m_insSkillList[index]
+end
+
+
+function SkillInscriptionContainer:PerformBegin(activeSkillCfg)
+    
+end
+
+function SkillInscriptionContainer:OnSkillPerformed(skillCfg)
+   -- 50005 50006 50014
+   for _, skillItem in pairs(self.m_insSkillList) do
+        local skillID = skillItem:GetID()
+        if skillID == 50005 then
+            if SkillUtil.IsActiveSkill(skillCfg) or SkillUtil.IsDazhao(skillCfg) then
+                skillItem:OnPerformInsSkill50005(self.m_selfActor)
+            end
+
+        elseif skillID == 50006 then
+            if SkillUtil.IsActiveSkill(skillCfg) then
+                skillItem:OnPerformInsSkill50006(skillCfg, self.m_selfActor)
+            end
+
+        elseif skillID == 50014 then
+            if SkillUtil.IsActiveSkill(skillCfg) or SkillUtil.IsDazhao(skillCfg) then
+                skillItem:OnPerformInsSkill50014(self.m_selfActor)
+            end
+
+        elseif skillID == 50034 then
+            if SkillUtil.IsAtk(skillCfg) then
+                skillItem:AddAtkCount(self.m_selfActor)
+            end
+        end
+    end
+end
+
+function SkillInscriptionContainer:GetSkillCount()
+    return #self.m_insSkillList
+end
+
+
+function SkillInscriptionContainer:OnHurtOther(target, chgVal, hurtType, skillCfg, judge)
+    -- 50003 50017 50018 50020 50021 50023 50024 50030 50034 50037
+    for _, skillItem in pairs(self.m_insSkillList) do
+        local skillID = skillItem:GetID()
+        if skillID == 50003 then
+            if SkillUtil.IsAtk(skillCfg) then
+                skillItem:OnPerformInsSkill50003(self.m_selfActor, target, chgVal, hurtType)
+            end
+
+        elseif skillID == 50017 then
+            if judge == BattleEnum.ROUNDJUDGE_BAOJI then
+                skillItem:OnPerformInsSkill50017(self.m_selfActor)
+            end
+
+        elseif skillID == 50018 then
+            if judge == BattleEnum.ROUNDJUDGE_BAOJI then
+                skillItem:OnPerformInsSkill50018(self.m_selfActor, target)
+            end
+
+        elseif skillID == 50020 then
+            if judge == BattleEnum.ROUNDJUDGE_BAOJI then
+                skillItem:OnPerformInsSkill50020(self.m_selfActor, target, chgVal)
+            end
+
+        elseif skillID == 50021 then
+            if judge == BattleEnum.ROUNDJUDGE_BAOJI then
+                skillItem:OnPerformInsSkill50021(self.m_selfActor, target, chgVal)
+            end
+
+        elseif skillID == 50023 then
+            if SkillUtil.IsAtk(skillCfg) then
+                skillItem:OnPerformInsSkill50023(self.m_selfActor, target)
+            end
+
+        elseif skillID == 50024 then
+            if SkillUtil.IsAtk(skillCfg) then
+                skillItem:OnPerformInsSkill50024(self.m_selfActor)
+            end
+
+        elseif skillID == 50030 then
+            if judge == BattleEnum.ROUNDJUDGE_BAOJI then
+                skillItem:OnPerformInsSkill50030(self.m_selfActor)
+            end
+
+        -- elseif skillID == 50034 then
+        --     if SkillUtil.IsAtk(skillCfg) then
+        --         skillItem:AddAtkCount(self.m_selfActor)
+        --     end
+            
+        elseif skillID == 50037 then
+            local targetState = target:GetStateContainer():GetState()
+            if targetState:GetStateID() == BattleEnum.ActorState_HURT then
+                local curPhase = targetState:GetStatePhase()
+                if curPhase == BattleEnum.HURTSTATE_PHASE_INSKY then
+                    skillItem:OnPerformInsSkill50037(self.m_selfActor)
+                end
+            end
+        end
+    end
+end
+
+function SkillInscriptionContainer:PreHurtOther(target, hurtType, skillCfg, judge)
+    -- 50002
+    local hurtMul = 1
+    for _, skillItem in pairs(self.m_insSkillList) do
+        local skillID = skillItem:GetID()
+        if skillID == 50002 then
+            hurtMul = FixMul(hurtMul, skillItem:OnPerformInsSkill50002(target))
+        elseif skillID == 50029 then
+            hurtMul = FixMul(hurtMul, skillItem:OnPerformInsSkill50029(target))
+        elseif skillID == 50033 then
+            if target:GetStatusContainer():IsStun() then
+                hurtMul = FixMul(hurtMul, skillItem:OnPerformInsSkill50033(self.m_selfActor))
+            end
+        end
+    end
+
+    return hurtMul
+end
+
+function SkillInscriptionContainer:PreBeHurt(target, hurtType, skillCfg, judge)
+    -- 50008 50011
+    local hurtMul = 1
+    for _, skillItem in pairs(self.m_insSkillList) do
+        local skillID = skillItem:GetID()
+        if skillID == 50008 then
+            if judge == BattleEnum.ROUNDJUDGE_BAOJI then
+                hurtMul = FixMul(hurtMul, skillItem:OnPerformInsSkill50008(self.m_selfActor))
+            end
+        elseif skillID == 50011 then
+            if SkillUtil.IsAtk(skillCfg) then
+                hurtMul =  FixMul(hurtMul, skillItem:OnPerformInsSkill50011(self.m_selfActor, target, chgVal, hurtType))
+            end
+        end
+    end
+
+    return hurtMul
+end
+
+function SkillInscriptionContainer:PreAddStatus(newStatus)
+    -- 50012 
+    for _, skillItem in pairs(self.m_insSkillList) do
+        local skillID = skillItem:GetID()
+        if skillID == 50012 then
+            if StatusUtil.IsControlType(newStatus:GetStatusType()) then
+                skillItem:OnPerformInsSkill50012(newStatus, self.m_selfActor)
+            end
+        end
+    end
+end
+
+function SkillInscriptionContainer:OnImmuneControl(newType)
+    -- 50031
+    for _, skillItem in pairs(self.m_insSkillList) do
+        local skillID = skillItem:GetID()
+        if skillID == 50031 then
+            skillItem:AddImmuneControlCount(self.m_selfActor)
+        end
+    end
+end
+
+function SkillInscriptionContainer:OnShanbi(atker)
+    -- 50026 50027 50038
+    for _, skillItem in pairs(self.m_insSkillList) do
+        local skillID = skillItem:GetID()
+        if skillID == 50026 then
+            skillItem:OnPerformInsSkill50026(self.m_selfActor, atker)
+        elseif skillID == 50027 then
+            skillItem:OnPerformInsSkill50027(self.m_selfActor)
+        elseif skillID == 50038 then
+            skillItem:OnPerformInsSkill50038(self.m_selfActor)
+        end
+    end
+end
+
+function SkillInscriptionContainer:OnBeHurt(giver, deltaHP, hurtType, reason)
+    -- 50015 50035
+    for _, skillItem in pairs(self.m_insSkillList) do
+        local skillID = skillItem:GetID()
+        if skillID == 50015 then
+            skillItem:OnPerformInsSkill50015(self.m_selfActor, deltaHP, giver)
+        elseif skillID == 50035 then
+            skillItem:AddReduceHp(FixMul(deltaHP, -1), self.m_selfActor)
+        end
+    end
+end
+
+function SkillInscriptionContainer:OnRecover(recoverTarget, skillCfg, keyFrame, chgVal, hurtType, judge, reason)
+    -- 50036
+    for _, skillItem in pairs(self.m_insSkillList) do
+        local skillID = skillItem:GetID()
+        if skillID == 50036 then
+            if reason == BattleEnum.HPCHGREASON_BY_SKILL then
+                skillItem:OnPerformInsSkill50036(self.m_selfActor)
+            end
+        end
+    end
+end
+
+return SkillInscriptionContainer
+

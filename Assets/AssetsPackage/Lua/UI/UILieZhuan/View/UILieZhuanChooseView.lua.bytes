@@ -1,0 +1,314 @@
+local GameObject = CS.UnityEngine.GameObject
+local GameUtility = CS.GameUtility
+local table_insert = table.insert
+local string_format = string.format
+local math_ceil = math.ceil
+local ConfigUtil = ConfigUtil
+local string_split = CUtil.SplitString
+local Vector3 = Vector3
+local UIGameObjectLoader = UIGameObjectLoader:GetInstance()
+local BagItemPath = TheGameIds.CommonBagItemPrefab
+local UIBagItem = require "UI.UIBag.View.BagItem"
+local ItemIconParam = require "DataCenter.ItemData.ItemIconParam"
+local LieZhuanCopyItemPath = "UI/Prefabs/LieZhuan/LieZhuanCopyItem.prefab"
+local LieZhuanCopyItem = require "UI.UILieZhuan.View.LieZhuanCopyItem"
+local LieZhuanMgr = Player:GetInstance():GetLieZhuanMgr()
+local UILieZhuanChooseView = BaseClass("UILieZhuanChooseView", UIBaseView)
+local base = UIBaseView
+local BattleEnum = BattleEnum
+
+local SceneObjPath = "UI/Prefabs/WuJiang/SceneObj.prefab"
+
+function UILieZhuanChooseView:OnCreate()    
+    base.OnCreate(self)
+    self:InitView()
+end
+
+function UILieZhuanChooseView:InitView()
+    self.m_backBtn, self.m_scrollView, self.m_dropItemContent, self.m_teamBtn,
+    self.m_aloneBtn, self.m_copyContent, self.m_wujiangRoot = UIUtil.GetChildRectTrans(self.transform, {
+        "Container/top/backBtn",
+        "Container/left/ItemScrollView",
+        "Container/right/dropScrollView/Viewport/dropItemContent",
+        "Container/right/teamBtn",
+        "Container/right/aloneBtn",
+        "Container/left/ItemScrollView/Viewport/ItemContent",
+        "Container/wujiangRoot/wujiangRoot"
+    })
+
+    local teamBtnText, aloneBtnText
+    self.m_roleNameText, self.m_limitText, self.m_awardText, teamBtnText, aloneBtnText, self.m_consumeText, self.m_describeText = UIUtil.GetChildTexts(self.transform, {
+        "Container/wujiangRoot/nameBg/nameText",
+        "Container/wujiangRoot/nameBg/limitText",
+        "Container/right/dropBg/awardText",
+        "Container/right/teamBtn/teamBtnText",
+        "Container/right/aloneBtn/aloneBtnText",
+        "Container/right/aloneBtn/consumeBg/consumeText",
+        "Container/right/describeText",
+    })
+    --self.m_countryImage = UIUtil.AddComponent(UIImage, self, "Container/right/showImage", ImageConfig.LieZhuan)
+    self.m_loopScrowContent = UIUtil.AddComponent(LoopScrowView, self, "Container/left/ItemScrollView/Viewport/ItemContent", Bind(self, self.UpdateCopyItemInfo))
+
+    self.m_detailItemBounds = GameUtility.GetRectTransWorldCorners(self.m_scrollView)
+    self.m_sCountryNameList = string_split(Language.GetString(3750), ",")
+    self.m_copyDetailItemList = {}
+    self.m_copyCfgList = {}
+    self.m_selectCopyId = 0
+    self.m_dropItemList = {}
+
+    teamBtnText.text = Language.GetString(3756)
+    aloneBtnText.text = Language.GetString(3757)
+end
+
+function UILieZhuanChooseView:OnClick(go, x, y)
+    if go.name == "backBtn" then
+        self:CloseSelf()
+    elseif go.name == "teamBtn" then
+        if LieZhuanMgr:IsLockedCopy(self.m_countryId, self.m_selectCopyId) then
+            UILogicUtil.FloatAlert(Language.GetString(3777))
+        else
+            UIManagerInst:OpenWindow(UIWindowNames.UILieZhuanTeam, self.m_selectCopyId)
+        end
+    elseif go.name == "aloneBtn" then  
+        UIManagerInst:OpenWindow(UIWindowNames.UILineupMain, BattleEnum.BattleType_LIEZHUAN, self.m_selectCopyId)    
+    end
+end
+
+function UILieZhuanChooseView:HandleClick()
+    local onClick = Bind(self, self.OnClick)
+    UIUtil.AddClickEvent(self.m_backBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_teamBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_aloneBtn.gameObject, onClick)
+end
+
+function UILieZhuanChooseView:RemoveClick()
+    UIUtil.RemoveClickEvent(self.m_backBtn.gameObject)
+    UIUtil.RemoveClickEvent(self.m_teamBtn.gameObject)
+    UIUtil.RemoveClickEvent(self.m_aloneBtn.gameObject)
+end
+
+function UILieZhuanChooseView:OnEnable(...)
+    base.OnEnable(self, ...)
+    LieZhuanMgr:ReqLiezhuanPannel()
+    self.m_countryId = LieZhuanMgr:GetSelectCountry()
+    if self.m_countryId and self.m_countryId ~= 0 then
+        if self.m_selectCopyId == 0 then
+            self.m_selectCopyId = self.m_countryId * 100 + 1
+        end
+        self:HandleClick()
+        self:CreateRoleContainer()
+        self:UpdateView()
+        self:UpdateCopyData()
+        self:UpdateDropItemByCopyId(self.m_selectCopyId)
+        self:UpdateRoleByCopyId(self.m_selectCopyId)
+    end
+end
+
+function UILieZhuanChooseView:OnDisable()
+    base.OnDisable(self)
+    self:RemoveClick()
+    self:ClearDropItemData()
+    self:DestroyRoleContainer()
+    if self.m_copyDetailItemList then
+        for i, v in ipairs(self.m_copyDetailItemList) do
+            v:Delete()
+        end
+        self.m_copyDetailItemList = {}
+    end
+
+    self.m_selectCopyId = 0
+    self.m_countryId = nil
+end
+
+function UILieZhuanChooseView:UpdateView()
+    --self.m_titleText.text = string_format(Language.GetString(3751), self.m_sCountryNameList[self.m_countryId])
+    self.m_limitText.text = string_format(Language.GetString(3753), self.m_sCountryNameList[self.m_countryId])    
+    self.m_consumeText.text = math_ceil(LieZhuanMgr:GetSingleFightNeedTili())
+    --self.m_countryImage:SetAtlasSprite(self.m_countryId..".png", false)
+end
+
+function UILieZhuanChooseView:UpdateCopyData() 
+    self.m_copyCfgList = LieZhuanMgr:GetCountryCopyCount(self.m_countryId)
+    if #self.m_copyDetailItemList == 0 then
+        self.m_loaderSeq = UIGameObjectLoader:PrepareOneSeq()
+        UIGameObjectLoader:GetGameObjects(self.m_loaderSeq, LieZhuanCopyItemPath, 16, function(objs)
+            self.m_loaderSeq = 0
+            if objs then
+                for i = 1, #objs do
+                    local copyDetailItem = LieZhuanCopyItem.New(objs[i], self.m_copyContent, LieZhuanCopyItemPath)
+                    table_insert(self.m_copyDetailItemList, copyDetailItem)
+                end
+                self.m_loopScrowContent:UpdateView(true, self.m_copyDetailItemList, self.m_copyCfgList)
+            end
+        end)
+    else
+        self.m_loopScrowContent:UpdateView(true, self.m_copyDetailItemList, self.m_copyCfgList)
+    end
+end
+
+function UILieZhuanChooseView:UpdateCopyItemInfo(item, realIndex)
+    if not item then
+        return
+    end
+    if realIndex > #self.m_copyCfgList then
+        return
+    end
+
+    local copyId = self.m_copyCfgList[realIndex].id
+    if copyId then
+        local countryData = LieZhuanMgr:GetCountryInfoById(self.m_countryId)
+        local islocked = true
+        if countryData then
+            if copyId <= countryData.max_pass_copy + 1 then
+                islocked = false
+            end
+        end
+        if copyId % 100 == 1 then
+            islocked = false
+        end
+        item:UpdateData(self.m_copyCfgList[realIndex], islocked, Bind(self, self.OnSelectCopy))
+    end
+    
+    if self.m_selectCopyId and item then
+        item:SetSelectState(self.m_selectCopyId == item:GetCopyId(), self.m_detailItemBounds)
+    end
+end
+
+function UILieZhuanChooseView:OnSelectCopy(copyItem)
+    if copyItem then
+        for k,v in pairs(self.m_copyDetailItemList) do
+            v:SetSelectState(v:GetCopyId() == copyItem:GetCopyId(), self.m_detailItemBounds)
+        end
+        self.m_selectCopyId = copyItem:GetCopyId()
+        self:UpdateDropItemByCopyId(self.m_selectCopyId)
+        self:UpdateRoleByCopyId(self.m_selectCopyId)
+    end
+end
+
+function UILieZhuanChooseView:UpdateDropItemByCopyId(copyId)
+    if not copyId then
+        return
+    end
+
+    self:ClearDropItemData()
+    if not self.m_dropItemList then
+        self.m_dropItemList = {}
+    end
+    
+    local unPass = LieZhuanMgr:IsLockedCopy(self.m_countryId, copyId)
+    local strNum = unPass and 3755 or 3759
+    self.m_awardText.text = Language.GetString(strNum)
+    local copyCfg = ConfigUtil.GetLieZhuanCopyCfgByID(copyId)
+    self.m_describeText.text = copyCfg.desc
+    if copyCfg then
+        local dropItemList = unPass and copyCfg.frist_award or copyCfg.preview_award
+        if dropItemList then
+            for k, v in pairs(dropItemList) do
+                self.m_seq = UIGameObjectLoader:PrepareOneSeq()
+                UIGameObjectLoader:GetGameObject(self.m_seq, BagItemPath, function(go)
+                    self.m_seq = 0
+                    if not IsNull(go) then
+                        local bagItem = UIBagItem.New(go, self.m_dropItemContent, BagItemPath)
+                        bagItem.transform.localScale = Vector3.New(0.7,0.7,0.7)
+                        bagItem.m_gameObject.name = v[1]
+                        table_insert(self.m_dropItemList, bagItem)
+                        local itemCfg = ConfigUtil.GetItemCfgByID(v[1])
+                        if itemCfg then
+                            local itemIconParam = ItemIconParam.New(itemCfg, v[2])
+                            if itemIconParam then
+                                itemIconParam.onClickShowDetail = true
+                                bagItem:UpdateData(itemIconParam)
+                            end
+                        end
+                    end
+                end)
+            end
+        end
+    end
+end
+
+function UILieZhuanChooseView:UpdateRoleByCopyId(copyId)
+    local copyCfg = ConfigUtil.GetLieZhuanCopyCfgByID(copyId)
+    if copyCfg then
+        local wujiangCfg = ConfigUtil.GetWujiangCfgByID(copyCfg.roleId)
+        if wujiangCfg then
+            self.m_roleNameText.text = wujiangCfg.sName
+        end
+        self:ShowGodBeastModel(copyCfg.roleId)
+    end
+end
+
+function UILieZhuanChooseView:ClearDropItemData()
+    if self.m_dropItemList then
+        for i, v in ipairs(self.m_dropItemList) do
+            v:Delete()
+        end
+        self.m_dropItemList = {}
+    end
+end
+
+function UILieZhuanChooseView:OnDestroy()
+    base.OnDestroy(self)
+end
+
+function UILieZhuanChooseView:OnAddListener()
+    self:AddUIListener(UIMessageNames.MN_LIEZHUAN_COUNTRY_INFO, self.UpdateCopyData)
+	base.OnAddListener(self)
+end
+
+function UILieZhuanChooseView:OnRemoveListener()
+    self:RemoveUIListener(UIMessageNames.MN_LIEZHUAN_COUNTRY_INFO, self.UpdateCopyData)
+	base.OnRemoveListener(self)
+end
+
+function UILieZhuanChooseView:CreateRoleContainer()
+    self.m_sceneSeq = UIGameObjectLoader:PrepareOneSeq()
+    UIGameObjectLoader:GetGameObject(self.m_sceneSeq, SceneObjPath, function(go)
+        self.m_sceneSeq = 0
+        if not IsNull(go) then
+            self.m_roleBgGo = go
+        end
+    end)
+end
+
+function UILieZhuanChooseView:DestroyRoleContainer()
+    UIGameObjectLoader:CancelLoad(self.m_sceneSeq)
+    self.m_sceneSeq = 0
+
+    if not IsNull(self.m_roleBgGo) then
+        UIGameObjectLoader:RecycleGameObject(SceneObjPath, self.m_roleBgGo)
+        self.m_roleBgGo = nil
+    end
+
+    if self.m_actorShow then
+        self.m_actorShow:Delete()
+        self.m_actorShow = nil
+    end
+end
+
+function UILieZhuanChooseView:ShowGodBeastModel(role_id)
+    if not self.m_wujiangRoot and role_id then
+        return
+    end
+
+    if self.m_actorShow then
+        self.m_actorShow:Delete()
+        self.m_actorShow = nil
+    end
+
+    if role_id and role_id > 0 then
+        self.m_sceneSeq = ActorShowLoader:GetInstance():PrepareOneSeq() 
+
+        ActorShowLoader:GetInstance():CreateShowOffWuJiang(self.m_sceneSeq, ActorShowLoader.MakeParam(role_id, 1), self.m_wujiangRoot, function(actorShow)
+            self.m_sceneSeq = 0
+            self.m_actorShow = actorShow
+            self.m_actorShow:PlayAnim(BattleEnum.ANIM_IDLE)
+            self.m_actorShow:SetPosition(Vector3.New(0, -20, 300))
+            self.m_actorShow:SetLocalScale(Vector3.New(300,300,300))
+            self.m_actorShow:SetEulerAngles(Vector3.New(0, 180, 0))
+            self.m_actorShow:SetLayer(Layers.UI)
+        end)
+    end 
+end
+
+return UILieZhuanChooseView

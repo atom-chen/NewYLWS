@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+
+	<key>AccountCannotBeEmpty</key>
+	<string>帐号不能为空</string>
+	
+	<key>AccountNumCannotBeLessThan6</key>
+	<string>帐号不能小于6位</string>
+	
+	<key>AccountNumCannotBeGreaterThan20</key>
+	<string>帐号不能大于20位</string>
+
+	<key>AccountCanOnlyBeNumLettersUnderlined</key>
+	<string>帐号只能是数字、字母、下划线</string>
+
+	<key>PasswordCannotBeNull</key>
+	<string>密码不能为空</string>
+	
+	<key>PasswordCannotBeLessThan6</key>
+	<string>密码不能小于6位</string>
+	
+	<key>PasswordCannotBeGreaterThan20</key>
+	<string>密码不能大于20位</string>
+
+	<key>PhoneNumCannotBeEmpty</key>
+	<string>手机号码不能为空</string>
+
+	<key>PleaseEnterCorrectPhoneNum</key>
+	<string>请输入正确的手机号码</string>
+	
+	<key>VerificationCodeMustBeFilled</key>
+	<string>验证码不能为空</string>
+
+	<key>PleaseEnterCorrectVerifyCode</key>
+	<string>请输入正确的验证码</string>
+
+	<key>BindPhone</key>
+	<string>绑定手机</string>	
+
+	<key>Return</key>
+	<string>返回</string>		
+
+	<key>PleaseEnterAccount</key>
+	<string>请输入帐号</string>	
+
+	<key>PleaseEnterPassword</key>
+	<string>请输入密码</string>	
+
+	<key>Display</key>
+	<string>显示</string>	
+
+	<key>PleaseEnterPhoneNumber</key>
+	<string>请输入手机号</string>
+
+	<key>PleaseEnterVerificationCode</key>
+	<string>请输入验证码</string>
+
+	<key>GetVerificationCode</key>
+	<string>获取验证码</string>
+	
+	<key>Hide</key>
+	<string>隐藏</string>
+
+	<key>FailedToGetVerificationCode</key>
+	<string>获取验证码失败</string>
+	
+	<key>OK</key>
+	<string>确定</string>
+
+	<key>GetVerificationCodeSuccessfully</key>
+	<string>获取验证码成功</string>
+
+	<key>ParameterError</key>
+	<string>参数错误</string>
+	
+	<key>HasBeenAlreadyBindPhone</key>
+	<string>该账号已绑定手机号</string>
+	
+	<key>WrongPassword</key>
+	<string>密码错误</string>
+	
+	<key>PhoneNumberIllegal</key>
+	<string>手机号非法</string>
+	
+	<key>SendSMSAgain</key>
+	<string>重复发送短信</string>
+	
+	<key>SendSMSFail</key>
+	<string>短信发送失败</string>
+	
+	<key>ChangePasswordFailed</key>
+	<string>修改密码失败!</string>
+	
+	<key>BindFail</key>
+	<string>绑定失败.</string>
+	
+	<key>BindSuccess</key>
+	<string>绑定成功</string>
+	
+	<key>VerificationCodeIsIncorrectOrTimedOut</key>
+	<string>验证码有误或者超时</string>
+	
+	<key>AfterSecGetAgain</key>
+	<string>s后重新获取</string>
+	
+	<key>ResetPassword</key>
+	<string>重设密码</string>
+
+	<key>PleaseEnterAccount</key>
+	<string>请输入帐号</string>
+
+	<key>PleaseEnterNewPassword</key>
+	<string>请输入新密码</string>
+
+	<key>ConfirmReset</key>
+	<string>确认重设</string>
+
+	<key>AccountDoesnotExistOrUselessBindingPhoneNumber</key>
+	<string>账号不存在或者没用绑定手机号</string>
+
+	<key>CannotSendVerificationCodeRepeatedly</key>
+	<string>不能重复发送验证码</string>
+
+	<key>ResetFailed</key>
+	<string>重设失败.</string>
+
+	<key>ResetSuccessful</key>
+	<string>重设成功</string>
+
+	<key>TimeoutOrVerificationCodeIsIncorrect</key>
+	<string>超时或者验证码有误</string>
+
+	<key>New</key>
+	<string>新</string>
+
+	<key>ChangePassword</key>
+	<string>修改密码</string>
+
+	<key>ForgetPassword</key>
+	<string>忘记密码</string>
+
+	<key>QuickReg</key>
+	<string>快速注册</string>
+
+	<key>Login</key>
+	<string>登  录</string>
+
+	<key>Register</key>
+	<string>注  册</string>
+
+	<key>AutoReging</key>
+	<string>自动注册中...</string>
+
+	<key>AutoRegFail</key>
+	<string>自动注册失败!</string>
+
+	<key>Logining</key>
+	<string>登录中...</string>
+
+	<key>LoginFail</key>
+	<string>登录失败</string>
+
+	<key>AccountDoesNotExist</key>
+	<string>帐号不存在</string>
+
+	<key>Delete</key>
+	<string>删除</string>
+
+	<key>PleaseEnterOldPassword</key>
+	<string>请输入旧密码</string>
+
+	<key>ConfirmChanges</key>
+	<string>确认修改</string>
+
+	<key>Origin</key>
+	<string>原</string>
+
+	<key>ChangePasswording</key>
+	<string>修改密码中...</string>
+
+	<key>ChangePasswordSuccess</key>
+	<string>修改密码成功</string>
+
+	<key>OriginPasswordIsWrong</key>
+	<string>原密码错误</string>
+
+	<key>RegisterAccount</key>
+	<string>注册帐号</string>
+
+	<key>Reging</key>
+	<string>注册中...</string>
+
+	<key>RegFail</key>
+	<string>注册失败</string>
+
+	<key>AccountAlreadyExists</key>
+	<string>帐号已存在</string>
+
+	<key>test</key>
+	<string>test</string>
+	
+</dict>
+</plist>

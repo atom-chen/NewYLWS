@@ -1,0 +1,34 @@
+local StatusGiver = StatusGiver
+local MediumManagerInst = MediumManagerInst
+local FixNewVector3 = FixMath.NewFixVector3
+local FixAdd = FixMath.add
+local MediumEnum = MediumEnum
+
+local SkillBase = require "GameLogic.Battle.Skill.SkillBase"
+local Skill10152 = BaseClass("Skill10152", SkillBase)
+
+function Skill10152:Perform(performer, target, performPos, special_param)
+    if not performer or not target or not target:IsLive() then
+        return
+    end
+
+    performer:AddEffect(101503)
+
+    local pos = performer:GetPosition()
+    local forward = performer:GetForward()
+    pos = FixNewVector3(pos.x, FixAdd(pos.y, 3), pos.z)
+    pos:Add(forward *0.5)
+
+    local normalFlyParam = {
+        targetActorID = target:GetActorID(),
+        keyFrame = special_param.keyFrameTimes,
+        speed = 15,
+    }
+    local giver = StatusGiver.New(performer:GetActorID(), self.m_skillCfg.id)
+    MediumManagerInst:CreateMedium(MediumEnum.MEDIUMTYPE_10152, 62, giver, self, pos, forward, normalFlyParam)
+
+    performer:ActiveFenshenSkill(10152, target:GetActorID())
+end
+
+
+return Skill10152

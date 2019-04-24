@@ -1,0 +1,45 @@
+-- 召唤兽3601
+local config = {
+
+    path = 'Timeline/BattleScene/Dragon/Dragon3601.prefab',
+    assetPath = 'Timeline/BattleScene/Dragon/Dragon3601Timeline.playable',
+    track_list = {
+        {
+            name = 'Dragon3601Anim',
+            bindingType = 4,
+            bindingPath = '3601',
+            bindingPos = {10000, 2.2, -0.72},
+            bindingRotation = {0, 180, 0},
+            bindingWujiangCamp = false,
+            bindingWujiangID = false,
+            clip_list = {},
+        },
+        {
+            name = 'Dragon3601Camera',
+            bindingType = 3,
+            bindingPath = false,
+            bindingWujiangCamp = false,
+            bindingWujiangID = false,
+            clipingType = 2,
+            clip_list = {},
+        },
+    },
+    load_list = {
+        -- {
+        --     path = "Maps/Summon/3601/Prefabs/Boss_Seabed.prefab",
+        --     createInstance = true,
+        --     name = "Boss_Seabed",
+        --     instancePos = {10000, 0, 0},
+        --     instanceRotation = {-90, -180, 0},
+        -- },
+        {
+            path = "Models/3601/3601_showoff.prefab",
+            createInstance = true,
+            name = "3601",
+            instancePos = {10000, 2.2, -0.72},
+            instanceRotation = {0, 180, 0},
+        }
+    },
+}
+
+return config

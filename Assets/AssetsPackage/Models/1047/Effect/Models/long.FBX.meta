@@ -1,0 +1,200 @@
+fileFormatVersion: 2
+guid: 97530f5ebbefd8e42be644f232dc8833
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: ' 1'
+    100002: Bone001
+    100004: Bone002
+    100006: Bone003
+    100008: Bone004
+    100010: Bone005
+    100012: Bone006
+    100014: Bone007
+    100016: Bone008
+    100018: Bone009
+    100020: Bone010
+    100022: Bone011
+    100024: Bone012
+    100026: Bone013
+    100028: Bone014
+    100030: Bone015
+    100032: Bone016
+    100034: Bone017
+    100036: IK Chain001
+    100038: Line001
+    100040: //RootNode
+    100042: long_Bone_10
+    100044: long_Bone_11
+    100046: long_Bone_12
+    100048: long_Bone_13
+    100050: long_Bone_14
+    100052: long_Bone_15
+    100054: long_Bone_16
+    100056: long_Bone_17
+    100058: long_Bone_18
+    100060: long_Bone_19
+    100062: long_Bone_20
+    100064: long_Bone_21
+    100066: long_Bone_22
+    100068: long_Bone_23
+    100070: long_Bone_24
+    100072: long_Bone_25
+    100074: long_Bone_26
+    100076: long_Bone_27
+    100078: long_Bone_28
+    100080: long_Bone_29
+    100082: long_Bone_30
+    100084: long_Bone_31
+    100086: long_Bone_37
+    100088: long_Bone_38
+    100090: long_Bone_39
+    100092: long_Bone_40
+    100094: long_Bone_41
+    100096: long_Bone_42
+    100098: long_Bone_43
+    100100: long_Bone_44
+    100102: long_Bone_45
+    100104: long_Bone_46
+    100106: long_Bone_47
+    100108: long_Bone_48
+    400000: ' 1'
+    400002: Bone001
+    400004: Bone002
+    400006: Bone003
+    400008: Bone004
+    400010: Bone005
+    400012: Bone006
+    400014: Bone007
+    400016: Bone008
+    400018: Bone009
+    400020: Bone010
+    400022: Bone011
+    400024: Bone012
+    400026: Bone013
+    400028: Bone014
+    400030: Bone015
+    400032: Bone016
+    400034: Bone017
+    400036: IK Chain001
+    400038: Line001
+    400040: //RootNode
+    400042: long_Bone_10
+    400044: long_Bone_11
+    400046: long_Bone_12
+    400048: long_Bone_13
+    400050: long_Bone_14
+    400052: long_Bone_15
+    400054: long_Bone_16
+    400056: long_Bone_17
+    400058: long_Bone_18
+    400060: long_Bone_19
+    400062: long_Bone_20
+    400064: long_Bone_21
+    400066: long_Bone_22
+    400068: long_Bone_23
+    400070: long_Bone_24
+    400072: long_Bone_25
+    400074: long_Bone_26
+    400076: long_Bone_27
+    400078: long_Bone_28
+    400080: long_Bone_29
+    400082: long_Bone_30
+    400084: long_Bone_31
+    400086: long_Bone_37
+    400088: long_Bone_38
+    400090: long_Bone_39
+    400092: long_Bone_40
+    400094: long_Bone_41
+    400096: long_Bone_42
+    400098: long_Bone_43
+    400100: long_Bone_44
+    400102: long_Bone_45
+    400104: long_Bone_46
+    400106: long_Bone_47
+    400108: long_Bone_48
+    2100000: 23 - Default
+    7400000: Take 001
+    9500000: //RootNode
+    13700000: ' 1'
+  externalObjects: {}
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

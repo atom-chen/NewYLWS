@@ -1,0 +1,103 @@
+local base = require "UI.UIBattleRecord.View.BattleSettlementView"
+local UIYuanmenSettlementView = BaseClass("UIYuanmenSettlementView", base)
+
+local math_floor = math.floor
+local table_insert = table.insert
+local string_format = string.format
+ 
+
+function UIYuanmenSettlementView:InitView()
+    base.InitView(self)
+
+    self.m_scoreDetailContentTr = UIUtil.GetChildTransforms(self.transform, {
+        "ScoreDetailContent",        
+    })
+
+    self.m_titleTxt,
+    self.m_timeDesTxt,
+    self.m_timeTxt,
+    self.m_diedDesTxt,
+    self.m_diedTxt = UIUtil.GetChildTexts(self.transform, { 
+        "ScoreDetailContent/BgContent/TitleTxt",
+        "ScoreDetailContent/BgContent/TimeDesTxt",
+        "ScoreDetailContent/BgContent/TimeDesTxt/TimeTxt",
+        "ScoreDetailContent/BgContent/DiedDesTxt",
+        "ScoreDetailContent/BgContent/DiedDesTxt/DiedTxt", 
+    })
+    self.m_titleTxt.text = Language.GetString(3317)
+    self.m_timeDesTxt.text = Language.GetString(3318)
+    self.m_diedDesTxt.text = Language.GetString(3320)
+end
+
+function UIYuanmenSettlementView:OnEnable(...)
+    base.OnEnable(self, ...)
+    self.m_scoreDetailContentTr.gameObject:SetActive(true)
+    
+    local _, msgObj = ...
+    if msgObj then
+        coroutine.start(self.UpdateSorceNum, self, msgObj.battle_result.yuanmen_result)
+    end
+end
+
+function UIYuanmenSettlementView:UpdateSorceNum(resultInfo)
+    coroutine.waitforseconds(0.2)  
+
+    local consumeTime =  os.date("%M:%S", resultInfo.consumed_time) or ""
+    self.m_timeTxt.text = string_format(Language.GetString(3319), consumeTime, resultInfo.deduct_time_score)
+    local diedCountStr = "x"..math.ceil(resultInfo.dead_wujiang)
+    self.m_diedTxt.text = string_format(Language.GetString(3319), diedCountStr, resultInfo.deduct_dead_wujiang)
+
+    local score = resultInfo.score
+    
+    local score2 = score
+    if not score or score == 0 then
+        return
+    end 
+
+    self.m_scoreImageTran.gameObject:SetActive(true)
+
+	local num_list = {}
+	local num
+    repeat
+        num = score % 10
+        score = math_floor(score / 10)
+        table_insert(num_list, num)
+    until score == 0
+
+	local curr_number_count = #num_list
+	local index = 1
+	local str = ""
+    for i = curr_number_count, 1, -1 do
+		str = string_format("number5%s.png", math_floor(num_list[i]))
+        self.m_scoreNumList[index].gameObject:SetActive(true)
+        self.m_scoreNumList[index]:SetAtlasSprite(str)
+        index = index + 1
+	end
+
+	for i = index, 5 do 
+		self.m_scoreNumList[index].gameObject:SetActive(false)
+	end
+
+	local nowImg = Player:GetInstance():GetYuanmenMgr():GetEvaluationSpritePath(score2)
+    self.m_scoreImage:SetAtlasSprite(nowImg)
+    
+    self:ScoreChgShow()
+end
+
+local SCORE_SCALE = Vector3.New(0.02, 0.02, 0.02)
+local DOTweenShortcut = CS.DOTween.DOTweenShortcut
+local DOTweenSettings = CS.DOTween.DOTweenSettings
+
+function UIYuanmenSettlementView:ScoreChgShow()
+	self.m_scoreImageTran.localScale = SCORE_SCALE
+	local tweener = DOTweenShortcut.DOScale(self.m_scoreImage.transform, 1, 0.2)
+	DOTweenSettings.SetEase(tweener, DoTweenEaseType.InBack)
+end
+
+function UIYuanmenSettlementView:OnDisable()
+    self.m_scoreDetailContentTr.gameObject:SetActive(false)
+
+    base.OnDisable(self)
+end
+
+return UIYuanmenSettlementView

@@ -1,0 +1,33 @@
+
+local StatusAllTimeShield = require("GameLogic.Battle.Status.impl.StatusAllTimeShield")
+local table_insert = table.insert
+local StatusEnum = StatusEnum
+local FixAdd = FixMath.add
+local FixSub = FixMath.sub
+
+local StatusLuSuAllShieldLeshan = BaseClass("StatusLuSuAllShieldLeshan", StatusAllTimeShield)
+
+function StatusLuSuAllShieldLeshan:__init()
+    self.m_storeHp = 0
+end
+
+function StatusLuSuAllShieldLeshan:Init(giver, hpStore, leftMS, effect)
+    StatusAllTimeShield.Init(self, giver, hpStore, leftMS, effect)
+    self.m_storeHp = hpStore
+end
+
+function StatusLuSuAllShieldLeshan:GetStatusType()
+    return StatusEnum.STATUSTYPE_LUSUALLSHIELDLESHAN
+end
+
+function StatusLuSuAllShieldLeshan:Merge(newStatus, actor) -- 合并规则：时间重置，护盾值重置
+    if not newStatus or newStatus:GetStatusType() ~= self:GetStatusType() then
+        return
+    end
+
+    self.m_leftMS = self.m_totalMS
+    self.m_hpStore = self.m_storeHp
+end
+
+
+return StatusLuSuAllShieldLeshan

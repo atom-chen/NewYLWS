@@ -1,0 +1,120 @@
+local StatusGiver = StatusGiver
+local StatusFactoryInst = StatusFactoryInst
+local BattleEnum = BattleEnum
+local FixIntMul = FixMath.muli
+local FixAdd = FixMath.add
+local FixMod = FixMath.mod
+local FixDiv = FixMath.div
+local FixSub = FixMath.sub
+local FixMul = FixMath.mul
+local table_insert = table.insert
+local ACTOR_ATTR = ACTOR_ATTR
+local FixVetor3RotateAroundY = FixMath.Vector3RotateAroundY
+local ActorManagerInst = ActorManagerInst
+local ConfigUtil = ConfigUtil
+local SkillUtil = SkillUtil
+local FixRand = BattleRander.Rand
+local CtlBattleInst = CtlBattleInst
+local table_insert = table.insert
+
+local Actor = require "GameLogic.Battle.Actors.Actor"
+local Actor1011 = BaseClass("Actor1011", Actor)
+local ActorCreateParam = require "GameLogic.Battle.Actors.ActorCreateParam"
+
+function Actor1011:__init()
+    self.m_targetIDList = {}
+    self.m_targetIDArray = {}
+
+    self.m_10113SkillItem = nil
+    self.m_10113SkillCfg = nil
+    self.m_10113X = 0
+    self.m_10113YPercent = 0
+    self.m_10113APercent = 0
+    self.m_10113Level = 0
+
+    self.m_magicHurtPercent = 0
+end
+
+
+
+function Actor1011:OnBorn(create_param)
+    Actor.OnBorn(self, create_param)
+
+    local skillItem = self.m_skillContainer:GetPassiveByID(10113)
+    if skillItem then
+        self.m_10113SkillItem = skillItem
+        local level = skillItem:GetLevel()
+        self.m_10113Level = level
+        local skillCfg = ConfigUtil.GetSkillCfgByID(10113)
+        if skillCfg then
+            self.m_10113SkillCfg = skillCfg
+
+            self.m_10113X = SkillUtil.X(skillCfg, level)
+            if level >= 6 then
+                self.m_10113YPercent = FixDiv(SkillUtil.Y(skillCfg, level), 100)
+                self.m_10113APercent = FixDiv(SkillUtil.A(skillCfg, level), 100)
+            end
+        end
+    end
+end
+
+
+function Actor1011:Get10113X()
+    if not self.m_10113SkillItem or not self.m_10113SkillCfg then
+        return 0
+    end
+
+    return self.m_10113X
+end
+
+function Actor1011:Get10113Level()
+    return self.m_10113Level
+end
+
+function Actor1011:AddMagicHurtMul()
+    if self.m_10113Level >= 6 and self.m_magicHurtPercent < self.m_10113APercent then
+        self.m_magicHurtPercent = FixAdd(self.m_magicHurtPercent, self.m_10113YPercent)
+        if self.m_magicHurtPercent > self.m_10113APercent then
+            self.m_magicHurtPercent = self.m_10113APercent
+        end
+
+        return self.m_magicHurtPercent
+    end
+
+    return self.m_magicHurtPercent
+end
+
+
+function Actor1011:GetMagicHurtMul()
+    return self.m_magicHurtPercent
+end
+
+
+function Actor1011:LogicOnFightEnd()
+    self.m_magicHurtPercent = 0
+end
+
+
+function Actor1011:Add10112TargetIDList(targetID)
+    if not self.m_targetIDList[targetID] then
+        self.m_targetIDList[targetID] = true
+        table_insert(self.m_targetIDArray, targetID)
+    end
+end
+
+
+function Actor1011:Is10112TargetIDList(targetID)
+    return self.m_targetIDList[targetID]
+end
+
+
+function Actor1011:Get10112TargetIDList()
+    return self.m_targetIDArray
+end
+
+function Actor1011:Clear10112TargetIDList()
+    self.m_targetIDList = {}
+    self.m_targetIDArray = {}
+end
+
+return Actor1011

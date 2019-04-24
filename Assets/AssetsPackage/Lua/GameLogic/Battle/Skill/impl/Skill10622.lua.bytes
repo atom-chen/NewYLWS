@@ -1,0 +1,63 @@
+local BattleEnum = BattleEnum
+local StatusGiver = StatusGiver
+local FixAdd = FixMath.add
+local CtlBattleInst = CtlBattleInst
+local ActorManagerInst = ActorManagerInst
+local FixNewVector3 = FixMath.NewFixVector3
+local MediumManagerInst = MediumManagerInst
+
+local SkillBase = require "GameLogic.Battle.Skill.SkillBase"
+local Skill10622 = BaseClass("Skill10622", SkillBase)
+
+function Skill10622:Perform(performer, target, performPos, special_param)
+    if not performer or not performer:IsLive() or not target or not target:IsLive() then
+        return
+    end
+
+    -- 戟之重击
+    -- 1
+    -- 召唤风刃切割当前攻击目标和拥有无力状态的敌人，被风刃击中的敌人受到{x1}（+{E}%物攻)点物理伤害。
+    -- 2-4
+    -- 召唤风刃切割当前攻击目标和拥有无力状态的敌人，被风刃击中的敌人立即受到{x2}（+{E}%物攻)点物理伤害并损失{A}点怒气。
+    -- 5-6
+    -- 召唤风刃切割当前攻击目标和拥有无力状态的敌人，被风刃击中的敌人立即受到{x5}（+{E}%物攻)点物理伤害并被吸取{A}点怒气，吸取的怒气会平摊到已方所有友军身上。
+
+    self:CreateSkill10622Medium(performer, target, special_param.keyFrameTimes)
+
+    local battleLogic = CtlBattleInst:GetLogic()
+    ActorManagerInst:Walk(
+        function(tmpTarget)
+            if tmpTarget:GetActorID() == target:GetActorID() then
+                return
+            end
+
+            if not battleLogic:IsEnemy(performer, tmpTarget, BattleEnum.RelationReason_SKILL_RANGE) then
+                return
+            end
+            local lidianDebuff = tmpTarget:GetStatusContainer():GetLidianDebuff()
+            if lidianDebuff then
+                self:CreateSkill10622Medium(performer, tmpTarget, special_param.keyFrameTimes)
+            end
+        end
+    )
+end
+
+
+function Skill10622:CreateSkill10622Medium(performer, target, keyFrame)
+    local pos = performer:GetPosition()
+    local forward = performer:GetForward()
+    pos = FixNewVector3(pos.x, FixAdd(pos.y, 1.3), pos.z)
+    pos:Add(forward * 1.13)
+    pos:Add(performer:GetRight() * -0.01)
+    local giver = StatusGiver.New(performer:GetActorID(), 10622)
+    
+    local mediaParam = {
+        keyFrame = keyFrame,
+        speed = 18,
+        targetActorID = target:GetActorID()
+    }
+
+    MediumManagerInst:CreateMedium(MediumEnum.MEDIUMTYPE_10622, 41, giver, self, pos, forward, mediaParam)
+end
+
+return Skill10622

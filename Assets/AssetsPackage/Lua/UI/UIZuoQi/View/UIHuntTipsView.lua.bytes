@@ -1,0 +1,100 @@
+
+local Vector2 = Vector2
+local UIUtil = UIUtil
+local GameUtility = CS.GameUtility
+local UITipsHelper = require "UI.Common.UITipsHelper"
+
+local UIHuntTipsView = BaseClass("UIHuntTipsView", UIBaseView)
+local base = UIBaseView
+
+function UIHuntTipsView:OnCreate()
+    base.OnCreate(self)
+
+    self.m_btnOneText, self.m_btnTwoText, self.m_btnThreeText, self.m_countText = UIUtil.GetChildTexts(self.transform, {
+        "Container/huntTips/ButtonOne/Text",
+        "Container/huntTips/ButtonTwo/Text",
+        "Container/huntTips/ButtonThree/Text",
+        "Container/huntTips/Yuanbao/yuanbao/countText",
+    })
+
+    self.m_closeBtn, self.m_oneBtn, self.m_twoBtn, self.m_threeBtn, self.m_tipsTr, self.m_yuanbaoGo = UIUtil.GetChildRectTrans(self.transform, {
+        "CloseBtn",
+        "Container/huntTips/ButtonOne",
+        "Container/huntTips/ButtonTwo",
+        "Container/huntTips/ButtonThree",
+        "Container/huntTips",
+        "Container/huntTips/Yuanbao"
+    })
+
+    self.m_tips = self:AddComponent(UITipsHelper, "Container")
+
+    self.m_yuanbaoGo = self.m_yuanbaoGo.gameObject
+    self.m_btnOneCallback = nil
+    self.m_btnTwoCallback = nil
+    self.m_btnThreeCallback = nil
+    
+    local function onClick(go)
+        if go.name == "CloseBtn" then
+            self:CloseSelf()
+        elseif go.name == "ButtonOne" then
+            if self.m_btnOneCallback then
+                self:CloseSelf()
+                self.m_btnOneCallback()
+                self.m_btnOneCallback = nil
+            end
+            TimelineMgr:GetInstance():TriggerEvent(SequenceEventType.CLICK_UI, "ButtonOne")
+        elseif go.name == "ButtonTwo" then
+            if self.m_btnTwoCallback then
+                self:CloseSelf()
+                self.m_btnTwoCallback()
+                self.m_btnTwoCallback = nil
+            end
+        elseif go.name == "ButtonThree" then
+            if self.m_btnThreeCallback then
+                self:CloseSelf()
+                self.m_btnThreeCallback()
+                self.m_btnThreeCallback = nil
+            end
+        end
+    end
+    UIUtil.AddClickEvent(self.m_closeBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_oneBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_twoBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_threeBtn.gameObject, onClick)
+end
+
+function UIHuntTipsView:OnEnable(...)
+    base.OnEnable(self, ...)
+    local _,  btnOneText, btnOneCallback, btnTwoText, btnTwoCallback, btnThreeText, btnThreeCallback, yuanbaoCount = ...
+
+    if self.m_tips then
+        self.m_tips:Init(Vector2.New(130, 0), nil, function()
+            TimelineMgr:GetInstance():TriggerEvent(SequenceEventType.SHOW_UI_END, self.winName)
+        end)
+    end
+    self.m_btnOneText.text = btnOneText or ""
+    self.m_btnTwoText.text = btnTwoText or ""
+    self.m_btnThreeText.text = btnThreeText or ""
+    if not btnOneCallback then
+        GameUtility.SetUIGray(self.m_oneBtn.gameObject, true)
+        UIUtil.TryBtnEnable(self.m_oneBtn.gameObject, false)
+    else
+        self.m_btnOneCallback = btnOneCallback
+        GameUtility.SetUIGray(self.m_oneBtn.gameObject, false)
+        UIUtil.TryBtnEnable(self.m_oneBtn.gameObject, true)
+    end
+    self.m_btnTwoCallback = btnTwoCallback or nil
+    self.m_btnThreeCallback = btnThreeCallback or nil
+    self.m_countText.text = yuanbaoCount or ""
+    self.m_yuanbaoGo:SetActive(self.m_countText.text ~= "")
+    self.m_threeBtn.gameObject:SetActive(self.m_btnThreeText.text ~= "")
+
+    local sizeDelta = self.m_tipsTr.sizeDelta
+    if not btnThreeText then
+        self.m_tipsTr.sizeDelta = Vector2.New(sizeDelta.x, 242)
+    else
+        self.m_tipsTr.sizeDelta = Vector2.New(sizeDelta.x, 297)
+    end
+end
+
+return UIHuntTipsView

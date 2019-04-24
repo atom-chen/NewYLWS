@@ -1,0 +1,414 @@
+local UIUtil = UIUtil
+local math_floor = math.floor
+local BattleEnum = BattleEnum
+local ConfigUtil = ConfigUtil
+local string_format = string.format
+local string_find = string.find
+local string_sub = string.sub
+local tonumber = tonumber
+local UIWindowNames = UIWindowNames
+local UIMessageNames = UIMessageNames
+local UILogicUtil = UILogicUtil
+local Vector3 = Vector3
+local UIImage = UIImage
+local AtlasConfig = AtlasConfig
+local table_insert = table.insert
+local CommonDefine = CommonDefine
+local GameObject = CS.UnityEngine.GameObject
+local Type_Toggle = typeof(CS.UnityEngine.UI.Toggle)
+local Type_RectTransform = typeof(CS.UnityEngine.RectTransform)
+local UIManagerInstance = UIManagerInst
+local ArenaMgr = Player:GetInstance():GetArenaMgr()
+local LineupMgr = Player:GetInstance():GetLineupMgr()
+local WuJiangMgr = Player:GetInstance():GetWujiangMgr()
+local ResourcesManagerInst = ResourcesManagerInst
+local UIGameObjectLoaderInst = UIGameObjectLoader:GetInstance()
+local AwardItemPrefabPath = TheGameIds.SimpleAwardItemPrefab
+local SimpleAwardItem = require("UI.Common.SimpleAwardItem")
+local LineupWuJiangCardItem = require("UI.UIWuJiang.View.LineupWuJiangCardItem")
+local WuJiangItemPath = TheGameIds.CommonWujiangCardPrefab
+local ArenaRivalItemPath = "UI/Prefabs/Arena/ArenaRivalItem.prefab"
+local ArenaRivalItem = require("UI.UIArena.View.ArenaRivalItem")
+local ToggleBtnName = "toggleBtn"
+local ItemDefine = ItemDefine
+
+local UIArenaMainView = BaseClass("UIArenaMainView", UIBaseView)
+local base = UIBaseView
+
+local ToggleBtnType = 
+{
+    Grading = 1,        --段位
+    BattleRecord = 2,   --战斗记录
+    RankList = 3,       --排行榜
+    Exchange = 4,       --兑换
+    Max =  5,
+}
+
+function UIArenaMainView:OnCreate()
+    base.OnCreate(self)
+
+    self:InitView()
+
+    self:InitData()
+
+    self:HandleClick()
+end
+
+function UIArenaMainView:InitView()
+    self.m_backBtnTrans, 
+    self.m_rankTipsBtnTrans, 
+    self.m_awardItemGridTrans,
+    self.m_changeLineupBtnTrans, 
+    self.m_wujiangItemGridTrans,
+    self.m_rivalItemGridTrans, 
+    self.m_refreshRivalBtnTrans
+    = 
+    UIUtil.GetChildRectTrans(self.transform, {
+        "backBtn",
+        "playerInfoContainer/rankTipsBtn",
+        "playerInfoContainer/awardContainer/awardItemScrollRect/Viewport/awardItemGrid",
+        "lineupContainer/changeLineupBtn",
+        "lineupContainer/wujiangItemGrid",
+
+        "rivalContainer/rivalContainerBg/rivalItemGrid",
+        "rivalContainer/refreshRivalBg/refreshRivalBtn",
+    })
+
+    self.m_playerRankInfoText, 
+    self.m_rankNameText, 
+    self.m_rankNumText, 
+    self.m_awardInfoText,
+    self.m_lineupInfoText, 
+    self.m_lineupPowerText, 
+    self.m_changeLineupBtnText,
+    self.m_refreshRivalBtnText,
+    self.m_challengeCostText,
+    self.m_challengeCostInfoText
+    =
+    UIUtil.GetChildTexts(self.transform, {
+        "playerInfoContainer/playerRankInfoText",
+        "playerInfoContainer/rankIconBg/rankNameBg/rankNameText",
+        "playerInfoContainer/rankIconBg/rankNumText",
+        "playerInfoContainer/awardContainer/awardInfoText",
+        "lineupContainer/lineupInfoBg/lineupInfoText",
+        "lineupContainer/lineupInfoBg/lineupPowerText",
+        "lineupContainer/changeLineupBtn/changeLineupBtnText",
+        "rivalContainer/refreshRivalBg/refreshRivalBtn/refreshRivalBtnText",
+        "lineupContainer/challengeCostText",
+        "lineupContainer/challengeCostText/moneyIcon/challengeCostInfoText",
+    })
+
+    self.m_toggleBtnTransArr = {}
+    self.m_toggleBtnTextArr = {}
+    for i = 1, ToggleBtnType.Max - 1 do
+        local btnName = ToggleBtnName..i
+        self.m_toggleBtnTransArr[i] = UIUtil.GetChildRectTrans(self.transform, {"toggleBtnContainer/"..btnName})
+        local btnTextName = "toggleBtnText"..i
+        self.m_toggleBtnTextArr[i] = UIUtil.GetChildTexts(self.transform, {"toggleBtnContainer/"..btnName.."/"..btnTextName})
+        self.m_toggleBtnTextArr[i].text = Language.GetString(2205 + i)
+    end
+
+    self.m_rankIcon = UIUtil.AddComponent(UIImage, self, "playerInfoContainer/rankIconBg/rankIcon", AtlasConfig.DynamicLoad)
+
+    self.m_playerRankInfoText.text = Language.GetString(2200)
+    self.m_awardInfoText.text = Language.GetString(2202)
+    self.m_lineupInfoText.text = Language.GetString(2203)
+    self.m_changeLineupBtnText.text = Language.GetString(2205)
+    self.m_refreshRivalBtnText.text = Language.GetString(2211)
+    self.m_challengeCostInfoText.text = Language.GetString(2230)
+end
+
+function UIArenaMainView:InitData()
+    self.m_battleType = BattleEnum.BattleType_ARENA
+    self.m_rankAwardItemSeq = 0
+    self.m_rankAwardItemList = {}
+    self.m_lineupWuJiangItemSeq = 0
+    self.m_lineupWuJiangItemList = {}
+    self.m_rivalItemList = {}
+    self.m_rivalItemListSeq = 0
+end
+
+function UIArenaMainView:OnDestroy()
+    self.m_backBtnTrans = nil
+    self.m_rankTipsBtn = nil
+    self.m_awardItemGridTrans = nil
+    self.m_changeLineupBtnTrans = nil
+    self.m_wujiangItemGridTrans = nil
+    self.m_rivalItemGridTrans = nil
+    self.m_refreshBtnTrans = nil
+
+    self.m_playerRankInfoText = nil
+    self.m_rankNameText = nil
+    self.m_rankNumText = nil
+    self.m_awardInfoText = nil
+    self.m_lineupInfoText = nil
+    self.m_lineupPowerText = nil
+    self.m_changeLineupBtnText = nil
+    self.m_refreshRivalBtnText = nil
+    self.m_challengeCostText = nil
+    self.m_challengeCostInfoText = nil
+
+    if self.m_rankIcon then
+        self.m_rankIcon:Delete()
+        self.m_rankIcon = nil
+    end
+
+    for i = 1, ToggleBtnType.Max - 1 do
+        self.m_toggleBtnTextArr[i] = nil
+        self.m_toggleBtnTransArr[i] = nil
+    end
+    self.m_toggleBtnTextArr = nil
+    self.m_toggleBtnTransArr = nil
+
+    self:RecycleRankAwardItemList()
+    self.m_rankAwardItemList = nil
+    
+    self:RecycleLineupWuJiangItemList()
+    self.m_lineupWuJiangItemList = nil
+
+    self:RecycleRivalItemList()
+    self.m_rivalItemList = nil
+end
+
+function UIArenaMainView:OnEnable(initOrder)
+    base.OnEnable(self)
+
+    UIManagerInstance:Broadcast(UIMessageNames.MN_MAIN_TOP_RIGHT_CURRENCY_TYPE, ItemDefine.ArenaFight_ID)
+    ArenaMgr:ReqPersonalPanel()
+end
+
+function UIArenaMainView:OnDisable()
+    UIManagerInstance:Broadcast(UIMessageNames.MN_MAIN_TOP_RIGHT_CURRENCY_TYPE, ItemDefine.Stamina_ID)
+
+    self:RecycleRankAwardItemList()
+    self:RecycleLineupWuJiangItemList()
+    self:RecycleRivalItemList()
+
+    base.OnDisable(self)
+end
+
+function UIArenaMainView:OnAddListener()
+    base.OnAddListener(self)
+
+    self:AddUIListener(UIMessageNames.MN_ARENA_UPDATE_PANEL, self.UpdatePanel)
+    self:AddUIListener(UIMessageNames.MN_ARENA_REFRESH_RIVAL, self.UpdateRivalContainer)
+    self:AddUIListener(UIMessageNames.MN_ARENA_UPDATE_DEFEND_LINEUP, self.UpdateLineupContainer)
+end
+
+function UIArenaMainView:OnRemoveListener()
+    self:RemoveUIListener(UIMessageNames.MN_ARENA_UPDATE_PANEL, self.UpdatePanel)
+    self:RemoveUIListener(UIMessageNames.MN_ARENA_REFRESH_RIVAL, self.UpdateRivalContainer)
+    self:RemoveUIListener(UIMessageNames.MN_ARENA_UPDATE_DEFEND_LINEUP, self.UpdateLineupContainer)
+
+    base.OnRemoveListener(self)
+end
+
+function UIArenaMainView:HandleClick()
+    local onClick = Bind(self, self.OnClick)
+    
+    UIUtil.AddClickEvent(self.m_backBtnTrans.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_rankTipsBtnTrans.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_changeLineupBtnTrans.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_refreshRivalBtnTrans.gameObject, onClick)
+    for i = 1, ToggleBtnType.Max - 1 do
+        UIUtil.AddClickEvent(self.m_toggleBtnTransArr[i].gameObject, onClick)
+    end
+end
+
+function UIArenaMainView:OnClick(go)
+    if not go then
+        return
+    end
+
+    local goName = go.name
+    if string_find(goName, ToggleBtnName) then
+        local startIndex, endIndex = string_find(goName, ToggleBtnName)
+        local btnTypeStr = string_sub(goName, endIndex + 1, #goName)
+        local btnType = tonumber(btnTypeStr)
+        if btnType == ToggleBtnType.Grading then
+            UIManagerInstance:OpenWindow(UIWindowNames.UIArenaGradingAward)
+        elseif btnType == ToggleBtnType.BattleRecord then
+            UIManagerInstance:OpenWindow(UIWindowNames.UIArenaBattleRecord)
+        elseif btnType == ToggleBtnType.RankList then
+            UIManagerInstance:OpenWindow(UIWindowNames.UICommonRank, CommonDefine.COMMONRANK_ARENA)
+        elseif btnType == ToggleBtnType.Exchange then
+            UIManagerInstance:OpenWindow(UIWindowNames.UIShop, CommonDefine.SHOP_ARENA)
+        end
+    end
+    if goName == "backBtn" then
+        UIManagerInstance:CloseWindow(UIWindowNames.UIArenaMain)
+    elseif goName == "rankTipsBtn" then
+
+    elseif goName == "changeLineupBtn" then
+		UIManagerInstance:OpenWindow(UIWindowNames.UILineupArenaEdit)
+    elseif goName == "refreshRivalBtn" then
+        ArenaMgr:ReqRefreshRival()
+    end
+end
+
+function UIArenaMainView:UpdatePanel()
+    self:UpdatePlayerRankInfo()
+
+    self:UpdateLineupContainer()
+
+    self:UpdateRivalContainer()
+end
+
+function UIArenaMainView:UpdatePlayerRankInfo()
+    local playerRank = ArenaMgr:GetRank()
+    playerRank = math_floor(playerRank)
+    self.m_rankNumText.text = string_format(Language.GetString(2201), playerRank)
+
+    local playerRankDan = ArenaMgr:GetRankDan()
+    local arenaDanAwardCfg = ConfigUtil.GetArenaDanAwardCfgByID(playerRankDan)
+    local rankDanName = ""
+    if arenaDanAwardCfg then
+        rankDanName = arenaDanAwardCfg.dan_name
+    end
+    self.m_rankNameText.text = rankDanName
+
+    --更新排名组图标
+    local rankDan = ArenaMgr:GetRankDan() or 0
+    local arenaDanAwardCfg = ConfigUtil.GetArenaDanAwardCfgByID(rankDan)
+    if arenaDanAwardCfg then
+        self.m_rankIcon:SetAtlasSprite(arenaDanAwardCfg.sIcon, false, AtlasConfig[arenaDanAwardCfg.sAtlas])
+    end
+
+    --创建奖励物品列表
+    self:RecycleRankAwardItemList()
+    
+    local awardList, awardListCount = UILogicUtil.GetArenaAwardListByRank(playerRank, rankDan)
+    if awardList then
+        self.m_rankAwardItemSeq = UIGameObjectLoader:GetInstance():PrepareOneSeq()
+        UIGameObjectLoaderInst:GetGameObjects(self.m_rankAwardItemSeq, AwardItemPrefabPath, awardListCount, 
+        function(objs)
+            self.m_rankAwardItemSeq = 0
+            if not objs then
+                return
+            end
+            local i = 1
+            for award_id, award_count in pairs(awardList) do
+                objs[i].name = "AwardItem_"..i
+                local awardItem = SimpleAwardItem.New(objs[i], self.m_awardItemGridTrans, AwardItemPrefabPath)
+                if awardItem then
+                    awardItem:UpdateData(award_id, award_count)
+                    table_insert(self.m_rankAwardItemList, awardItem)
+                end
+                i = i + 1
+            end
+        end)
+    end
+end
+
+--更新布阵信息
+function UIArenaMainView:UpdateLineupContainer()
+
+    --更新消耗的令牌数
+    self.m_challengeCostText.text = ArenaMgr:GetBattleDeductLingPai()
+
+    --更新总战力
+    local totalPower = ArenaMgr:GetLineupTotalPower()
+    totalPower = math_floor(totalPower)
+    self.m_lineupPowerText.text = string_format(Language.GetString(2204), totalPower)
+
+    --更新武将item
+    self:RecycleLineupWuJiangItemList()
+    if #self.m_lineupWuJiangItemList == 0 and self.m_lineupWuJiangItemSeq == 0 then
+        self.m_lineupWuJiangItemSeq = UIGameObjectLoader:GetInstance():PrepareOneSeq()
+        UIGameObjectLoaderInst:GetGameObjects(self.m_lineupWuJiangItemSeq, WuJiangItemPath, CommonDefine.LINEUP_WUJIANG_COUNT,
+        function(objs)
+            self.m_lineupWuJiangItemSeq = 0
+            if not objs then
+                return
+            end
+            for i = 1, #objs do
+                objs[i].name = "lineupItem_"..i
+                local wujiangItem = LineupWuJiangCardItem.New(objs[i], self.m_wujiangItemGridTrans, WuJiangItemPath)
+                table_insert(self.m_lineupWuJiangItemList, wujiangItem)
+            end
+
+            self:UpdateLineupWuJiangItemList()
+        end)
+    else
+        self:UpdateLineupWuJiangItemList()
+    end
+end
+
+--更新武将item的UI信息
+function UIArenaMainView:UpdateLineupWuJiangItemList()
+    Player:GetInstance():GetArenaMgr():WalkMain(function(standPos, wujiangBriefData)
+        local wujiangItem = self.m_lineupWuJiangItemList[standPos]
+        if wujiangBriefData then
+            wujiangItem:SetData(wujiangBriefData)
+            wujiangItem:SetNameActive(true)
+        else
+            wujiangItem:HideAll()
+        end
+    end)
+end
+
+--更新对手列表
+function UIArenaMainView:UpdateRivalContainer()
+    self:RecycleRivalItemList()
+
+    local arenaRivalDataList = ArenaMgr:GetRivalDataList()
+    if arenaRivalDataList then
+        local totalRivalCount = #arenaRivalDataList
+        self.m_rivalItemListSeq = UIGameObjectLoader:GetInstance():PrepareOneSeq()
+        UIGameObjectLoaderInst:GetGameObjects(self.m_rivalItemListSeq, ArenaRivalItemPath, totalRivalCount, function(objs)
+            self.m_rivalItemListSeq = 0
+            
+            if not objs then
+                return
+            end
+    
+            for i = 1, #objs do
+                local arenaRivalItem = ArenaRivalItem.New(objs[i], self.m_rivalItemGridTrans, ArenaRivalItemPath)
+                if arenaRivalItem then
+                    arenaRivalItem:UpdateData(arenaRivalDataList[i], self.m_battleType)
+                    table_insert(self.m_rivalItemList, arenaRivalItem)
+    
+                    if #self.m_rivalItemList == totalRivalCount then
+                        self.m_rivalItemList[totalRivalCount]:SetLineSptShowState(false)
+                    end
+                end
+            end
+        end)
+    end
+end
+
+function UIArenaMainView:RecycleRankAwardItemList()
+    UIGameObjectLoaderInst:CancelLoad(self.m_rankAwardItemSeq)
+    self.m_rankAwardItemSeq = 0
+
+    for i = 1, #self.m_rankAwardItemList do
+        self.m_rankAwardItemList[i]:Delete()
+    end
+    self.m_rankAwardItemList = {}
+end
+
+function UIArenaMainView:RecycleLineupWuJiangItemList()
+    if self.m_rankAwardItemSeq ~= 0 then
+        UIGameObjectLoaderInst:CancelLoad(self.m_lineupWuJiangItemSeq)
+        self.m_lineupWuJiangItemSeq = 0
+    end
+
+    for i = 1, #self.m_lineupWuJiangItemList do
+        self.m_lineupWuJiangItemList[i]:Delete()
+    end
+    self.m_lineupWuJiangItemList = {}
+end
+
+function UIArenaMainView:RecycleRivalItemList()
+    if self.m_rivalItemListSeq ~= 0 then
+        UIGameObjectLoaderInst:CancelLoad(self.m_rivalItemListSeq)
+        self.m_rivalItemListSeq = 0
+    end
+
+    for i = 1, #self.m_rivalItemList do
+        self.m_rivalItemList[i]:Delete()
+    end
+    self.m_rivalItemList = {}
+end
+
+return UIArenaMainView

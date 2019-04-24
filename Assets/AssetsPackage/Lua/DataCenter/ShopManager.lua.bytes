@@ -1,0 +1,353 @@
+local PBUtil = PBUtil
+local table_insert = table.insert
+local table_sort = table.sort
+local ShopManager = BaseClass("ShopManager")
+
+function ShopManager:__init()
+    self.m_serverList = {} 
+
+	HallConnector:GetInstance():RegisterHandler(MsgIDDefine.SHOP_RSP_SHOP_PANEL, Bind(self, self.RspShopPanel))
+	HallConnector:GetInstance():RegisterHandler(MsgIDDefine.SHOP_RSP_BUY_GOODS, Bind(self, self.RspBuyGoods))
+	HallConnector:GetInstance():RegisterHandler(MsgIDDefine.SHOP_RSP_REFRESH, Bind(self, self.RspRefreshShop))
+	HallConnector:GetInstance():RegisterHandler(MsgIDDefine.VIP_RSP_VIP_SHOP_INFO, Bind(self, self.RspVipShopPanel))
+	HallConnector:GetInstance():RegisterHandler(MsgIDDefine.VIP_RSP_RECHARGE_AWARD_INFO, Bind(self, self.RspRechargeAwardInfo))
+	HallConnector:GetInstance():RegisterHandler(MsgIDDefine.VIP_RSP_TAKE_RECHARGE_AWARD, Bind(self, self.RspTakeRechargeAward))
+	HallConnector:GetInstance():RegisterHandler(MsgIDDefine.VIP_NTF_RECHARGE_AWARD_INFO_CHG, Bind(self, self.NtfRechargeAwardInfo))
+	HallConnector:GetInstance():RegisterHandler(MsgIDDefine.VIP_RSP_YUEKA_INFO, Bind(self, self.RspYueKaInfo))
+	HallConnector:GetInstance():RegisterHandler(MsgIDDefine.VIP_NTF_YUEKA_INFO, Bind(self, self.NtfYueKaInfo))
+	HallConnector:GetInstance():RegisterHandler(MsgIDDefine.VIP_RSP_TAKE_YUEKA_AWARD, Bind(self, self.RspTakeYueKaAward))
+	HallConnector:GetInstance():RegisterHandler(MsgIDDefine.VIP_NTF_BUY_GOODS, Bind(self, self.NtfBuyGoods))
+end
+
+function ShopManager:Dispose()
+
+end
+
+function ShopManager:ReqShopPanel(shopType)
+	local msg_id = MsgIDDefine.SHOP_REQ_SHOP_PANEL
+	local msg = (MsgIDMap[msg_id])()
+	msg.shop_type = shopType
+	HallConnector:GetInstance():SendMessage(msg_id, msg)
+end
+
+function ShopManager:RspShopPanel(msg_obj)
+	local result = msg_obj.result
+	if result ~= 0 then
+		Logger.LogError('RspShopPanel failed: '.. result)
+		return
+	end
+
+	local panelData = {
+		shopType = msg_obj.shop_type,
+		refreshTime = msg_obj.refresh_time,
+		refreshPrice = msg_obj.refresh_price,
+		leftRefreshTimes = msg_obj.left_refresh_times,
+		goodsList = {},
+	}
+
+	local totalGoodsList = {}
+	for _, proto in ipairs(msg_obj.goods_list) do
+		table_insert(totalGoodsList, PBUtil.ConvertShopGoodsProtoToData(proto))
+	end
+	table_sort(totalGoodsList, function(x, y)
+		if x.goodsID < y.goodsID then
+			return true
+		else
+			return false
+		end
+    end)
+
+	local fourGoods = {} -- 4个商品分一组放在一个货架上，只是把数据整理一下方便Ui使用
+	for _, goodsData in ipairs(totalGoodsList) do
+		table_insert(fourGoods, goodsData)
+		if #fourGoods >= 4 then
+			table_insert(panelData.goodsList, fourGoods)
+			fourGoods = {}
+		end
+	end
+	if #fourGoods > 0 then
+		table_insert(panelData.goodsList, fourGoods)
+	end
+
+	UIManagerInst:Broadcast(UIMessageNames.MN_SHOP_GET_PANEL_INFO, panelData)
+end
+
+function ShopManager:ReqBuyGoods(shopType, goodsId, count)
+	local msg_id = MsgIDDefine.SHOP_REQ_BUY_GOODS
+	local msg = (MsgIDMap[msg_id])()
+	msg.shop_type = shopType
+	msg.goods_id = goodsId
+	msg.goods_count = count
+	HallConnector:GetInstance():SendMessage(msg_id, msg)
+end
+
+function ShopManager:RspBuyGoods(msg_obj)
+	local result = msg_obj.result
+	if result ~= 0 then
+		Logger.LogError('RspBuyGoods failed: '.. result)
+		return
+	end
+
+	local awardList = PBUtil.ParseAwardList(msg_obj.award_list)
+   
+    local uiData = {
+        openType = 1,
+		awardDataList = awardList,
+		titleMsg = Language.GetString(3409),
+    }
+	UIManagerInst:OpenWindow(UIWindowNames.UIGetAwardPanel, uiData)
+end
+
+function ShopManager:ReqRefreshShop(shopType)
+	local msg_id = MsgIDDefine.SHOP_REQ_REFRESH
+	local msg = (MsgIDMap[msg_id])()
+	msg.shop_type = shopType
+	HallConnector:GetInstance():SendMessage(msg_id, msg)
+end
+
+function ShopManager:RspRefreshShop(msg_obj)
+	local result = msg_obj.result
+	if result ~= 0 then
+		Logger.LogError('RspRefreshShop failed: '.. result)
+		return
+	end
+end
+
+function ShopManager:ReqVipShopPanel(shopType)
+	local msg_id = MsgIDDefine.VIP_REQ_VIP_SHOP_INFO
+	local msg = (MsgIDMap[msg_id])()
+	msg.shop_type = shopType
+	msg.phone_type = 2
+	msg.terrace = "TEST"
+	HallConnector:GetInstance():SendMessage(msg_id, msg)
+end
+
+function ShopManager:RspVipShopPanel(msg_obj)
+	local result = msg_obj.result
+	if result ~= 0 then
+		Logger.LogError('RspVipShopPanel failed: '.. result)
+		return
+	end
+
+	local goodsList = {}
+	for _, goodsCfgProto in ipairs(msg_obj.goods_cfg_list) do
+		local goodsData = PBUtil.ConvertVipShopGoodsProtoToData(goodsCfgProto)
+		table_insert(goodsList, goodsData)
+	end
+
+	table_sort(goodsList, function(a, b)
+		return a.sortID > b.sortID
+	end)
+	UIManagerInst:Broadcast(UIMessageNames.MN_VIP_SHOP_GET_PANEL_INFO, goodsList)
+end
+
+
+-------------- start 首充----------------
+function ShopManager:ReqRechargeAwardInfo()
+	local msg_id = MsgIDDefine.VIP_REQ_RECHARGE_AWARD_INFO
+	local msg = (MsgIDMap[msg_id])() 
+
+	HallConnector:GetInstance():SendMessage(msg_id, msg)
+end
+
+function ShopManager:RspRechargeAwardInfo(msg_obj)
+	if msg_obj.result == 0 then
+		local tempData1 = {}
+		for i = 1, #msg_obj.charge_award_list do
+			local oneRecharge = self:ConvertOneRechargeAwardInfo(msg_obj.charge_award_list[i])
+			table.insert(tempData1, oneRecharge)
+		end  
+		local panelData = {
+			charge_award_list = tempData1, 
+		} 
+
+		UIManagerInst:Broadcast(UIMessageNames.MN_RSP_SHOUCHONG_AWARD_INFO, panelData)
+	end
+end
+
+function ShopManager:NtfRechargeAwardInfo(msg_obj)
+	local tempData1 = {}
+	for i = 1, #msg_obj.charge_award_list do
+		local oneRecharge = self:ConvertOneRechargeAwardInfo(msg_obj.charge_award_list[i])
+		table.insert(tempData1, oneRecharge)
+	end 
+
+	local panelData = {
+		charge_award_list = tempData1, 
+	} 
+
+	UIManagerInst:Broadcast(UIMessageNames.MN_NTF_SHOUCHONG_AWARD_INFO, panelData)
+end
+
+function ShopManager:ReqTakeRechargeAward(take_type)
+	local msg_id = MsgIDDefine.VIP_REQ_TAKE_RECHARGE_AWARD
+	local msg = (MsgIDMap[msg_id])() 
+	msg.take_type = take_type
+
+	HallConnector:GetInstance():SendMessage(msg_id, msg)
+end
+
+function ShopManager:RspTakeRechargeAward(msg_obj)
+	if msg_obj.result == 0 then  
+		local data = {
+			btn_status = msg_obj.btn_status or 0,
+			take_type = msg_obj.take_type or 0,
+			award_list = PBUtil.ParseAwardList(msg_obj.award_list)
+		}  
+
+		UIManagerInst:Broadcast(UIMessageNames.MN_SHOU_CHONG_GET_AWARD, data) 
+	end
+end
+
+function ShopManager:ConvertOneRechargeAwardInfo(one_recharge_award_info)
+	if one_recharge_award_info then
+		local data = {}
+		data.price = one_recharge_award_info.price
+		data.award_list = {}
+		if one_recharge_award_info.award_list then
+			for i = 1, #one_recharge_award_info.award_list do
+				local one_item = self:ConvertOneItem(one_recharge_award_info.award_list[i])
+				table.insert(data.award_list, one_item)
+			end
+		end
+		data.btn_status = one_recharge_award_info.btn_status or 0
+		data.extral_charge_money = one_recharge_award_info.extral_charge_money or 0
+		return data
+	end
+end
+
+function ShopManager:ConvertOneItem(one_item)
+	if one_item then
+		 local data = {}
+		 data.item_id = one_item.item_id or 0
+		 data.count = one_item.count or 0
+		 data.locked = one_item.locked or 0
+		 return data
+	end
+end 
+ 
+function ShopManager:SetShouChongRedPointStatus(dataList)
+	local status = false
+
+	if dataList then
+		for k, v in ipairs(dataList) do
+			if v.btn_status == 1 then
+				status = true
+				break
+			end
+		end
+	end
+
+	local userMgr = Player:GetInstance():GetUserMgr()
+	if not status then 
+        userMgr:DeleteRedPointID(SysIDs.SHOU_CHONG)
+	else
+		userMgr:AddRedPointId(SysIDs.SHOU_CHONG)
+	end 
+
+	UIManagerInst:Broadcast(UIMessageNames.MN_MAIN_ICON_REFRESH_RED_POINT)
+end 
+---------------- end 首充------------------
+
+
+------------------月卡-----------------
+function ShopManager:ReqYueKaInfo()
+	local msg_id = MsgIDDefine.VIP_REQ_YUEKA_INFO
+	local msg = (MsgIDMap[msg_id])() 
+
+	HallConnector:GetInstance():SendMessage(msg_id, msg)
+end
+
+function ShopManager:RspYueKaInfo(msg_obj)
+	if msg_obj.result == 0 then
+		local tempSmallYueKa = self:ConvertOneYueKa(msg_obj.small_yueka)
+		local tempBigYueKa = self:ConvertOneYueKa(msg_obj.big_yueka)
+
+		local panelData = {
+			small_yueka = tempSmallYueKa,
+			big_yueka = tempBigYueKa,
+		}
+		self:SetYueKaRedPointStatus(tempSmallYueKa, tempBigYueKa)
+
+		UIManagerInst:Broadcast(UIMessageNames.MN_RSP_YUEKA_PANEL_INFO, panelData)
+	end
+end
+
+function ShopManager:NtfYueKaInfo(msg_obj)
+	local tempSmallYueKa = self:ConvertOneYueKa(msg_obj.small_yueka)
+	local tempBigYueKa = self:ConvertOneYueKa(msg_obj.big_yueka)
+
+	local panelData = {
+		small_yueka = tempSmallYueKa,
+		big_yueka = tempBigYueKa,
+	}
+	self:SetYueKaRedPointStatus(tempSmallYueKa, tempBigYueKa)
+
+	UIManagerInst:Broadcast(UIMessageNames.MN_NTF_YUEKA_PANEL_INFO, panelData)
+end
+
+function ShopManager:ReqTakeYueKaAward(yueka_type)
+	local msg_id = MsgIDDefine.VIP_REQ_TAKE_YUEKA_AWARD
+	local msg = (MsgIDMap[msg_id])() 
+	msg.yueka_type = yueka_type
+
+	HallConnector:GetInstance():SendMessage(msg_id, msg)
+end
+
+function ShopManager:RspTakeYueKaAward(msg_obj)
+	if msg_obj.result == 0 then
+		local awardList = PBUtil.ParseAwardList(msg_obj.award_list)
+   		UIManagerInst:Broadcast(UIMessageNames.MN_RSP_YUEKA_TAKE_AWARD, awardList)
+	end
+end
+
+function ShopManager:ConvertOneYueKa(one_yueka)
+	if one_yueka then
+		local data = {}
+		data.goods_id = one_yueka.goods_id or 0
+		data.price = one_yueka.price or 0
+		data.left_days = one_yueka.left_days or 0
+		data.item_list = {}
+		if one_yueka.item_list then
+			for i = 1, #one_yueka.item_list do
+				local one_item = self:ConvertOneItem(one_yueka.item_list[i])
+				table.insert(data.item_list, one_item)
+			end
+		end
+		data.status = one_yueka.status or 0
+		return data
+	end
+end
+
+function ShopManager:SetYueKaRedPointStatus(smallData, bigData)
+	local status = false
+	if bigData and smallData then
+		if bigData.status == 2 then
+			status = true
+		end
+		if smallData.status == 2 then
+			status = true
+		end
+	end
+
+	local userMgr = Player:GetInstance():GetUserMgr()
+	if not status then 
+        userMgr:DeleteRedPointID(SysIDs.YUE_KA)
+	else
+		userMgr:AddRedPointId(SysIDs.YUE_KA)
+    end 
+	UIManagerInst:Broadcast(UIMessageNames.MN_MAIN_ICON_REFRESH_RED_POINT)
+end
+
+-----------------月卡 end---------------------------------
+ 
+function ShopManager:NtfBuyGoods(msg_obj)
+    local awardList = PBUtil.ParseAwardList(msg_obj.award_list)
+    local uiData = {
+        openType = 1,
+        awardDataList = awardList
+    }
+    UIManagerInst:OpenWindow(UIWindowNames.UIGetAwardPanel, uiData)
+end
+
+return ShopManager

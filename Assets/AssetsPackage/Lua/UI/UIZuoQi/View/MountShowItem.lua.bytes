@@ -1,0 +1,175 @@
+
+local string_format = string.format
+local math_ceil = math.ceil
+local math_floor = math.floor
+local GameUtility = CS.GameUtility
+local UILogicUtil = UILogicUtil
+local UIUtil = UIUtil
+local Language = Language
+local ConfigUtil = ConfigUtil
+local PreloadHelper = PreloadHelper
+local MountMgr = Player:GetInstance():GetMountMgr()
+local UserMgr = Player:GetInstance():GetUserMgr()
+
+local MountShowItem = BaseClass("MountShowItem", UIBaseItem)
+local base = UIBaseItem
+
+function MountShowItem:OnCreate()
+    base.OnCreate(self)
+    local stageAreaText
+    self.m_gardenNameText, stageAreaText, self.m_coolingTimeText, self.m_leftCount,
+    self.m_cantShowText = UIUtil.GetChildTexts(self.transform, {
+        "frame/GradenText",
+        "maintain/stageArea/Text",
+        "maintain/coolingTime",
+        "maintain/leftCount",
+        "cantShowText",
+    })
+
+    self.m_clickBtn, self.m_noMountGo, self.m_maintainGo, self.m_mountPos = UIUtil.GetChildTransforms(self.transform, {
+        "frame",
+        "NoMountBg",
+        "maintain",
+        "mountPos"
+    })
+
+    self.m_maintainGo = self.m_maintainGo.gameObject
+    self.m_noMountGo = self.m_noMountGo.gameObject
+    stageAreaText.text = Language.GetString(3543)
+    self.m_showData = false
+    
+    local function onClick(go)
+        if go.name == "frame" then
+            if self.m_showData.status ~= 1 and self.m_showData.status ~= 2 then
+                if not self.m_showData.left_times or self.m_showData.left_times <= 0 then
+                    UILogicUtil.FloatAlert(Language.GetString(3554))
+                    return
+                end
+            
+                local letfTime = self.m_showData.cd_end_time - Player:GetInstance():GetServerTime()
+                if letfTime > 0 then
+                    local allTime = UserMgr:GetSettingData().horse_show_cd
+                    local priceCfg = ConfigUtil.GetShowClearCDPriceCfgByID(self.m_showData.clear_cd_times + 1)
+                    local yuanbaoCount = math_ceil((letfTime / allTime) * priceCfg.price)
+                    UIManagerInst:OpenWindow(UIWindowNames.UIHuntTips, Language.GetString(3547), Bind(self, self.HorseShowClick),
+                        Language.GetString(3548), Bind(self, self.HorseAttrClick), nil, nil, yuanbaoCount)
+                else
+                    UIManagerInst:OpenWindow(UIWindowNames.UIHuntTips, Language.GetString(3547), Bind(self, self.HorseShowClick),
+                    Language.GetString(3548), Bind(self, self.HorseAttrClick))
+                end
+            end
+        end
+    end
+    UIUtil.AddClickEvent(self.m_clickBtn.gameObject, onClick)
+end
+
+function MountShowItem:HorseShowClick()
+    local letfTime = self.m_showData.cd_end_time - Player:GetInstance():GetServerTime()
+    if letfTime > 0 then
+        local allTime = UserMgr:GetSettingData().horse_show_cd
+        local priceCfg = ConfigUtil.GetShowClearCDPriceCfgByID(self.m_showData.clear_cd_times + 1)
+        local yuanbaoCount = math_ceil((letfTime / allTime) * priceCfg.price)
+        local data = {
+            titleMsg = Language.GetString(3553),
+            contentMsg = string_format(Language.GetString(3552), yuanbaoCount),
+            yuanbao = yuanbaoCount,
+            buyCallback = Bind(self, self.ClearHorseCD),
+        }
+        UIManagerInst:OpenWindow(UIWindowNames.UIBuyTipsDialog, data)
+    else
+        UIManagerInst:OpenWindow(UIWindowNames.UIMountChoice, self.m_showData.id)
+    end
+end
+
+function MountShowItem:ClearHorseCD()
+    MountMgr:ReqClearShowCD(self.m_showData.id)
+    UIManagerInst:OpenWindow(UIWindowNames.UIMountChoice, self.m_showData.id)
+end
+
+function MountShowItem:HorseAttrClick()
+    UIManagerInst:OpenWindow(UIWindowNames.UIMountAttribute , self.m_showData.id, self.m_showData.level)
+end
+
+function MountShowItem:SetData(showData, clipBounds)
+    if not showData then
+        return
+    end
+    
+    self.m_showData = showData
+    local huntCfg = ConfigUtil.GetHuntCfgByID(showData.id)
+    if huntCfg then
+        self.m_gardenNameText.text = huntCfg.name
+        self.m_leftCount.text = string_format(Language.GetString(3544), showData.left_times, showData.total_times)
+        if showData.status == 1 then
+            self.m_maintainGo:SetActive(false)
+            self.m_noMountGo:SetActive(true)
+            self.m_cantShowText.text = string_format(Language.GetString(3545), "解锁")
+        elseif showData.status == 2 then
+            self.m_maintainGo:SetActive(false)
+            self.m_noMountGo:SetActive(true)
+            self.m_cantShowText.text = string_format(Language.GetString(3545), "维护")
+        else
+            self.m_maintainGo:SetActive(true)
+            self.m_noMountGo:SetActive(false)
+            self.m_cantShowText.text = ""
+            self:ShowMountModel(huntCfg.horse_id, clipBounds)
+        end
+    end
+end
+
+function MountShowItem:ShowMountModel(mountId, clipBounds)
+    if not mountId then
+        Logger.LogError("no mountId!")
+        return
+    end
+    local pool = GameObjectPoolInst
+    local resPath = PreloadHelper.GetHorsePath(mountId, 5)
+
+    pool:GetGameObjectAsync(resPath, function(inst)
+        if IsNull(inst) then
+            pool:RecycleGameObject(resPath, inst)
+            return
+        end
+
+        local trans = inst.transform
+
+        trans:SetParent(self.m_mountPos)
+        trans.localScale = Vector3.New(140, 140, 140)
+        trans.localPosition = Vector3.New(-9.6, -118, 0)
+        trans.localEulerAngles = Vector3.New(7, 151, 0)
+        
+        GameUtility.RecursiveSetLayer(inst, Layers.UI)
+
+        local clipRegion = Vector4.New(clipBounds[0].x, clipBounds[0].y, clipBounds[2].x, clipBounds[2].y)
+       
+        UIUtil.ClipGameObjectWithBounds(trans, clipRegion)
+    end)
+end
+
+function MountShowItem:ChangeTime(time)
+    local timeText = ""
+    if time >= 0 then
+        local hour = time / 3600
+        hour = math_floor(hour)
+        time = time - hour * 3600
+        local minute = time / 60
+        minute = math_floor(minute)
+        time = time - minute * 60
+        local second = math_floor(time)
+        timeText = string.format("%02d:%02d:%02d", hour, minute, second)
+    else
+        timeText = ""
+    end
+    return timeText
+end
+
+function MountShowItem:Update()
+    local serverTime = Player:GetInstance():GetServerTime()
+    if self.m_showData.cd_end_time - serverTime > 0 then
+        self.m_coolingTimeText.text = self:ChangeTime(self.m_showData.cd_end_time - serverTime)
+    else
+        self.m_coolingTimeText.text = ""
+    end
+end
+
+return MountShowItem

@@ -1,0 +1,80 @@
+--[[
+ added by graylei @ 2018-08-06
+ 网络监控器，负责监控网络断线、跨天
+]]
+
+local NetMonitor = BaseClass("NetMonitor", Singleton)
+
+local CrossDayCheckInterval = 5
+local HeartBeatCheckInterval = 5
+local UpdateInterval = 1
+
+function NetMonitor:__init()
+    self.m_pauseStartTime = 0
+    self.m_updateTime = 0
+    self.m_heartBeatCheckTime = 0
+    self.m_crossDayCheckTime = 0
+
+    self.m_isEditor = CS.GameUtility.IsEditor()
+
+    self.m_player = Player:GetInstance()
+    self.m_userMgr = Player:GetInstance():GetUserMgr()
+    self.m_loginMgr = Player:GetInstance():GetLoginMgr()
+end
+
+function NetMonitor:Update(deltaTime)
+    if not self.m_player:IsGameInit() then
+        return
+    end
+
+    self.m_updateTime = self.m_updateTime + deltaTime
+    if self.m_updateTime < UpdateInterval then
+        return
+    end
+    self.m_updateTime = self.m_updateTime - UpdateInterval
+    self.m_player:SetServerTime(self.m_player:GetServerTime() + UpdateInterval)
+    self.m_heartBeatCheckTime = self.m_heartBeatCheckTime + UpdateInterval
+    self.m_crossDayCheckTime = self.m_crossDayCheckTime + UpdateInterval
+
+    if self.m_heartBeatCheckTime >= HeartBeatCheckInterval then
+        self.m_heartBeatCheckTime = 0
+        self.m_userMgr:ReqHeartBeat()
+    end
+
+    if self.m_crossDayCheckTime >= CrossDayCheckInterval then
+        self.m_crossDayCheckTime = 0
+        if self.m_userMgr:IsCrossDay() then
+            self.m_userMgr:SetCrossDay(false)
+            self.m_loginMgr:ReqAllData()
+        end
+    end
+
+    UIUtil.CheckTryClickTime()
+end
+
+function NetMonitor:OnApplicationPause(isPause)
+    if self.m_isEditor then
+        return
+    end
+
+    self.m_player:SetAppPause(isPause)
+    if isPause then
+        self.m_pauseStartTime = os.time()
+    else
+        local pauseSeconds = os.difftime(os.time(), self.m_pauseStartTime)
+        if pauseSeconds >= 3 * 24 * 3600 then
+            UIManagerInst:OpenOneButtonTip(Language.GetString(9), Language.GetString(202), Language.GetString(10), function()
+                CS.UnityEngine.Application.Quit()
+            end)
+            return
+        end
+
+        self.m_player:SetServerTime(self.m_player:GetServerTime() + pauseSeconds)
+
+        if HallConnector:GetInstance():IsSocketConnected() and not SceneManagerInst:IsLoginScene() then
+            HallConnector:GetInstance():Reconnect()
+        end
+    end
+end
+
+return NetMonitor

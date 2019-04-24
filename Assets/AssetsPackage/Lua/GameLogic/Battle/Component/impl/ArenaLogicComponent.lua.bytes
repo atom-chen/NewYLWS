@@ -1,0 +1,48 @@
+
+local PBUtil = PBUtil
+local BattleEnum = BattleEnum
+local BaseBattleLogicComponent = require "GameLogic.Battle.Component.BaseBattleLogicComponent"
+local ArenaLogicComponent = BaseClass("ArenaLogicComponent", BaseBattleLogicComponent)
+
+function ArenaLogicComponent:__init(copyLogic)
+    -- HallConnector:GetInstance():RegisterHandler(MsgIDDefine.BATTLE_RSP_REPORT_FRAME_DATA, Bind(self, self.RspReportFrameData))
+end
+
+function ArenaLogicComponent:__delete()
+    -- HallConnector:GetInstance():ClearHandler(MsgIDDefine.BATTLE_RSP_REPORT_FRAME_DATA)
+end
+  
+function ArenaLogicComponent:ShowBattleUI()
+    UIManagerInst:OpenWindow(UIWindowNames.UIBattleArenaMain)
+    BaseBattleLogicComponent.ShowBloodUI(self)
+end  
+
+function ArenaLogicComponent:RspReportFrameData(msg_obj)
+
+end
+
+function ArenaLogicComponent:ReqBattleFinish(playerWin)     
+    UIManagerInst:CloseWindow(UIWindowNames.UIBattleArenaMain)   
+    UIManagerInst:OpenWindow(UIWindowNames.UIArenaSettlement, playerWin)   
+    
+    local battleResultData = self.m_logic:GetBattleParam().battleResultData
+    if battleResultData then    -- 看录像是没有这个的
+        local prev_rank_dan = battleResultData.prev_rank_dan
+        local curr_rank_dan = battleResultData.curr_rank_dan
+        if curr_rank_dan < prev_rank_dan then
+            GamePromptMgr:GetInstance():InstallPrompt(CommonDefine.ARENA_RANK_LEVEL_UP, curr_rank_dan)
+        end
+
+        local isEqual = self:CompareBattleResult(battleResultData.resultInfo)
+        if not isEqual then
+            Logger.Log("Do not sync, report frame data to server")
+            self:ReqReportFrameData()
+        end
+    end
+end
+
+function ArenaLogicComponent:OnDragonSkillPerform(camp)
+    UIManagerInst:Broadcast(UIMessageNames.UIBATTLE_DRAGON_SKILL_PERFORM, camp)
+end
+
+return ArenaLogicComponent

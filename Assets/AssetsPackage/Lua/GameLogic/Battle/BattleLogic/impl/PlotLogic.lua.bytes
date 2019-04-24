@@ -1,0 +1,340 @@
+local BattleEnum = BattleEnum
+local NewFixVector3 = FixMath.NewFixVector3
+local ConfigUtil = ConfigUtil
+local SequenceEventType = SequenceEventType
+local PreloadHelper = PreloadHelper
+local ScreenColorEffect = CS.ScreenColorEffect
+local CtlBattleInst = CtlBattleInst
+
+local ActorCreateParam = require "GameLogic.Battle.Actors.ActorCreateParam"
+local BaseBattleLogic = require "GameLogic.Battle.BattleLogic.BaseBattleLogic"
+local PlotLogic = BaseClass("PlotLogic", BaseBattleLogic)
+
+local base = BaseBattleLogic
+
+function PlotLogic:__init()
+    self.m_isAlreadExecute = false
+    self.m_battleParam = false
+    self.m_rightPosList = {
+        NewFixVector3(17.88, 0.01, -0.95),
+        NewFixVector3(12.37, 0.01, -3.59),
+        NewFixVector3(12.37, 0.01, -1.03),
+        NewFixVector3(13.72, 0.01, 0.42),
+        NewFixVector3(13.72, 0.01, -2.35),
+        NewFixVector3(13.72, 0.01, -4.8),
+        NewFixVector3(15.16, 0.01, -3.89),
+        NewFixVector3(15.16, 0.01, -0.29),
+        NewFixVector3(17.15, 0.01, -0.29),
+        NewFixVector3(17.15, 0.01, -3.79),
+		NewFixVector3(15.69, 0.01, -2.07),
+		NewFixVector3(17.06, 0.01, -2.07),
+		NewFixVector3(18.69, 0.01, -2.07),
+		NewFixVector3(15.71, 0.01, -5.28),
+		NewFixVector3(15.85, 0.01, 1.76),
+		NewFixVector3(17.77, 0.01, 1.76),
+		NewFixVector3(19.01, 0.01, -0.07),
+		NewFixVector3(17.45, 0.01, -5.47),
+    }
+    self.m_leftPosList = {
+        NewFixVector3(0, 0, 0),
+        NewFixVector3(-1.5, 0, -2),
+        NewFixVector3(-1.5, 0, 2),
+        NewFixVector3(-3.5, 0, -1),
+        NewFixVector3(-3.5, 0, 1),
+        NewFixVector3(2, 0, 0),
+        NewFixVector3(0.5, 0, -2),
+        NewFixVector3(0.5, 0, 2),
+    }
+
+    self.m_bossforward = NewFixVector3(1, 0, 0)
+
+    self.m_monsterforward = NewFixVector3(-1, 0, 0) -- 小怪朝向
+    self.m_dongzuoPos = NewFixVector3(10.02, 0.01, -2.41)
+    self.m_monsterPosList = {
+        NewFixVector3(12.37, 0.01, -3.59),
+        NewFixVector3(12.37, 0.01, -1.03),
+        NewFixVector3(13.72, 0.01, 0.42),
+        NewFixVector3(13.72, 0.01, -2.35),
+        NewFixVector3(13.72, 0.01, -4.8),
+        NewFixVector3(15.16, 0.01, -3.89),
+        NewFixVector3(15.16, 0.01, -0.29),
+        NewFixVector3(17.15, 0.01, -0.29),
+        NewFixVector3(17.15, 0.01, -3.79),
+		NewFixVector3(15.69, 0.01, -2.07),
+		NewFixVector3(17.06, 0.01, -2.07),
+		NewFixVector3(18.69, 0.01, -2.07),
+		NewFixVector3(15.71, 0.01, -5.28),
+		NewFixVector3(15.85, 0.01, 1.76),
+		NewFixVector3(17.77, 0.01, 1.76),
+		NewFixVector3(19.01, 0.01, -0.07),
+		NewFixVector3(17.45, 0.01, -5.47),
+    }
+    self.m_wujiangPosList = {
+        NewFixVector3(2.54, 0.01, -2.19),
+        NewFixVector3(1.01, 0.01, -0.57),
+        NewFixVector3(1.01, 0.01, -3.84),
+        NewFixVector3(-0.37, 0.01, -1.29),
+        NewFixVector3(-0.37, 0.01, -3.07),
+    }
+    self.m_wujiangforward = NewFixVector3(1, 0, 1) 
+
+    self.m_battleType = BattleEnum.BattleType_PLOT
+    self.m_dongZuoActorID = 0
+    self.m_lastHPPercent = 0
+    self.m_actorMgr = ActorManagerInst
+    self.m_monsterList = {}
+    self.m_firstMonsterList = {} -- 第一波小怪需要特殊处理下，因为他们刷新的时候是在战斗中，会被AI驱动播放走路动作
+    self.m_battleRoundCfg = nil
+    self.m_monsterCount = 0
+    self.m_isSecondWave = false
+end
+
+function PlotLogic:OnBattleInit()
+    base.OnBattleInit(self)
+    
+    local actormgr = ActorManagerInst
+
+    local leftWujiangList = self.m_battleParam.leftCamp.wujiangList
+    for i, oneWujiang in ipairs(leftWujiangList) do
+        local createParam = ActorCreateParam.New()
+        createParam:MakeSource(BattleEnum.ActorSource_ORIGIN, 0)
+        createParam:MakeAttr(BattleEnum.ActorCamp_LEFT, oneWujiang)
+        createParam:MakeLocation(self:GetBornWorldLocation(BattleEnum.ActorCamp_LEFT, 0, i))
+        createParam:MakeAI(BattleEnum.AITYPE_MANUAL) 
+        createParam:MakeRelationType(BattleEnum.RelationType_NORMAL)
+        createParam:SetImmediateCreateObj(true)
+
+        actormgr:CreateActor(createParam)
+    end
+
+    local battleRoundCfg = ConfigUtil.GetBattleRoundCfgByID(100001)
+    self:FlushBattleRound(battleRoundCfg, true)
+
+    self.m_lastHPPercent = 1
+    self.m_monsterCount = 0
+end
+
+function PlotLogic:CreatePlot()
+    self.m_plotContext = SequenceMgr:GetInstance():PlayPlot('PlotXuZhang')
+end
+
+function PlotLogic:GetLeftPos(wave)
+    return self.m_leftPosList
+end
+
+function PlotLogic:GetRightPos(wave)
+    return self.m_rightPosList
+end
+
+function PlotLogic:Update(deltaMS, battlestatus)
+    if not self.m_isAlreadExecute then
+        local isEnd, timelineName = BattleCameraMgr:IsCurCameraModeEnd()
+        if isEnd then
+            self.m_isAlreadExecute = true
+            if timelineName == "Luoyangdemo1" or timelineName == "Luoyangdemo2" then
+                SequenceMgr:GetInstance():TriggerEvent(SequenceEventType.PLOT_TIMELINE_END)
+            elseif timelineName == "Luoyangdemo3" then
+                SceneManagerInst:SwitchScene(SceneConfig.HomeScene)
+            elseif timelineName == "Luoyangdemo4" then
+                self.m_isSecondWave = true
+                SequenceMgr:GetInstance():TriggerEvent(SequenceEventType.PLOT_TIMELINE_END)
+            end
+        end
+    end
+    if battlestatus == BattleEnum.BattleStatus_WAVE_FIGHTING then
+        if self.m_lastHPPercent > 0.7 then
+            local actor = self.m_actorMgr:GetActor(self.m_dongZuoActorID)
+            if actor then
+                local fightData = actor:GetData()
+                local curHp = fightData:GetAttrValue(ACTOR_ATTR.FIGHT_HP)
+                local maxHP = fightData:GetAttrValue(ACTOR_ATTR.FIGHT_MAXHP)
+                self.m_lastHPPercent = curHp/maxHP
+                if self.m_lastHPPercent <= 0.7 then
+                    self:OnBattleStop()
+                    local mat = ResourcesManagerInst:LoadSync("EffectCommonMat/DynamicMaterials/SE_ScreenColor.mat", typeof(CS.UnityEngine.Material))
+                    ScreenColorEffect.ApplyScreenColorEffect(mat, 1, Color.black, true)
+
+                    self.timer_action = function(self)
+                        self.timer:Stop()
+                        SequenceMgr:GetInstance():TriggerEvent(SequenceEventType.BATTLE_WAVE_END)
+                    end
+                    self.timer = TimerManager:GetInstance():GetTimer(1, self.timer_action , self, true)
+                    self.timer:Start()
+                end
+            end
+        end
+    end
+end
+
+function PlotLogic:PlayPlotBeforeGO()
+    BattleCameraMgr:SwitchCameraMode(BattleEnum.CAMERA_MODE_PLOT, "Luoyangdemo1", TimelineType.PATH_HOME_SCENE)
+    self.m_isAlreadExecute = false
+end
+
+function PlotLogic:PlayPlotBeforeStart()
+    BattleCameraMgr:SwitchCameraMode(BattleEnum.CAMERA_MODE_PLOT, "Luoyangdemo2", TimelineType.PATH_HOME_SCENE)
+    self.m_isAlreadExecute = false
+end
+
+function PlotLogic:PlayPlotWhenBattleEnd()
+    BattleCameraMgr:SwitchCameraMode(BattleEnum.CAMERA_MODE_PLOT, "Luoyangdemo3", TimelineType.PATH_HOME_SCENE)
+    self.m_isAlreadExecute = false
+end
+
+function PlotLogic:PlayPlotBetweenBattle()
+    self:CreateMonsterList()
+
+    self:ResetWujiangPosAndForward()
+    ScreenColorEffect.StopScreenColorEffect(0.5)
+
+    BattleCameraMgr:SwitchCameraMode(BattleEnum.CAMERA_MODE_PLOT, "Luoyangdemo4", TimelineType.PATH_HOME_SCENE)
+    self.m_isAlreadExecute = false
+end
+
+function PlotLogic:OnWaveEnd()
+    base.OnWaveEnd(self)
+    SequenceMgr:GetInstance():TriggerEvent(SequenceEventType.BATTLE_GO_START)
+end
+
+function PlotLogic:ResetWujiangPosAndForward()
+    self.m_actorMgr:Walk(function(tmpTarget)
+        if tmpTarget:GetCamp() == BattleEnum.ActorCamp_RIGHT then
+            if tmpTarget:GetActorID() == self.m_dongZuoActorID then
+                tmpTarget:SetPosition(self:ToWorldPosition(self.m_dongzuoPos, self.m_currWave))
+                tmpTarget:SetRelationType(BattleEnum.RelationType_SON_NONINTERACTIVE)
+            else
+                tmpTarget:SetPosition(self:ToWorldPosition(self.m_monsterPosList[tmpTarget:GetLineupPos()], self.m_currWave))
+            end
+            tmpTarget:SetForward(self.m_monsterforward)
+        else
+            tmpTarget:SetPosition(self:ToWorldPosition(self.m_wujiangPosList[tmpTarget:GetLineupPos()], self.m_currWave))
+            tmpTarget:SetForward(self.m_wujiangforward)
+        end
+        tmpTarget:PlayAnim(BattleEnum.ANIM_IDLE)
+    end)
+end
+
+function PlotLogic:GoToCurrentWaveStandPoint(ignorePartner)
+    BattleCameraMgr:SwitchCameraMode(BattleEnum.CAMERA_MODE_WAVE_GO, "luoyangpath", TimelineType.PATH_HOME_SCENE)
+    WaveGoMgr:GoToCurrentWaveStandPoint(self, ignorePartner)
+end
+
+function PlotLogic:OnNextWaveArrived()   
+    SequenceMgr:GetInstance():TriggerEvent(SequenceEventType.BATTLE_GO_END)
+end
+
+function PlotLogic:PlayDollyGroupCamera(dollyImmediate)
+    BattleCameraMgr:SwitchCameraMode(BattleEnum.CAMERA_MODE_DOLLY_GROUP, "DollyGroup30", self.m_isSecondWave)
+end
+
+function PlotLogic:GetForward(camp, wave)
+    if camp == BattleEnum.ActorCamp_LEFT then
+        return base.GetForward(self, camp, wave)
+    else
+        if not self.m_isSecondWave then
+            return self.m_bossforward
+        else
+            return self.m_monsterforward
+        end
+    end
+end
+
+function PlotLogic:OnActorDie(actor, killerGiver, hurtReason, deadMode)
+    if not actor then
+        return
+    end
+
+    base.OnActorDie(self, actor, killerGiver, hurtReason)
+
+    if actor:IsCalled() then
+        return
+    end
+
+    if self.m_monsterCount < 100 then
+        local monster = self.m_monsterList[actor:GetActorID()]
+        if monster then
+            self.m_monsterList[actor:GetActorID()] = nil
+            self:CreateOneMonster(monster.i, monster.id)
+        end
+    end
+
+    if actor:GetCamp() == BattleEnum.ActorCamp_LEFT then
+        if ActorManagerInst:IsCampAllDie(BattleEnum.ActorCamp_LEFT) then
+            SequenceMgr:GetInstance():TriggerEvent(SequenceEventType.BATTLE_END)
+        end
+    elseif actor:GetCamp() == BattleEnum.ActorCamp_RIGHT then
+        local isEnd = true
+        self.m_actorMgr:Walk(function(tmpTarget)
+            if tmpTarget:GetCamp() == BattleEnum.ActorCamp_RIGHT and tmpTarget:IsLive() and tmpTarget:GetActorID() ~= self.m_dongZuoActorID then
+                isEnd = false
+            end
+        end)
+        if isEnd then
+            local actor = self.m_actorMgr:GetActor(self.m_dongZuoActorID)
+            if actor then
+                actor:OnFightEnd()
+            end
+            SequenceMgr:GetInstance():TriggerEvent(SequenceEventType.BATTLE_END)
+        end
+    end
+end
+
+function PlotLogic:FlushBattleRound(battleRoundCfg, immediatelyCreateObj)
+    local monster = battleRoundCfg.monsterlist[1]
+    local monsterCfg = ConfigUtil.GetMonsterCfgByID(monster[1])
+    if monsterCfg then
+        local createParam = ActorCreateParam.New()
+        createParam:MakeAI(monster[2])
+        
+        local oneWujiang = self:CreateBattleMonster(1, monsterCfg, battleRoundCfg, monster[3])
+        createParam:MakeMonster(monster[1], oneWujiang.bossType)
+        createParam:MakeAttr(BattleEnum.ActorCamp_RIGHT, oneWujiang)
+        createParam:MakeLocation(self:GetBornWorldLocation(BattleEnum.ActorCamp_RIGHT, self.m_currWave, 1)) 
+        createParam:SetImmediateCreateObj(immediatelyCreateObj)
+
+        local actor = self.m_actorMgr:CreateActor(createParam)
+        self.m_dongZuoActorID = actor:GetActorID()
+    end
+end
+
+function PlotLogic:CreateMonsterList()
+    self.m_battleRoundCfg = ConfigUtil.GetBattleRoundCfgByID(100002)
+    for i, monster in ipairs(self.m_battleRoundCfg.monsterlist) do
+        self.m_firstMonsterList[monster[1]] = true
+        local actorID = self:CreateOneMonster(i, monster[1])
+    end
+end
+
+function PlotLogic:CreateOneMonster(index, monsterID)
+    self.m_monsterCount = self.m_monsterCount + 1
+    local monsterCfg = ConfigUtil.GetMonsterCfgByID(monsterID)
+    if monsterCfg then
+        local createParam = ActorCreateParam.New()
+        createParam:MakeAI(BattleEnum.AITYPE_INITIATE)
+        local oneWujiang = self:CreateBattleMonster(index, monsterCfg, self.m_battleRoundCfg)
+        createParam:MakeMonster(monsterID, oneWujiang.bossType)
+        createParam:MakeAttr(BattleEnum.ActorCamp_RIGHT, oneWujiang)
+        createParam:MakeLocation(self:GetBornWorldLocation(BattleEnum.ActorCamp_RIGHT, self.m_currWave, index + 1)) 
+        createParam:SetImmediateCreateObj(true)
+
+        local actor = self.m_actorMgr:CreateActor(createParam)
+        self.m_monsterList[actor:GetActorID()] = {i = index, id = monsterID}
+        return actor:GetActorID()
+    end
+end
+
+function PlotLogic:OnActorCreated(actor)
+    if not actor then return end
+
+    if CtlBattleInst:IsInFight() then
+        if not self.m_firstMonsterList[actor:GetMonsterID()] then
+            actor:ResetSkillFirstCD()
+
+            actor:OnFightStart(self.m_currWave)
+        end
+    end
+
+    self.m_battleDamage:OnActorCreated(actor)
+end
+
+return PlotLogic

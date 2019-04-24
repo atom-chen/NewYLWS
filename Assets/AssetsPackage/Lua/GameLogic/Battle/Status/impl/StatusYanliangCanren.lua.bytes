@@ -1,0 +1,115 @@
+local StatusEnum = StatusEnum
+local FixMul = FixMath.mul
+local FixIntMul = FixMath.muli
+local FixAdd = FixMath.add
+local FixSub = FixMath.sub
+local ACTOR_ATTR = ACTOR_ATTR
+
+local StatusBase = require("GameLogic.Battle.Status.StatusBase")
+local StatusYanliangCanren = BaseClass("StatusYanliangCanren", StatusBase)
+ 
+function StatusYanliangCanren:__init()
+    self.m_chgPhyDef = 0
+    self.m_chgMagicDef = 0
+    self.m_phyDefPercent = 0
+    self.m_baojiPercent = 0
+    self.m_addPhyBaoji = 0
+    self.m_addMagicBaoji = 0
+    self.m_addAttr = false
+    self.m_effectKey = -1
+end
+
+function StatusYanliangCanren:Init(giver, leftMS, addBaojiPercent, phyDefPercent, effect)
+    StatusBase.Init(self, giver, leftMS, addBaojiPercent, phyDef, effect)
+    self:SetLeftMS(leftMS)
+    self.m_giver = giver
+    self.m_effectMask = effect
+    self.m_phyDefPercent = phyDefPercent
+
+    self.m_chgPhyDef = 0
+    self.m_chgMagicDef = 0
+    self.m_baojiPercent = addBaojiPercent
+    self.m_addAttr = false
+    self.m_addPhyBaoji = 0
+    self.m_addMagicBaoji = 0
+    self.m_effectKey = -1
+end
+
+function StatusYanliangCanren:GetStatusType()
+    return StatusEnum.STATUSTYPE_YANGLIANG_CANREN
+end
+
+function StatusYanliangCanren:Effect(actor)
+    if actor and actor:IsLive() then
+        if self.m_phyDefPercent > 0 then
+            local chgPhyDef = actor:CalcAttrChgValue(ACTOR_ATTR.BASE_PHY_DEF, self.m_phyDefPercent)
+            self.m_chgPhyDef = chgPhyDef
+            actor:GetData():AddFightAttr(ACTOR_ATTR.FIGHT_PHY_DEF, chgPhyDef)
+        end
+
+        if self.m_baojiPercent > 0 then
+            local chgPhyBaoji = actor:CalcAttrChgValue(ACTOR_ATTR.BASE_PHY_BAOJI, self.m_baojiPercent)
+            self.m_addPhyBaoji = chgPhyBaoji
+            actor:GetData():AddFightAttr(ACTOR_ATTR.FIGHT_PHY_BAOJI, chgPhyBaoji)
+            
+            local chgMagicDef = actor:CalcAttrChgValue(ACTOR_ATTR.BASE_MAGIC_BAOJI, self.m_baojiPercent)
+            self.m_addMagicBaoji = chgMagicDef
+            actor:GetData():AddFightAttr(ACTOR_ATTR.FIGHT_MAGIC_BAOJI, chgMagicDef)
+        end
+
+        self.m_addAttr = true
+
+        if self.m_effectMask and #self.m_effectMask > 0 and self.m_effectKey <= 0 then
+            self.m_effectKey = self:ShowEffect(actor, self.m_effectMask[1])
+        end
+    end
+end
+
+function StatusYanliangCanren:ClearEffect(actor)
+    if actor and actor:IsLive() then
+        if self.m_addAttr then
+            if self.m_chgPhyDef > 0 then
+                actor:GetData():AddFightAttr(ACTOR_ATTR.FIGHT_PHY_DEF, FixMul(self.m_chgPhyDef, -1))
+            end
+    
+            if self.m_addPhyBaoji > 0 then
+                actor:GetData():AddFightAttr(ACTOR_ATTR.FIGHT_PHY_BAOJI, FixMul(self.m_addPhyBaoji, -1))
+            end
+
+            if self.m_addMagicBaoji > 0 then
+                actor:GetData():AddFightAttr(ACTOR_ATTR.FIGHT_MAGIC_BAOJI, FixMul(self.m_addMagicBaoji, -1))
+            end
+
+            self.m_chgPhyDef = 0
+            self.m_addPhyBaoji = 0 
+            self.m_addMagicBaoji = 0
+            self.m_addAttr = false
+        end
+
+        if self.m_effectKey > 0 then
+            EffectMgr:RemoveByKey(self.m_effectKey)
+            self.m_effectKey = -1
+        end
+    end
+end
+
+function StatusYanliangCanren:Merge(newStatus, actor)
+    if not newStatus or newStatus:GetStatusType() ~= self:GetStatusType() then
+        return
+    end
+
+    self.m_leftMS = self.m_totalMS
+end
+
+
+function StatusYanliangCanren:Update(deltaMS, actor)
+    self.m_leftMS = FixSub(self.m_leftMS, deltaMS)
+    if self.m_leftMS > 0 then
+        return StatusEnum.STATUSCONDITION_CONTINUE, false
+    end
+
+    self:ClearEffect(actor)
+    return StatusEnum.STATUSCONDITION_END, false
+end
+
+return StatusYanliangCanren

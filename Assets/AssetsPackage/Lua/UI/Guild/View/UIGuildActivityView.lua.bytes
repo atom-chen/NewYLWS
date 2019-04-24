@@ -1,0 +1,99 @@
+
+local UIUtil = UIUtil
+local UILogicUtil = UILogicUtil
+
+local UIGuildActivityView = BaseClass("UIGuildActivityView", UIBaseView)
+local base = UIBaseView
+
+local GuildMgr = Player:GetInstance().GuildMgr
+local GuildBossMgr = Player:GetInstance():GetGuildBossMgr()
+
+
+function UIGuildActivityView:OnCreate()
+    base.OnCreate(self)
+
+    self:InitView()
+end
+
+function UIGuildActivityView:InitView()
+    self.m_taskLockText = UIUtil.GetChildTexts(self.transform, {
+        "Container/JunTuanZhengBaBtn/LockImg/taskLockText"
+    })
+
+    self.m_zhengbaBtn, self.m_attackBtn, self.m_taskBtn, self.m_taskUnlockBtn, self.m_backBtn, self.m_helpBtn = UIUtil.GetChildTransforms(self.transform, {
+        "Container/JunTuanZhengBaBtn",
+        "Container/GuildAttackBtn",
+        "Container/GuildTaskBtn",
+        "Container/JunTuanZhengBaBtn/LockImg/lockClick",
+        "backBtn",
+        "helpBtn"
+    })
+
+    self.m_taskLockGo = UIUtil.GetChildTransforms(self.transform, {
+        "Container/JunTuanZhengBaBtn/LockImg"
+    })
+
+    self.m_taskLockText.text = Language.GetString(1394)
+    self.m_taskLockGo = self.m_taskLockGo.gameObject
+
+    local function onClick(go)
+        if go.name == "backBtn" then
+            self:CloseSelf()
+        elseif go.name == "GuildTaskBtn" then
+            UIManagerInst:OpenWindow(UIWindowNames.UIGuildTask)
+        elseif go.name == "GuildAttackBtn" then
+            self:ReqGuildBossFight()
+        elseif go.name == "lockClick" then
+            UILogicUtil.FloatAlert(Language.GetString(1391))
+        elseif go.name == "JunTuanZhengBaBtn" then
+            UILogicUtil.SysShowUI(SysIDs.GUILD_WAR)
+        end
+    end
+
+    UIUtil.AddClickEvent(self.m_zhengbaBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_attackBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_taskBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_backBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_helpBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_taskUnlockBtn.gameObject, onClick)
+end
+
+function UIGuildActivityView:OnEnable(...)
+    base.OnEnable(self, ...)
+
+    if GuildMgr.MyGuildData.level >= 3 then
+        self.m_taskLockGo:SetActive(false)
+    end
+
+end
+
+function UIGuildActivityView:OnDestroy()
+    UIUtil.RemoveClickEvent(self.m_zhengbaBtn.gameObject)
+    UIUtil.RemoveClickEvent(self.m_attackBtn.gameObject)
+    UIUtil.RemoveClickEvent(self.m_taskBtn.gameObject)
+    UIUtil.RemoveClickEvent(self.m_backBtn.gameObject)
+    UIUtil.RemoveClickEvent(self.m_helpBtn.gameObject)
+    base.OnDestroy(self)
+end
+
+function UIGuildActivityView:ReqGuildBossFight()
+    local msg_id = MsgIDDefine.GUILD_REQ_ALL_GUILD_BOSS_INFO
+	local msg = (MsgIDMap[msg_id])()
+	HallConnector:GetInstance():SendMessage(msg_id, msg)
+end
+
+function UIGuildActivityView:EnterGuildBossFight(go)
+	UIManagerInst:OpenWindow(UIWindowNames.UIGuildBoss, go)
+end
+
+function UIGuildActivityView:OnAddListener()
+	base.OnAddListener(self)
+    self:AddUIListener(UIMessageNames.MN_GUILDBOSS_RSP_BOSSINFO, self.EnterGuildBossFight)
+end
+
+function UIGuildActivityView:OnRemoveListener()
+    self:RemoveUIListener(UIMessageNames.MN_GUILDBOSS_RSP_BOSSINFO, self.EnterGuildBossFight)
+	base.OnRemoveListener(self)
+end
+
+return UIGuildActivityView

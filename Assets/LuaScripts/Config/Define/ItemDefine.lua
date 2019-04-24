@@ -1,0 +1,22 @@
+ItemDefine = {
+    Stamina_ID = 10009,
+    TongQian_ID = 10001,
+    YuanBao_ID = 10002,
+    GuildCoin_ID = 10012,
+    ChangeNameCardId = 20050,
+    ArenaFight_ID = 20051,
+    ArenaCoin_ID = 10004,
+    QingYi_ID = 10016,
+    TaoFaLing_ID = 20055,
+    YuanmenLing_ID = 20053,
+    TIEJIA_ID = 28002,
+    JINJIA_ID = 28001,
+    DIANJIANGLING_ID = 20054,
+    QunXiongZhuLu_ID = 10025,
+    LieYuan_ID = 24002,
+    GuildTongQian_ID = 10017,
+    GuildYuanBao_ID = 10018,
+    JunTuanBi_ID = 10012,
+    JiXingGaoZhao_ID = 10100,--吉星高照特殊itemID
+    XingHe_ID = 20052,
+}

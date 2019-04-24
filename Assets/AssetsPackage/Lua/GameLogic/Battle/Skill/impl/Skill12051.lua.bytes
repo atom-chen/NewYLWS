@@ -1,0 +1,71 @@
+local FixDiv = FixMath.div
+local CtlBattleInst = CtlBattleInst
+local ActorManager = ActorManager
+local FixIntMul = FixMath.muli
+local StatusGiver = StatusGiver
+local StatusFactoryInst = StatusFactoryInst
+local BattleEnum = BattleEnum
+local ACTOR_ATTR = ACTOR_ATTR
+
+local SkillBase = require "GameLogic.Battle.Skill.SkillBase"
+local Skill12051 = BaseClass("Skill12051", SkillBase)
+local ActorCreateParam = require "GameLogic.Battle.Actors.ActorCreateParam"
+
+function Skill12051:Perform(performer, target, performPos, special_param)
+    if not performer or not performer:IsLive() then
+        return
+    end
+    -- 1
+    -- 提升我方所有武将物防、法防{x1}%，持续{y1}秒，此段时间内场上没有白马义从则召唤{A}个新的白马义从。
+    -- 2-3
+    -- 提升我方所有武将物防、法防{x2}%，并且自身免疫所有负面状态，持续{y2}秒，此段时间内场上没有白马义从则召唤{A}个新的白马义从。
+    -- 4-6
+    -- 提升我方所有武将物防、法防{x4}%，并且自身免疫所有负面状态，持续{y4}秒，此段时间内场上没有白马义从则召唤{A}个新的白马义从。
+    -- 施放本技能时额外召唤{B}名白马义从。
+
+    local time = FixIntMul(self:Y(), 1000)
+    if self.m_level >= 2 then
+        local giver = StatusGiver.New(performer:GetActorID(), 12051)
+        local immuneBuff = StatusFactoryInst:NewStatusImmune(giver, time)
+        immuneBuff:AddImmune(StatusEnum.IMMUNEFLAG_NEGATIVE)
+        self:AddStatus(performer, performer, immuneBuff)
+    end
+
+    local battleLogic = CtlBattleInst:GetLogic()
+    local factory = StatusFactoryInst
+    local statusGiverNew = StatusGiver.New
+    ActorManagerInst:Walk(
+        function(tmpTarget)
+            if not tmpTarget:IsLive() then
+                return
+            end
+
+            if not battleLogic:IsFriend(performer, tmpTarget, true) then
+                return
+            end
+
+            local giver = statusGiverNew(performer:GetActorID(), 12051)  
+            local buff = factory:NewStatusBuff(giver, BattleEnum.AttrReason_SKILL, time)
+            
+            local basePhyDef = tmpTarget:GetData():GetAttrValue(ACTOR_ATTR.BASE_PHY_DEF)
+            local chgPhyDef = FixIntMul(basePhyDef, FixDiv(self:X(), 100))
+            buff:AddAttrPair(ACTOR_ATTR.FIGHT_PHY_DEF, chgPhyDef)
+            
+            local baseMagicDef = tmpTarget:GetData():GetAttrValue(ACTOR_ATTR.BASE_MAGIC_DEF)
+            local chgMagicDef = FixIntMul(baseMagicDef, FixDiv(self:X(), 100))
+            buff:AddAttrPair(ACTOR_ATTR.FIGHT_MAGIC_DEF, chgMagicDef)
+
+            self:AddStatus(performer, tmpTarget, buff)
+        end
+    )
+
+
+    performer:CheckCongyi(self:A(), time)
+
+    if self.m_level >= 4 then
+        performer:CalcCallStandIndex(self:B())
+    end
+end
+
+
+return Skill12051

@@ -1,0 +1,168 @@
+
+local StatusBuff = require("GameLogic.Battle.Status.impl.StatusBuff")
+local table_insert = table.insert
+local table_remove = table.remove
+local FixAdd = FixMath.add
+local FixSub = FixMath.sub
+local FixMul = FixMath.mul
+local FixMod = FixMath.mod
+local StatusEnum = StatusEnum
+local ACTOR_ATTR = ACTOR_ATTR
+local FixRand = BattleRander.Rand
+local IsInCircle = SkillRangeHelper.IsInCircle
+local StatusFactoryInst = StatusFactoryInst
+local ActorManagerInst = ActorManagerInst
+local CtlBattleInst = CtlBattleInst
+
+local StatusDongzhuoFireBuff = BaseClass("StatusDongzhuoFireBuff", StatusBuff)
+
+function StatusDongzhuoFireBuff:__init()
+    self.m_totalTime = 0
+    self.m_rand = 0
+    self.m_radius = 0
+    self.m_copyMaxCount = 0
+    self.m_copyEffect = 0
+    self.m_copyActorID = 0
+    self.m_copyAttrList = {}
+    self.m_copyActorList = {}
+    self.m_intervalTime = 1000
+    self.m_reduceAttrCount = 0
+    self.m_effectKey = -1
+end
+
+function StatusDongzhuoFireBuff:Init(giver, attrReason, leftMS, rand, radius, copyMaxCount, effect, maxCount, subStatusType)
+    StatusBuff.Init(self, giver, attrReason, leftMS, effect, maxCount, subStatusType)
+    self.m_totalTime = leftMS
+    self.m_rand = rand
+    self.m_radius = radius
+    self.m_copyEffect = effect
+    self.m_copyMaxCount = copyMaxCount
+    self.m_effectMask = effect
+
+    self.m_copyActorID = 0
+    self.m_copyAttrList = {}
+    self.m_copyActorList = {}
+    self.m_intervalTime = 1000
+    self.m_reduceAttrCount = 0
+    self.m_effectKey = -1
+end
+
+function StatusDongzhuoFireBuff:AddAttrPair(attrType, attrValue)
+    StatusBuff.AddAttrPair(self, attrType, attrValue)
+    table_insert(self.m_copyAttrList, {attrType = attrType, attrValue = attrValue})
+end
+
+function StatusDongzhuoFireBuff:GetStatusType()
+    return StatusEnum.STATUSTYPE_DONGZHUOFIREBUFF
+end
+
+function StatusDongzhuoFireBuff:ClearEffect(actor)
+    StatusBuff.ClearEffect(self, actor)
+
+    local actorID = self:SelectRandActor(actor)
+    if actorID then
+        local performer = ActorManagerInst:GetActor(self.m_giver.actorID)
+        if not performer or not performer:IsLive() then
+            return
+        end
+
+        if performer:GetCopyCount() >= self.m_copyMaxCount then
+            return
+        end
+
+        local copyActor = ActorManagerInst:GetActor(actorID)
+        if copyActor and copyActor:IsLive() then
+            self.m_copyActorID = actorID
+
+            local copyBuff = StatusFactoryInst:NewStatusBuff(self.m_giver, self.m_attrChgReason, self.m_totalTime, self.m_copyEffect, self.m_maxCount)
+            for _,ap in pairs(self.m_copyAttrList) do
+                if ap then
+                    copyBuff:AddAttrPair(ap.attrType, ap.attrValue)
+                end
+            end
+            copyActor:GetStatusContainer():Add(copyBuff, performer)
+
+            performer:AddCopyCount()
+        end
+    end
+end
+
+function StatusDongzhuoFireBuff:Attach(actor, isAttach) 
+    for _, ap in pairs(self.m_attrList) do
+        local attrValue = ap.attrValue
+        if not isAttach then
+            attrValue = FixMul(-1, FixMul(ap.attrValue, self.m_reduceAttrCount))
+            if self.m_effectKey > 0 then
+                EffectMgr:RemoveByKey(self.m_effectKey)
+                self.m_effectKey = -1
+            end
+        else
+            if self.m_effectMask and #self.m_effectMask > 0 and self.m_effectKey <= 0 then
+                self.m_effectKey = self:ShowEffect(actor, self.m_effectMask[1])
+            end
+        end
+
+        local isShowedAttrText = self:IsShowedAttrText(actor, ap.attrType, attrValue)
+        actor:GetData():AddFightAttr(ap.attrType, attrValue, isShowedAttrText)
+    end
+end
+
+function StatusDongzhuoFireBuff:SelectRandActor(actor)
+    local rand = FixMod(FixRand(), 100)
+    if rand >= self.m_rand then
+        return false
+    end
+    
+    local copyActorList = {}
+
+    local battleLogic = CtlBattleInst:GetLogic()
+    ActorManagerInst:Walk(
+        function(tmpTarget)
+            if not battleLogic:IsFriend(actor, tmpTarget, false) then
+                return
+            end
+
+            if not IsInCircle(actor:GetPosition() , self.m_radius, tmpTarget:GetPosition(), tmpTarget:GetRadius()) then
+                return
+            end
+
+            table_insert(copyActorList, tmpTarget:GetActorID())
+        end
+    )
+    
+    local count = #copyActorList
+    local tmpActorID = false
+    if count > 0 then
+        local index = FixMod(FixRand(), count)
+        index = FixAdd(index, 1)
+        tmpActorID = copyActorList[index]
+        if tmpActorID then
+            return tmpActorID
+        end
+    end
+
+    return false
+end
+
+function StatusDongzhuoFireBuff:Update(deltaMS, actor) 
+    self.m_intervalTime = FixSub(self.m_intervalTime, deltaMS)
+    if self.m_intervalTime > 0 then
+        return StatusEnum.STATUSCONDITION_CONTINUE, false
+    end
+
+    self.m_maxCount = FixSub(self.m_maxCount, 1)
+    if self.m_maxCount > 0 then
+        self.m_isAttrDefReduce = false
+
+        self.m_intervalTime = 1000
+        self.m_reduceAttrCount = FixAdd(self.m_reduceAttrCount, 1)
+        self:Effect(actor)
+        
+        return StatusEnum.STATUSCONDITION_CONTINUE, false
+    end
+
+    self:ClearEffect(actor)
+    return StatusEnum.STATUSCONDITION_END, false
+end
+
+return StatusDongzhuoFireBuff

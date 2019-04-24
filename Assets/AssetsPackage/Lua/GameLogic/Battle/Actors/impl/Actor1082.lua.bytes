@@ -1,0 +1,124 @@
+local StatusGiver = StatusGiver
+local ACTOR_ATTR = ACTOR_ATTR
+local BattleEnum = BattleEnum
+local FixIntMul = FixMath.muli
+local FixAdd = FixMath.add
+local FixMod = FixMath.mod
+local FixDiv = FixMath.div
+local FixMul = FixMath.mul
+local FixSub = FixMath.sub
+local table_remove = table.remove
+local table_insert = table.insert
+local FixNormalize = FixMath.Vector3Normalize
+local FixNewVector3 = FixMath.NewFixVector3
+local CtlBattleInst = CtlBattleInst
+
+local Actor = require "GameLogic.Battle.Actors.Actor"
+local Actor1082 = BaseClass("Actor1082", Actor)
+
+function Actor1082:__init()
+    self.m_10822TargetID = 0
+    self.m_10822BackTime = 0
+    self.m_perform10822 = false
+    self.m_perform10823Count = 0
+
+    self.m_10823A = 0
+    self.m_10823XPercent = 0
+    self.m_10823Y = 0
+end
+
+function Actor1082:Set10822TargetID(targetID, backTime)
+    self.m_10822TargetID = targetID
+    self.m_10822BackTime = backTime
+    self.m_perform10822 = true
+end
+
+function Actor1082:SetOrignalPos(pos)
+    self.m_skill10822OrignalPos = pos
+end
+
+function Actor1082:OnBorn(create_param)
+    Actor.OnBorn(self, create_param)
+
+    local skillItem = self.m_skillContainer:GetPassiveByID(10823)
+    if skillItem then
+        self.m_10823Level = skillItem:GetLevel()
+        local skillCfg = ConfigUtil.GetSkillCfgByID(10823)
+        self.m_10823SkillCfg = skillCfg
+        if skillCfg then
+            self.m_10823XPercent = FixDiv(SkillUtil.X(skillCfg, self.m_10823Level), 100)
+            self.m_10823A = SkillUtil.A(skillCfg, self.m_10823Level)
+            
+            if self.m_10823Level >= 5 then
+                self.m_10823Y = SkillUtil.Y(skillCfg, self.m_10823Level)
+            end
+        end
+    end
+end
+
+function Actor1082:LogicUpdate(deltaMS)
+    if self.m_perform10822 then
+        self.m_10822BackTime = FixSub(self.m_10822BackTime, deltaMS)
+        if self.m_10822BackTime <= 0 then
+            self.m_perform10822 = false
+            self:BackToOriganlPos()
+        end
+    end
+end
+
+function Actor1082:OnSBDie(dieActor, killerGiver)
+    if self.m_10822BackTime > 0 then
+        if self.m_10822TargetID == dieActor:GetActorID() then
+            self.m_perform10822 = false
+            self:BackToOriganlPos()
+            self.m_10822BackTime = 0
+        end
+    end
+
+    if ActorUtil.IsAnimal(dieActor) then
+        return
+    end
+
+    if CtlBattleInst:GetLogic():IsFriend(self, dieActor, false, true) then
+        if self.m_perform10823Count < self.m_10823A then
+            local basePhyAtk = self:GetData():GetAttrValue(ACTOR_ATTR.BASE_PHY_ATK)
+            local chgPhyAtk = FixIntMul(basePhyAtk, self.m_10823XPercent)
+            self:GetData():AddFightAttr(ACTOR_ATTR.FIGHT_PHY_ATK, chgPhyAtk)
+
+            if self.m_10823Level >= 5 then
+                self:ChangeNuqi(self.m_10823Y, BattleEnum.NuqiReason_SKILL_RECOVER, self.m_10823SkillCfg)
+            end
+            self.m_perform10823Count = FixAdd(self.m_perform10823Count, 1)
+        end
+    end
+end
+
+function Actor1082:BackToOriganlPos()
+    if not self.m_skill10822OrignalPos then
+        return
+    end
+
+    local distance = 0
+    local movehelper = self:GetMoveHelper()
+    if movehelper then
+        local performerPos = self:GetPosition()
+        local moveTargetPos = self.m_skill10822OrignalPos:Clone()
+        self.m_skill10822OrignalPos = nil
+        local pathHandler = CtlBattleInst:GetPathHandler()
+        if pathHandler then
+            local x,y,z = performerPos:GetXYZ()
+            local x2, y2, z2 = moveTargetPos:GetXYZ()
+            local hitPos = pathHandler:HitTest(x, y, z, x2, y2, z2)
+            if hitPos then
+                moveTargetPos:SetXYZ(hitPos.x , performerPos.y, hitPos.z)
+            end
+        end
+        
+        distance = (moveTargetPos - performerPos):Magnitude()
+        local speed = FixDiv(distance, 0.1)  -- time 暂定
+        movehelper:Stop()
+        movehelper:Start({ moveTargetPos }, speed, nil, false)
+    end
+end
+
+return Actor1082

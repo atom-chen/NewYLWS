@@ -1,0 +1,58 @@
+local string_format = string.format
+local math_ceil = math.ceil
+local string_split = CUtil.SplitString
+local GodBeastMgr = Player:GetInstance():GetGodBeastMgr()
+
+local GodBeastItem = BaseClass("GodBeasttem", UIBaseItem)
+local base = UIBaseItem
+
+function GodBeastItem:OnCreate()
+    base.OnCreate(self)
+
+    self.m_iconImage = UIUtil.AddComponent(UIImage, self, "", ImageConfig.GodBeast)
+
+    self.lockedText = UIUtil.GetChildTexts(self.transform, {
+        "locked/lockedText"
+    })
+
+    self.m_locked = UIUtil.GetChildTransforms(self.transform, { "locked" })
+
+    local function onClick(go, x, y)
+        if go == self:GetGameObject() then
+            local godBeastData = {}
+            if self.m_godBeastId then
+                local godBeastData = GodBeastMgr:GetGodBeastByID(self.m_godBeastId)
+                if godBeastData then
+                    UIManagerInst:OpenWindow(UIWindowNames.UIGodBeastMain, godBeastData)
+                else
+                    -- print("can not find GodBeast id", self.m_godBeastId, "in my godBeast date" )
+                end
+            end            
+        end
+    end
+
+    UIUtil.AddClickEvent(self:GetGameObject(), onClick)
+end
+
+function GodBeastItem:UpdateData(index, id)
+    self.m_godBeastId = id
+    self.m_iconImage:SetAtlasSprite("godBeast"..index..".png", true)
+    self:SetLockStatus(index)
+end
+
+function GodBeastItem:SetLockStatus(index)
+    --解锁情況
+    --local sysopenCfg = ConfigUtil.GetSysopenCfgByID(index)    
+    self.m_locked.gameObject:SetActive(false)
+end
+
+function GodBeastItem:OnDestroy()
+    if self.m_iconImage then
+        self.m_iconImage:Delete()
+        self.m_iconImage = nil
+    end
+    
+    base.OnDestroy(self)
+end
+
+return GodBeastItem

@@ -1,0 +1,10 @@
+local SectionLanguage5 = {
+    [1] = '',
+    [5] = '返回',
+    [6] = '请选择您想要进行的操作',
+    [7] = '继续战斗',
+    [8] = '退出战斗',
+    [9] = '提示',
+}
+
+return SectionLanguage5

@@ -1,0 +1,61 @@
+local CtlBattleInst = CtlBattleInst
+local ActorManagerInst = ActorManagerInst
+local BattleEnum = BattleEnum
+
+local SkillBase = require "GameLogic.Battle.Skill.SkillBase"
+local Skill12052 = BaseClass("Skill12052", SkillBase)
+
+function Skill12052:Perform(performer, target, performPos, special_param)
+    if not performer or not performer:IsLive() or not target or not target:IsLive() then
+        return
+    end
+
+    -- 1-2
+    -- 骑上坐骑向离自己最远的一名敌方目标冲锋，造成{x1}（+{E}%物攻)点物理伤害，并必定晕眩目标{C}秒。
+    -- 3-4
+    -- 骑上坐骑向离自己最远的一名敌方目标冲锋，造成{x3}（+{E}%物攻)点物理伤害，并必定晕眩目标{C}秒。
+    -- 冲锋后有{B}%概率召唤一名白马义从。
+    -- 5-6
+    -- 骑上坐骑向离自己最远的一名敌方目标冲锋，造成{x5}（+{E}%物攻)点物理伤害，此时每带有一名白马义从，
+    -- 冲锋伤害就提升{A}%，并必定晕眩目标{C}秒。冲锋后有{B}%概率召唤一名白马义从。
+
+    performer:Set12052TargetID(target:GetActorID())
+    performer:BeginMount()
+end
+
+
+function Skill12052:SelectSkillTarget(performer, target)
+    if not performer then
+        return
+    end
+
+    local maxDistance2 = 0
+    local newTarget = false
+
+    local ctlBattle = CtlBattleInst
+    ActorManagerInst:Walk(
+        function(tmpTarget)
+            if not ctlBattle:GetLogic():IsEnemy(performer, tmpTarget, BattleEnum.RelationReason_SKILL_RANGE) then
+                return
+            end
+
+            if tmpTarget:IsCalled() then
+                return
+            end
+
+            local dis2 = (performer:GetPosition() - tmpTarget:GetPosition()):SqrMagnitude()
+            if dis2 > maxDistance2 then
+                maxDistance2 = dis2
+                newTarget = tmpTarget
+            end
+        end
+    )
+
+    if newTarget then
+        return newTarget, newTarget:GetPosition()
+    end
+    return nil, nil
+end
+
+
+return Skill12052

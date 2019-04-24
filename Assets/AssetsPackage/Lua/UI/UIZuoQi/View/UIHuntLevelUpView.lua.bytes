@@ -1,0 +1,114 @@
+
+local Language = Language
+local UIUtil = UIUtil
+local ConfigUtil = ConfigUtil
+local AtlasConfig = AtlasConfig
+local GameObject = CS.UnityEngine.GameObject
+local GameUtility = CS.GameUtility
+local string_format = string.format
+local math_floor = math.floor
+
+local UIHuntLevelUpView = BaseClass("UIHuntLevelUpView", UIBaseView)
+local base = UIBaseView
+
+
+function UIHuntLevelUpView:OnCreate()
+    base.OnCreate(self)
+    local titleText, afterLevelUpText, LevelUpSpendText, levelUpBtnText
+    titleText, self.m_gardenNameText, self.m_curLevelText, self.m_nextLevelText,
+    afterLevelUpText, LevelUpSpendText, levelUpBtnText, self.m_spendTimeText = UIUtil.GetChildTexts(self.transform, {
+        "BgRoot/titleText",
+        "BgRoot/ContentRoot/nameText",
+        "BgRoot/ContentRoot/level/curLevelText",
+        "BgRoot/ContentRoot/level/nextLevelText",
+        "BgRoot/ContentRoot/afterLevelUpText",
+        "BgRoot/ContentRoot/LevelUpSpendText",
+        "BgRoot/ContentRoot/ButtonOne/ButtonOneText",
+        "BgRoot/ContentRoot/SpendTimeText",
+    })
+
+    self.m_closeBtn, self.m_levelUpBtn, self.m_itemGridTr, self.m_itemPrefab = UIUtil.GetChildTransforms(self.transform, {
+        "CloseBtn",
+        "BgRoot/ContentRoot/ButtonOne",
+        "BgRoot/ContentRoot/itemGrid",
+        "BgRoot/ContentRoot/ItemPrefab",
+    })
+
+    self.m_itemPrefab = self.m_itemPrefab.gameObject
+    titleText.text = Language.GetString(3533)
+    afterLevelUpText.text = Language.GetString(3530)
+    LevelUpSpendText.text = Language.GetString(3531)
+    levelUpBtnText.text = Language.GetString(3523)
+    self.m_levelUpCallback = nil
+
+    local function onClick(go)
+        if go.name == "ButtonOne" then
+            if self.m_levelUpCallback then
+                self.m_levelUpCallback()
+                self.m_levelUpCallback = nil
+                self:CloseSelf()
+            end
+        elseif go.name == "CloseBtn" then
+            self:CloseSelf()
+        end
+    end
+
+    UIUtil.AddClickEvent(self.m_closeBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_levelUpBtn.gameObject, onClick)
+end
+
+function UIHuntLevelUpView:OnEnable(...)
+    base.OnEnable(self, ...)
+    local _, id, name, level, callback = ...
+    
+    if not id then
+        return
+    end
+    
+    local levelUpCfg = ConfigUtil.GetHuntLevelUpCfgByID(id)
+    if levelUpCfg then
+        self.m_gardenNameText.text = name
+        self.m_curLevelText.text = string_format("%d级", level)
+        self.m_nextLevelText.text = string_format("%d级", level + 1)
+        local itemCount = 0
+        if levelUpCfg.levelup_item_id1 > 0 then
+            itemCount = itemCount + 1
+        end
+        if levelUpCfg.levelup_item_id2 > 0 then
+            itemCount = itemCount + 1
+        end
+        if levelUpCfg.levelup_item_id3 > 0 then
+            itemCount = itemCount + 1
+        end
+        for i = 1, itemCount do
+            local itemCfg = ConfigUtil.GetItemCfgByID(levelUpCfg["levelup_item_id"..i])
+            local go = GameObject.Instantiate(self.m_itemPrefab, self.m_itemGridTr)
+            local text = UIUtil.FindText(go.transform, "Text")
+            local image = UIUtil.AddComponent(UIImage, go.transform, "")
+            text.text = levelUpCfg["levelup_item_count"..i]
+            image:SetAtlasSprite(itemCfg.sIcon, false, AtlasConfig[itemCfg.sAtlas])
+        end
+        self.m_spendTimeText.text = string_format(Language.GetString(3536), self:GetLeftTimeText(levelUpCfg.levelup_need_time))
+    end
+    self.m_levelUpCallback = callback or nil
+end
+
+function UIHuntLevelUpView:GetLeftTimeText(time)
+    local hour = math_floor(time / 3600)
+    if hour < 24 then
+        return hour.."时"
+    else
+        if hour % 24 == 0 then
+            return math_floor(hour / 24).."天"
+        else
+            return math_floor(hour / 24).."天"..(hour % 24).."时"
+        end
+    end
+end
+
+function UIHuntLevelUpView:OnDisable()
+    GameUtility.DestroyChild(self.m_itemGridTr.gameObject)
+    base.OnDisable(self)
+end
+
+return UIHuntLevelUpView

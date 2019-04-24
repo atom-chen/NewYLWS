@@ -1,0 +1,135 @@
+local BattleEnum = BattleEnum
+local StatusGiver = StatusGiver
+local Formular = Formular
+local AtkRoundJudge = Formular.AtkRoundJudge
+local IsJudgeEnd = Formular.IsJudgeEnd
+local CalcInjure = Formular.CalcInjure
+local FixMul = FixMath.mul
+local FixDiv = FixMath.div
+local FixSub = FixMath.sub
+local FixIntMul = FixMath.muli
+local StatusFactoryInst = StatusFactoryInst
+local ActorManagerInst = ActorManagerInst
+local FixNormalize = FixMath.Vector3Normalize
+local NewFixVector3 = FixMath.NewFixVector3
+local table_insert = table.insert
+local CtlBattleInst = CtlBattleInst
+local ACTOR_ATTR = ACTOR_ATTR
+
+local SkillBase = require "GameLogic.Battle.Skill.SkillBase"
+local Skill10441 = BaseClass("Skill10441", SkillBase)
+local ActorCreateParam = require "GameLogic.Battle.Actors.ActorCreateParam"
+
+local standPos = {
+    NewFixVector3(0, 0, -2),
+    NewFixVector3(-2, 0, 0),
+    NewFixVector3(0, 0, 2),
+    NewFixVector3(2, 0, 0),
+}
+
+function Skill10441:Perform(performer, target, performPos, special_param)
+    if not performer or not target or not target:IsLive() then
+        return
+    end
+
+    if special_param.keyFrameTimes == 1 then
+        performer:AddSceneEffect(104407, Vector3.New(performPos.x, performPos.y, performPos.z), Quaternion.identity)    
+    end
+
+    if special_param.keyFrameTimes == 2 then
+        for i=1,4 do
+            self:Call(performer, performPos:Clone(), 2097, 1002097, FixDiv(self:X(), 100), standPos[i], performPos)
+        end
+    end
+end
+
+
+function Skill10441:Call(performer, pos, resID, monsterID, percent, standPos, performPos)
+    local roleCfg = ConfigUtil.GetWujiangCfgByID(resID)
+    if not roleCfg then
+        -- print(' no zhang jiao hu fa role cfg ==========')
+        return
+    end
+
+    pos.y = performer:GetPosition().y
+
+    local oneWujiang = OneBattleWujiang.New()
+    oneWujiang.wujiangID = roleCfg.id
+    oneWujiang.level = performer:GetLevel()
+    oneWujiang.init_nuqi = roleCfg.initNuqi
+    oneWujiang.lineUpPos = 0
+
+    local fightData = performer:GetData()
+    oneWujiang.max_hp = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_MAXHP), percent)
+    oneWujiang.phy_atk = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_PHY_ATK), percent)
+    oneWujiang.phy_def = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_PHY_DEF), percent)
+    oneWujiang.magic_atk = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_MAGIC_ATK), percent)
+    oneWujiang.magic_def = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_MAGIC_DEF), percent)
+    oneWujiang.phy_baoji = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_PHY_BAOJI), percent)
+    oneWujiang.magic_baoji = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_MAGIC_BAOJI), percent)
+    oneWujiang.shanbi = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_SHANBI), percent)
+    oneWujiang.mingzhong = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_MINGZHONG), percent)
+    oneWujiang.move_speed = fightData:GetAttrValue(ACTOR_ATTR.BASE_MOVESPEED)
+    oneWujiang.atk_speed = fightData:GetAttrValue(ACTOR_ATTR.BASE_ATKSPEED)
+
+    table_insert(oneWujiang.skillList, {skill_id = 20972, skill_level = 1})
+    table_insert(oneWujiang.skillList, {skill_id = 20973, skill_level = 1})
+    table_insert(oneWujiang.skillList, {skill_id = 20974, skill_level = 1})
+
+    local createParam = ActorCreateParam.New()
+    createParam:MakeSource(BattleEnum.ActorSource_CALLED, performer:GetActorID())
+    createParam:MakeAI(BattleEnum.AITYPE_ZHANGJIAO_HUFA)
+    createParam:MakeAttr(performer:GetCamp(), oneWujiang)
+
+    pos:Add(standPos)
+
+    createParam:MakeLocation(pos, performer:GetForward())
+    createParam:MakeRelationType(BattleEnum.RelationType_NORMAL)
+    createParam:SetImmediateCreateObj(true)
+    
+    local hufaActor = ActorManagerInst:CreateActor(createParam)
+    hufaActor:SetLifeTime(FixIntMul(self:A(), 1000))
+    performer:AddHufaTargetID(hufaActor:GetActorID())
+    if self:GetLevel() >= 3 then
+        local hufaAI = hufaActor:GetAI()
+        if hufaAI then
+            hufaAI:SetAtkTargetID(self:SetAtkTarget(performPos))
+        end
+
+        if self:GetLevel() >= 6 then
+            hufaActor:SetCallIgnoreMagicDef(self:Z())
+        end
+    end
+end
+
+function Skill10441:SetAtkTarget(performPos)
+    local minHp = 9999999
+    local minhpTarget = false
+    local battleLogic = CtlBattleInst:GetLogic()
+    local factory = StatusFactoryInst
+    local skillLevel = self:GetLevel()
+    local dis2 = self.m_skillCfg.dis2
+    ActorManagerInst:Walk(
+        function(tmpTarget)
+            if not battleLogic:IsEnemy(performer, tmpTarget, BattleEnum.RelationReason_SKILL_RANGE) then
+                return
+            end
+
+            local targetID = tmpTarget:GetActorID()
+            if not IsInCircle(performPos, dis2, tmpTarget:GetPosition(), tmpTarget:GetRadius()) then
+                return
+            end
+
+            local tmpCurHp = tmpTarget:GetData():GetAttrValue(ACTOR_ATTR.FIGHT_HP)
+            if tmpCurHp < minHp then
+                minhpTarget = tmpTarget
+                minHp = tmpCurHp
+            end
+        end
+    )
+
+    return minhpTarget
+end
+
+
+return Skill10441

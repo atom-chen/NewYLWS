@@ -1,0 +1,48 @@
+local BaseLogicHelper = require("GameLogic.Battle.BattleLogic.helper.BaseLogicHelper")
+local PlotLogicHelper = BaseClass("PlotLogicHelper", BaseLogicHelper)
+local base = BaseLogicHelper
+
+function PlotLogicHelper:GetPreloadList(...)
+    base.GetPreloadList(self, ...)
+    
+    self:AddTimelinePreloadObj("Luoyangdemo1", TimelineType.PATH_HOME_SCENE)
+    self:AddTimelinePreloadObj("Luoyangdemo2", TimelineType.PATH_HOME_SCENE)
+    self:AddTimelinePreloadObj("Luoyangdemo3", TimelineType.PATH_HOME_SCENE)
+    self:AddTimelinePreloadObj("luoyangpath", TimelineType.PATH_HOME_SCENE)
+    self:AddTimelinePreloadObj("DollyGroup30", TimelineType.PATH_BATTLE_SCENE)
+
+    self:AddWujiangPreloadObj(1001, 4, 0, 0)
+    self:AddWujiangPreloadObj(1003, 4, 0, 0)
+    self:AddWujiangPreloadObj(1004, 4, 0, 0)
+    self:AddWujiangPreloadObj(1035, 4, 0, 0)
+    self:AddWujiangPreloadObj(1043, 4, 0, 0)
+    self:AddWujiangPreloadObj(1041, 4, 0, 0)
+
+    local battleRoundCfg = ConfigUtil.GetBattleRoundCfgByID(100002)
+    for _, monster in ipairs(battleRoundCfg.monsterlist) do
+        local monsterCfg = ConfigUtil.GetMonsterCfgByID(monster[1])
+        if monsterCfg then
+            self:AddWujiangPreloadObj(monsterCfg.role_id, 1, 0, 0)
+        end
+    end
+
+    return self.m_preloadList
+end
+
+function PlotLogicHelper:GetMapID()
+    return 15
+end
+
+function PlotLogicHelper:PreloadWorldArtCount()
+    return 40
+end
+
+function PlotLogicHelper:PreloadFontCount()
+    return 200
+end
+
+function PlotLogicHelper:PreloadDieFXCount()
+    return 20
+end
+
+return PlotLogicHelper

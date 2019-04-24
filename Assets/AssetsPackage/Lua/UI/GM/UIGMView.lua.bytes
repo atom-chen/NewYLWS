@@ -1,0 +1,45 @@
+
+
+local SplitString = CUtil.SplitString
+local UIGMView = BaseClass("UIGMView", UIBaseView)
+local base = UIBaseView
+
+function UIGMView:OnCreate()
+	base.OnCreate(self)
+
+    self.cmdInput = self:AddComponent(UIInput, "Container/CmdInput")
+
+    self.m_submitBtnBtn, self.m_closeBtn = UIUtil.GetChildTransforms(self.transform,
+       {"Container/SubmitBtn", "Container/CloseBtn"} )
+
+    self.m_timeText = UIUtil.GetChildTexts(self.transform, {
+        "Container/TimeText",
+    })
+
+    local function onClick(go, x, y)
+        if go.name == "SubmitBtn" then
+            local content = self.cmdInput:GetText()
+            local strList = SplitString(content, ' ')
+            if strList[1] == "guide" then
+                self:CloseSelf()
+                GuideMgr:GetInstance():Play(tonumber(strList[2]))
+            else
+                local msg_id = MsgIDDefine.ADMIN_REQ_EXEC_CMD
+                local msg = (MsgIDMap[msg_id])()
+                --msg.cmd = 'addallwujiang'
+                msg.cmd = content
+                HallConnector:GetInstance():SendMessage(msg_id, msg)
+            end
+        elseif go.name == "CloseBtn" then
+            UIManagerInst:CloseWindow(UIWindowNames.UIGMView)
+        end
+    end
+    UIUtil.AddClickEvent(self.m_submitBtnBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_closeBtn.gameObject, onClick)
+end
+
+function UIGMView:Update()
+    self.m_timeText.text = TimeUtil.ToYearMonthDayHourMinSec(Player:GetInstance():GetServerTime())
+end
+
+return UIGMView

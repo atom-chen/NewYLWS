@@ -1,0 +1,52 @@
+local TimelineType = TimelineType
+local base = SummonBase
+local BattleEnum = BattleEnum
+local CtlBattleInst = CtlBattleInst
+
+local DragonTimelineBase = BaseClass("DragonTimelineBase")
+
+function DragonTimelineBase:__init()
+    self.m_timelineID = false
+    self.m_onSummonShowEnd = false
+end
+
+function DragonTimelineBase:Start(timelinePath, onSummonShowEnd)
+    CtlBattleInst:FramePause()
+    CtlBattleInst:Pause(BattleEnum.PAUSEREASON_SUMMON, 0)
+    BattleCameraMgr:Pause()
+    self.m_onSummonShowEnd = onSummonShowEnd
+    self.m_timelineID = TimelineMgr:GetInstance():Play(TimelineType.SUMMON, timelinePath, TimelineType.PATH_BATTLE_SCENE)
+    UIManagerInst:Broadcast(UIMessageNames.UIBATTLE_HIDE_MAINVIEW)
+end
+
+function DragonTimelineBase:Dispose()
+    CtlBattleInst:FrameResume()
+    CtlBattleInst:Resume(BattleEnum.PAUSEREASON_SUMMON)
+    BattleCameraMgr:Resume()
+    UIManagerInst:Broadcast(UIMessageNames.UIBATTLE_SHOW_MAINVIEW)
+    TimelineMgr:GetInstance():Release(TimelineType.SUMMON, self.m_timelineID)
+    self.m_timelineID = false
+    if self.m_onSummonShowEnd then
+        self.m_onSummonShowEnd(false)
+        self.m_onSummonShowEnd = false
+    end
+end
+
+function DragonTimelineBase:IsOver()
+    local timeline = TimelineMgr:GetInstance():GetTimeline(TimelineType.SUMMON, self.m_timelineID)
+    if not timeline then
+        return true
+    end
+    return timeline:IsOver()
+end
+
+function DragonTimelineBase:CanSkip()
+    local timeline = TimelineMgr:GetInstance():GetTimeline(TimelineType.SUMMON, self.m_timelineID)
+    if not timeline then
+        return true
+    end
+
+    return not timeline:IsLoading()
+end
+
+return DragonTimelineBase

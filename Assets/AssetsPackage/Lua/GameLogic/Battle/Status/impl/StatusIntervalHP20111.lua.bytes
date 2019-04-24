@@ -1,0 +1,49 @@
+local StatusBase = require("GameLogic.Battle.Status.StatusBase")
+local table_insert = table.insert
+local table_remove = table.remove
+local FixAdd = FixMath.add
+local FixMul = FixMath.mul
+local FixRound = FixMath.round
+local FixSub = FixMath.sub
+local StatusEnum = StatusEnum
+local BattleEnum = BattleEnum
+
+local StatusIntervalHP20111 = BaseClass("StatusIntervalHP20111", StatusBase)
+
+function StatusIntervalHP20111:__init()
+    self.m_phyDef = 0
+    self.m_effectKey = 0 
+end
+
+function StatusIntervalHP20111:Init(giver, deltaHP, interval, chgCount, phyDef, effect, maxOverlayCount)
+    StatusBase.Init(self, giver, deltaHP, interval, chgCount, effect, maxOverlayCount)
+    self.m_phyDef = phyDef
+    self.m_effectKey = 0 
+end
+
+function StatusIntervalHP20111:GetStatusType()
+    return StatusEnum.STAUTSTYPE_INTERVAL_HP_20111 
+end
+ 
+function StatusIntervalHP20111:Effect(actor)
+    if self.m_phyDef > 0 then
+        if actor and actor:IsLive() then
+            actor:GetData():AddFightAttr(ACTOR_ATTR.FIGHT_PHY_DEF, FixMul(self.m_phyDef, -1))
+        end
+    end
+
+    return StatusBase.Effect(self, actor)
+end
+
+function StatusIntervalHP20111:ClearEffect(actor)
+    if self.m_phyDef > 0 then
+        if actor and actor:IsLive() then
+            actor:GetData():AddFightAttr(ACTOR_ATTR.FIGHT_PHY_DEF, self.m_phyDef)
+        end 
+    end
+
+    return StatusBase.ClearEffect(self, actor)
+end
+
+
+return StatusIntervalHP20111

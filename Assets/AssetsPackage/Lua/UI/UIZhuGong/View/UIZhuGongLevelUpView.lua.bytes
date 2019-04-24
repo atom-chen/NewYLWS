@@ -1,0 +1,142 @@
+
+local UIUtil = UIUtil
+local ConfigUtil = ConfigUtil
+local math_ceil = math.ceil
+local WujiangRootPath = "UI/Prefabs/ZhuGong/WujiangLevelUpRoot.prefab"
+local GameObject = CS.UnityEngine.GameObject
+local base = UIBaseView
+local UIZhuGongLevelUpView = BaseClass("UIZhuGongLevelUpView",UIBaseView)
+
+function UIZhuGongLevelUpView:OnCreate()
+    base.OnCreate(self)
+    self:InitView()
+end
+
+function UIZhuGongLevelUpView:OnEnable(...)
+    base.OnEnable(self, ...)
+    local order, data = ...
+
+    local levelList = ConfigUtil.GetUserExpCfgByID(data[1])
+    local levelUpList = ConfigUtil.GetUserExpCfgByID(data[2])
+    
+    self.m_levelText.text = string.format(Language.GetString(2705),  math_ceil(data[1]))
+    self.m_levelUpText.text = string.format(Language.GetString(2705), math_ceil(data[2]))
+    self.m_staminaText.text = math_ceil(levelList.stamina_limit)
+    self.m_staminaUpText.text = string.format(Language.GetString(2706), math_ceil(levelUpList.stamina_limit - levelList.stamina_limit))
+    self.m_curStaminaText.text = math_ceil(data[3])
+    self.m_curStaminaUpText.text = string.format(Language.GetString(2706), math_ceil(levelUpList.stamina_recovery))
+    self:CreateRoleContainer()
+    self:LoadWujiangModel()
+    if Player:GetInstance():GetMainlineMgr():IsAutoFight() then
+        self.m_countDownTime = 3
+    end
+end
+
+function UIZhuGongLevelUpView:InitView()
+    self.m_countDownTime = 0
+    self.m_levelText, self.m_levelUpText, self.m_staminaText, self.m_staminaUpText, self.m_curStaminaText,
+    self.m_curStaminaUpText, self.m_clickText = UIUtil.GetChildTexts(self.transform, {
+        "root/contentRoot/level/levelText",
+        "root/contentRoot/level/levelUpText",
+        "root/contentRoot/stamina/staminaText",
+        "root/contentRoot/stamina/staminaUpText",
+        "root/contentRoot/currentStamina/curStaminaText",
+        "root/contentRoot/currentStamina/curStaminaUpText",
+        "root/clickText",
+    })
+    self.m_clickText.text = Language.GetString(2716)
+
+    self.m_closeBtn, self.m_actorAnchor = UIUtil.GetChildTransforms(self.transform, {
+        "root/closeBtn",
+        "root/contentRoot/actorAnchor",
+    })
+
+    local onClick = Bind(self, self.OnClick)
+    UIUtil.AddClickEvent(self.m_closeBtn.gameObject, onClick)
+end
+
+function UIZhuGongLevelUpView:OnDestroy()
+    UIUtil.RemoveClickEvent(self.m_closeBtn.gameObject)
+    base.OnDestroy(self)
+end
+
+function UIZhuGongLevelUpView:OnClick(go)
+    if go.name == "closeBtn" then
+        self:CloseSelf()
+    end
+end
+
+function UIZhuGongLevelUpView:LoadWujiangModel()
+    self.m_wujiangLoaderSeq = ActorShowLoader:GetInstance():PrepareOneSeq()
+    ActorShowLoader:GetInstance():CreateShowOffWuJiang(self.m_wujiangLoaderSeq, ActorShowLoader.MakeParam(6666, 1), self.m_roleContainerTrans, function(actorShow)
+        self.m_wujiangLoaderSeq = 0
+        self.m_curActorShow = actorShow
+        
+        local screenPos = UIManagerInst:GetUICamera():WorldToScreenPoint(self.m_actorAnchor.position)
+        local wPos = Vector3.New(screenPos.x , screenPos.y, 2.2)
+        wPos = self.m_roleCam:ScreenToWorldPoint(wPos)
+
+        self.m_curActorShow:SetPosition(Vector3.New(wPos.x, 0.01, wPos.z))
+        self.m_curActorShow:SetEulerAngles(Vector3.New(0, -26.5, 0))
+        
+        actorShow:ShowEffect(666620, function()
+            actorShow:SetActive(false)
+            actorShow:SetActive(true)
+        end)
+    end)
+end
+
+function UIZhuGongLevelUpView:OnDisable()
+    GamePromptMgr:GetInstance():ClearCurPrompt()
+    GamePromptMgr:GetInstance():ShowPrompt()
+    if self.m_curActorShow then
+        self.m_curActorShow:Delete()
+        self.m_curActorShow = nil
+    end
+    self:DestroyRoleContainer()
+
+    base.OnDisable(self)
+end
+
+function UIZhuGongLevelUpView:CreateRoleContainer()
+    if IsNull(self.m_roleContainerGo) then
+        self.m_roleContainerGo = GameObject("RoleContainer")
+        self.m_roleContainerTrans = self.m_roleContainerGo.transform
+        local wujiangRootPrefab = ResourcesManagerInst:LoadSync(WujiangRootPath, typeof(GameObject))
+        if not IsNull(wujiangRootPrefab) then
+            self.m_roleBgGo = GameObject.Instantiate(wujiangRootPrefab)
+            local roleBgTrans = self.m_roleBgGo.transform
+            roleBgTrans.localPosition = Vector3.New(7777,0,0)
+
+            self.m_roleContainerTrans:SetParent(roleBgTrans)
+            local roleCamTrans = UIUtil.FindTrans(roleBgTrans, "RoleCamera")
+            self.m_roleCam = UIUtil.FindComponent(roleCamTrans, typeof(CS.UnityEngine.Camera))
+        end
+    end
+end
+
+function UIZhuGongLevelUpView:DestroyRoleContainer()
+    if not IsNull(self.m_roleContainerGo) then
+        GameObject.DestroyImmediate(self.m_roleContainerGo)
+    end
+
+    self.m_roleContainerGo = nil
+    self.m_roleContainerTrans = nil
+    self.m_roleCam = nil
+
+    if not IsNull(self.m_roleBgGo) then
+        UIGameObjectLoader:GetInstance():RecycleGameObject(WujiangRootPath, self.m_roleBgGo)
+        self.m_roleBgGo = nil
+    end
+end
+
+function UIZhuGongLevelUpView:Update()
+    if self.m_countDownTime > 0 then
+        self.m_countDownTime = self.m_countDownTime - Time.deltaTime
+        if self.m_countDownTime <= 0 then
+            self:CloseSelf()
+        end
+    end
+end
+
+return UIZhuGongLevelUpView

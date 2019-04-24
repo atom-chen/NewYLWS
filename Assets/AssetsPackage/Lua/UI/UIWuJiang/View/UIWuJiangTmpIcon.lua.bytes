@@ -1,0 +1,35 @@
+local UILogicUtil = UILogicUtil
+local UIUtil = UIUtil
+local string_format = string.format
+local math_ceil = math.ceil
+
+local UIWuJiangTmpIcon = BaseClass("UIWuJiangTmpIcon", UIBaseItem)
+
+function UIWuJiangTmpIcon:OnCreate()
+    self.m_icon = UIUtil.AddComponent(UIImage, self, "icon", AtlasConfig.RoleIcon)
+    self.m_frameImage = UIUtil.AddComponent(UIImage, self, "frame", AtlasConfig.DynamicLoad)
+    self.m_levelText = UIUtil.FindText(self.transform, "LvText")
+end
+
+function UIWuJiangTmpIcon:SetData(wujiangData)
+    if wujiangData == nil then
+        return
+    end
+
+    local wujiangCfg = ConfigUtil.GetWujiangCfgByID(wujiangData.id)
+    if not wujiangCfg then
+        return
+    end
+
+    self.m_icon:SetAtlasSprite(math_ceil(wujiangData.id)..".jpg")
+
+    local wuJiangStarCfg = ConfigUtil.GetWuJiangStarCfgByID(wujiangData.star)
+    if wuJiangStarCfg then
+        local strID = wujiangData.level < wuJiangStarCfg.level_limit and 634 or 639
+        self.m_levelText.text = string_format(Language.GetString(strID), wujiangData.level, wuJiangStarCfg.level_limit)
+    end
+    UILogicUtil.SetWuJiangFrame(self.m_frameImage, wujiangCfg.rare)
+end
+
+
+return UIWuJiangTmpIcon

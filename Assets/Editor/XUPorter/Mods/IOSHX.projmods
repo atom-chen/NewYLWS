@@ -1,0 +1,11 @@
+{
+    "group": "IOSHX",
+    "libs": ["libz.tbd", "libc++.tbd"],
+    "frameworks": ["AdSupport.framework", "StoreKit.framework", "CoreText.framework", "CFNetwork.frmework", "Security.framework", "QuartzCore.framework", "CoreMotion.framework", "CoreTelephony.framework", "CoreLocation.framework", "SystemConfiguration.framework"],
+    "headerpaths": [],
+    "files":   [],
+    "folders": ["iOS/IOSHX/"],    
+    "excludes": ["^.*.meta$", "^.*.mdown$", "^.*.pdf$"],
+    "compiler_flags": [],
+    "linker_flags": []
+}

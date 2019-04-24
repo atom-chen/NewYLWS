@@ -1,0 +1,83 @@
+
+local string_format = string.format
+local table_insert = table.insert
+local math_min = math.min
+local tonumber = tonumber
+local ConfigUtil = ConfigUtil
+local UIUtil = UIUtil
+local UILogicUtil = UILogicUtil
+local Language = Language
+local CommonDefine = CommonDefine
+local GameObject = CS.UnityEngine.GameObject
+local UIGameObjectLoaderInstance = UIGameObjectLoader:GetInstance()
+local FuliMgr = Player:GetInstance():GetFuliMgr()
+local QiandaoItemClass = require "UI.UIFuli.View.QiandaoItem"
+
+
+local DetailQiandaoHelper = BaseClass("DetailQiandaoHelper")
+
+function DetailQiandaoHelper:__init(fuliTr, fuliView)
+    self.m_fuliView = fuliView
+
+    self.m_titleText, self.m_countText = UIUtil.GetChildTexts(fuliTr, {
+        "Container/Fuli/bg/RightContainer/Qiandao/Title/Text",
+        "Container/Fuli/bg/RightContainer/Qiandao/QiandaoCountText",
+    })
+
+    self.m_qiandaoTr, self.m_qiandaoItemTr, self.m_qiandaoContentTr
+    = UIUtil.GetChildTransforms(fuliTr, {
+        "Container/Fuli/bg/RightContainer/Qiandao",
+        "Container/Fuli/bg/RightContainer/Qiandao/QiandaoItem",
+        "Container/Fuli/bg/RightContainer/Qiandao/ItemScrollView/Viewport/ItemContent"
+    })
+
+    self.m_qiandaoGo = self.m_qiandaoTr.gameObject
+    self.m_qiandaoItemPrefab = self.m_qiandaoItemTr.gameObject
+    
+    self.m_qiandaoItemList = {}
+end
+
+function DetailQiandaoHelper:__delete()
+    self.m_fuliView = nil
+    self:Close()
+end
+
+function DetailQiandaoHelper:Close()
+    self.m_qiandaoGo:SetActive(false)
+    
+    for _, v in ipairs(self.m_qiandaoItemList) do
+        GameObject.Destroy(v:GetGameObject())
+    end
+    self.m_qiandaoItemList = {}
+end
+
+function DetailQiandaoHelper:UpdateInfo()
+    local oneFuli = self.m_fuliView:GetOneFuli()
+    if not oneFuli then
+        return
+    end
+
+    self.m_qiandaoGo:SetActive(true)
+    self.m_titleText.text = self.m_fuliView:GetTitleName()
+    local qiandaoDays = 0
+    for i, v in ipairs(oneFuli.entry_list) do
+        local qiandaoItem = self.m_qiandaoItemList[i]
+        if not qiandaoItem then
+            local go = GameObject.Instantiate(self.m_qiandaoItemPrefab)
+            qiandaoItem = QiandaoItemClass.New(go, self.m_qiandaoContentTr)
+            table_insert(self.m_qiandaoItemList, qiandaoItem)
+            qiandaoItem:UpdateData(v.award_list[1], v.e_param1, v.index, v.status, self.m_fuliView:GetFuliId())
+        else
+            qiandaoItem:UpdateData(v.award_list[1], v.e_param1, v.index, v.status, self.m_fuliView:GetFuliId())
+        end
+        if v.status == 2 then
+            qiandaoDays = qiandaoDays + 1
+        end
+    end
+    self.m_countText.text = string_format(Language.GetString(3432), qiandaoDays)
+        
+    
+end
+
+
+return DetailQiandaoHelper

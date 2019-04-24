@@ -1,0 +1,226 @@
+local UIUtil = UIUtil
+local UIImage = UIImage
+local Language = Language 
+local AtlasConfig = AtlasConfig
+local string_format = string.format
+local Type_Slider = typeof(CS.UnityEngine.UI.Slider)
+local FriendMgr = Player:GetInstance():GetFriendMgr()
+local UIGameObjectLoaderInst = UIGameObjectLoader:GetInstance()
+local FriendTaskItemPrefab = TheGameIds.FriendTaskItemPrefab
+local FriendTaskItemClass = require("UI.UIFriend.View.FriendTaskItem")
+
+local UIFriendTaskView = BaseClass("UIFriendTaskView", UIBaseView)
+local base = UIBaseView
+
+function UIFriendTaskView:OnCreate()
+    base.OnCreate(self)
+    self.m_taskItemList = {}
+    self.m_taskItemLoadSeq = 0 
+    self.m_floor = 0
+
+    self:InitView() 
+    self:HandleClick()
+end
+
+function UIFriendTaskView:InitView()
+    self.m_blackBgTrans,
+    self.m_tipsBtnTrans,
+    self.m_closeBtnTrans,
+    self.m_progressSliderTrans, 
+    self.m_taskItemGridTrans,
+    self.m_boxIconTrans,
+    self.m_boxRedPointTrans,
+    self.m_nextLayerBtnTr = UIUtil.GetChildRectTrans(self.transform, {
+        "BlackBg",
+        "Panel/TipsBtn",
+        "Panel/CloseBtn",
+        "Panel/ProgressSlider", 
+        "Panel/TaskItemGrid",
+        "Panel/BoxIcon",
+        "Panel/BoxIcon/BoxRedPoint",
+        "Panel/NextLayerBtn",
+    })
+
+    self.m_titleTxt,
+    self.m_progressSliderValueTxt,
+    self.m_lastLayerTxt,
+    self.m_nextLayerBtnTxt,
+    self.m_completedTxt = UIUtil.GetChildTexts(self.transform, {
+        "Panel/TitleTxt",
+        "Panel/ProgressSlider/SliderValueTxt",
+        "Panel/LastLayerTxt",
+        "Panel/NextLayerBtn/Text",
+        "Panel/CompletedTxt",
+    })
+
+    self.m_progressSlider = self.m_progressSliderTrans:GetComponent(Type_Slider)
+    self.m_boxIcon = UIUtil.AddComponent(UIImage, self, self.m_boxIconTrans, AtlasConfig.DynamicLoad)
+
+    self.m_titleTxt.text = Language.GetString(3035)
+    self.m_nextLayerBtnTxt.text = Language.GetString(3075) 
+end  
+
+function UIFriendTaskView:OnEnable(initOrder, friend_uid)
+    base.OnEnable(self, initOrder)
+
+    self.m_friend_uid = friend_uid
+ 
+    FriendMgr:ReqFriendTask(self.m_friend_uid, self.m_floor)
+end  
+
+function UIFriendTaskView:UpdateData(panelData)
+    if not panelData then
+        return
+    end 
+    self.m_panelData = panelData 
+    
+    local curFloor = self.m_panelData.curr_floor <= 4 and self.m_panelData.curr_floor or 1
+    local realIndex = curFloor + 3070
+    self.m_lastLayerTxt.text = Language.GetString(realIndex) 
+
+    if curFloor >= self.m_panelData.max_floor then
+        self.m_nextLayerBtnTr.gameObject:SetActive(false)
+        self.m_completedTxt.text = Language.GetString(3076) 
+    else
+        self.m_nextLayerBtnTr.gameObject:SetActive(true)
+        self.m_completedTxt.text = ""
+    end
+
+    self.m_floor = curFloor
+
+    local totalProgress = self.m_panelData.box_cond
+    local currProgress = self.m_panelData.box_curr_value
+    local box_status = self.m_panelData.box_status
+    self.m_progressSlider.value = currProgress / totalProgress
+    self.m_progressSliderValueTxt.text = string_format(Language.GetString(3069), currProgress, totalProgress)
+    self.m_boxRedPointTrans.gameObject:SetActive(box_status == 1)
+    local boxSptName = nil
+    if box_status == 1 then
+        boxSptName = "zhuxian18.png"
+    elseif box_status == 2 then
+        boxSptName = "zhuxian17.png"
+    end
+    if boxSptName then
+        self.m_boxIcon:SetAtlasSprite(boxSptName, false, AtlasConfig.DynamicLoad)
+    end
+
+    self:CreateTaskItemList()
+end
+
+function UIFriendTaskView:CreateTaskItemList()
+    local task_list = self.m_panelData.task_list  
+    if not task_list then
+        return
+    end 
+
+    if #self.m_taskItemList <= 0 then
+        self.m_taskItemLoadSeq = UIGameObjectLoaderInst:PrepareOneSeq()
+        UIGameObjectLoaderInst:GetGameObjects(self.m_taskItemLoadSeq, FriendTaskItemPrefab, #task_list, function(objs)
+            self.m_taskItemLoadSeq = 0
+            if not objs then
+                return
+            end
+            for i = 1, #objs do
+                local taskItem = FriendTaskItemClass.New(objs[i], self.m_taskItemGridTrans, FriendTaskItemPrefab)
+                if taskItem then
+                    taskItem:UpdateData(task_list[i], self.m_friend_uid, self.m_floor)
+                    table.insert(self.m_taskItemList, taskItem)
+                end
+            end
+        end)
+    else
+        for i = 1, #self.m_taskItemList do 
+            self.m_taskItemList[i]:UpdateData(task_list[i], self.m_friend_uid, self.m_floor)
+        end
+    end 
+end 
+
+function UIFriendTaskView:OnClick(go, x, y)
+    local goName = go.name
+    if goName == "TipsBtn" then 
+
+    elseif goName == "CloseBtn" or goName == "BlackBg" then
+        self:CloseSelf()
+        return
+    elseif goName == "BoxIcon" then 
+        if self.m_panelData and self.m_panelData.box_status == 1 then
+            FriendMgr:ReqTakeBoxAward(self.m_friend_uid, self.m_floor)
+        end
+    elseif goName == "NextLayerBtn" then
+       if not self:IsCurLayerTaskCompleted() then
+            UILogicUtil.FloatAlert(Language.GetString(3077))
+            return
+       end
+      
+        FriendMgr:ReqFriendTask(self.m_friend_uid, self.m_floor + 1)
+    end
+end 
+
+function UIFriendTaskView:IsCurLayerTaskCompleted()
+    local task_list = self.m_panelData.task_list  
+
+    local isCompleted = true
+    if not task_list then
+        return false
+    end 
+
+    for i = 1, #task_list do
+        if task_list[i].status ~= 2 then
+            isCompleted = false
+        end
+    end
+
+    if self.m_panelData.box_status ~= 2 then
+        isCompleted = false
+    end
+
+    return isCompleted
+end
+
+function UIFriendTaskView:HandleClick()
+    local onClick = Bind(self, self.OnClick)
+
+    UIUtil.AddClickEvent(self.m_blackBgTrans.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_tipsBtnTrans.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_closeBtnTrans.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_boxIconTrans.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_nextLayerBtnTr.gameObject, onClick)
+end
+
+function UIFriendTaskView:OnAddListener()
+    base.OnAddListener(self)
+    
+    self:AddUIListener(UIMessageNames.MN_RSP_FRIEND_TASK_PANEL_INFO, self.UpdateData)
+end
+
+function UIFriendTaskView:OnRemoveListener()
+    base.OnRemoveListener(self)
+    
+    self:RemoveUIListener(UIMessageNames.MN_RSP_FRIEND_TASK_PANEL_INFO, self.UpdateData)
+end 
+
+function UIFriendTaskView:OnDisable() 
+    if self.m_taskItemLoadSeq ~= 0 then
+        UIGameObjectLoaderInst:CancelLoad(self.m_taskItemLoadSeq)
+        self.m_taskItemLoadSeq = 0
+    end
+    for i = 1, #self.m_taskItemList do
+        self.m_taskItemList[i]:Delete()
+    end
+    self.m_taskItemList = {}
+
+    base.OnDisable(self)
+end
+
+function UIFriendTaskView:OnDestroy()  
+    if self.m_boxIcon then
+        self.m_boxIcon:Delete()
+        self.m_boxIcon = nil
+    end 
+ 
+    self.m_taskItemList = nil
+
+    base.OnDestroy(self)
+end
+
+return UIFriendTaskView

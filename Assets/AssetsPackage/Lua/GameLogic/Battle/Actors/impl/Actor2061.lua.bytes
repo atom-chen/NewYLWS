@@ -1,0 +1,38 @@
+local Actor = require "GameLogic.Battle.Actors.Actor"
+local Actor2061 = BaseClass("Actor2061", Actor)
+
+local ActorManagerInst = ActorManagerInst
+
+function Actor2061:__init()
+    self.m_atkEffectPercent = 0
+end
+
+
+function Actor2061:SetAtkEffectPercent(percent)
+    self.m_atkEffectPercent = percent
+end
+
+function Actor2061:LogicUpdate(deltaMS)
+    local owner = ActorManagerInst:GetActor(self:GetOwnerID())
+    if not owner or not owner:IsLive() then
+        self:KillSelf()
+        return
+    end
+end
+
+function Actor2061:LogicOnFightEnd()
+    self:KillSelf()
+end
+
+function Actor2061:GetAtkEffectPercent()
+    return self.m_atkEffectPercent
+end
+
+
+function Actor2061:OnDie(killerGiver, hpChgReason, killKeyFrame, deadMode)
+    self:AddEffect(206101)
+
+    Actor.OnDie(self, killerGiver, hpChgReason, killKeyFrame, deadMode)
+end
+
+return Actor2061

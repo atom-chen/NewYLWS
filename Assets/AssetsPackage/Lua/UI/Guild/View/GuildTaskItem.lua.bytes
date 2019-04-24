@@ -1,0 +1,116 @@
+local string_format = string.format
+local ItemDefine = ItemDefine
+local table_insert = table.insert
+
+local GuildTaskItem = BaseClass("GuildTaskItem", UIBaseItem)
+local base = UIBaseItem
+
+local GuildMgr = Player:GetInstance().GuildMgr
+local AwardItem = require "UI.Guild.View.GuildTaskAwardItem"
+local GameObject = CS.UnityEngine.GameObject
+
+function GuildTaskItem:OnCreate()
+    base.OnCreate(self)
+    self.m_taskId = false
+    self.m_awardList = {}
+    self:InitView()
+end
+
+function GuildTaskItem:InitView()
+    local awardTaskText, doneBtnText, finishText, underWayText
+
+    self.m_taskNameText, self.m_contentText, self.m_awardCountText, self.m_goalText, awardTaskText,
+    doneBtnText, finishText, underWayText = UIUtil.GetChildTexts(self.transform, {
+        "NameBg/NameText",
+        "ContentText",
+        "AwardTaskText/AwardTaskCountText",
+        "GoalBg/GoalText",
+        "AwardTaskText",
+        "DoneBtn/DoneBtnText",
+        "Finish",
+        "underWay"
+    })
+
+    self.m_doneBtn, self.m_finishGo, self.m_underWayGo, self.m_awardItemPrefab,
+    self.m_awardGridTr = UIUtil.GetChildTransforms(self.transform, {
+        "DoneBtn",
+        "Finish",
+        "underWay",
+        "awardItem",
+        "AwardGrid"
+    })
+
+    self.m_finishGo = self.m_finishGo.gameObject
+    self.m_underWayGo = self.m_underWayGo.gameObject
+    self.m_awardItemPrefab = self.m_awardItemPrefab.gameObject
+
+    awardTaskText.text = Language.GetString(1411)
+    doneBtnText.text = Language.GetString(1412)
+    finishText.text = Language.GetString(1413)
+    underWayText.text = Language.GetString(1414)
+
+    self.m_doneBtn.gameObject:SetActive(false)
+    self.m_finishGo:SetActive(false)
+    self.m_underWayGo:SetActive(false)
+
+    local function onClick(go)
+        if go.name == "DoneBtn" then
+            GuildMgr:ReqCompleteTask(self.m_taskId)
+        end
+    end
+
+    UIUtil.AddClickEvent(self.m_doneBtn.gameObject, onClick)
+end
+
+function GuildTaskItem:ChangeCompleteState()
+    self.m_doneBtn.gameObject:SetActive(false)
+    self.m_finishGo:SetActive(true)
+end
+
+function GuildTaskItem:GetTaskId()
+    return self.m_taskId
+end
+
+function GuildTaskItem:UpdateData(id, process, takeFlag)
+    local cfg = ConfigUtil.GetGuildTaskCfgByID(id)
+    if cfg then
+        self.m_taskId = id
+        self.m_taskNameText.text = cfg.title
+        self.m_contentText.text = cfg.desc
+        self.m_awardCountText.text = cfg.add_huoyue
+        if cfg.award_list then
+            for i = 1, #cfg.award_list do
+                local awardItem = self.m_awardList[i]
+                if not awardItem then
+                    local go = GameObject.Instantiate(self.m_awardItemPrefab)
+                    awardItem = AwardItem.New(go, self.m_awardGridTr)
+                    table_insert(self.m_awardList, awardItem)
+                end
+                awardItem:UpdateData(cfg.award_list[i][1], cfg.award_list[i][2])
+            end
+        end
+    end
+
+    if process < cfg.param1 then
+        self.m_goalText.text = string_format(Language.GetString(1415), process,cfg.param1)
+        self.m_underWayGo:SetActive(true)
+    else
+        self.m_goalText.text = string_format("%d/%d", process,cfg.param1)
+        if takeFlag == 0 then
+            self.m_doneBtn.gameObject:SetActive(true)
+        elseif takeFlag == 1 then
+            self.m_finishGo:SetActive(true)
+        end
+    end
+end
+
+function GuildTaskItem:OnDisable()
+    for i, v in pairs(self.m_awardList) do
+        v:Delete()
+    end
+    self.m_awardList = {}
+
+    base.OnDisable(self)
+end
+
+return GuildTaskItem

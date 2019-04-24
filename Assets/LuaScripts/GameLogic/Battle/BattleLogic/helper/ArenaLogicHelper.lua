@@ -1,0 +1,62 @@
+local FilmLogicHelper = require("GameLogic.Battle.BattleLogic.helper.FilmLogicHelper")
+local ArenaLogicHelper = BaseClass("ArenaLogicHelper", FilmLogicHelper)
+local base = FilmLogicHelper
+local CtlBattleInst = CtlBattleInst
+
+function ArenaLogicHelper:GetPreloadList(...)
+    base.GetPreloadList(self, ...)
+    
+    local isReplayVideo = ...
+    if isReplayVideo then
+        local battleParam = CtlBattleInst:GetLogic():GetBattleParam()
+        local leftWujiangList = battleParam.leftCamp.wujiangList
+        for _, oneWujiang in ipairs(leftWujiangList) do
+            self:AddWujiangPreloadObj(oneWujiang.wujiangID, oneWujiang.wuqiLevel or 1, oneWujiang.mountID, oneWujiang.mountLevel)
+        end
+        if battleParam.leftCamp.oneDragon then
+            self:AddDragonTimelinePreloadObj(battleParam.leftCamp.oneDragon.dragonID)
+        end
+
+        for i = 1, #battleParam.rightCampList do
+            local rightCamp = battleParam.rightCampList[i]
+            local rightWujiangList = rightCamp.wujiangList
+            for _, oneWujiang in ipairs(rightWujiangList) do
+                self:AddWujiangPreloadObj(oneWujiang.wujiangID, oneWujiang.wuqiLevel or 1, oneWujiang.mountID, oneWujiang.mountLevel)
+            end
+            if rightCamp.oneDragon then
+                self:AddDragonTimelinePreloadObj(rightCamp.oneDragon.dragonID)
+            end
+        end
+    else
+        local buzhenID = Utils.GetBuZhenIDByBattleType(BattleEnum.BattleType_ARENA)
+        Player:GetInstance():GetLineupMgr():Walk(buzhenID, function(wujiangBriefData)
+			self:AddWujiangPreloadObj(wujiangBriefData.id, wujiangBriefData.weaponLevel or 1, wujiangBriefData.mountID, wujiangBriefData.mountLevel)
+		end)
+                
+        local rivalData = Player:GetInstance():GetArenaMgr():GetCurFightRivalData()
+        if rivalData then
+            for _, oneWujiang in ipairs(rivalData.def_wujiang_list) do
+                self:AddWujiangPreloadObj(oneWujiang.id, oneWujiang.wuqiLevel or 1, oneWujiang.mountID, oneWujiang.mountLevel)
+            end
+            self:AddDragonTimelinePreloadObj(rivalData.summon)
+        end
+        
+        self:AddDragonTimelinePreloadObj(Player:GetInstance():GetLineupMgr():GetLineupDragon(buzhenID))
+    end
+
+    --  timeline预加载
+    self:AddTimelinePreloadObj("Arena20", TimelineType.PATH_BATTLE_SCENE)
+    self:AddTimelinePreloadObj("Arena30", TimelineType.PATH_BATTLE_SCENE)
+    self:AddTimelinePreloadObj("Arena40", TimelineType.PATH_BATTLE_SCENE)
+
+    return self.m_preloadList
+end
+
+function ArenaLogicHelper:GetMapID(...)
+    return 7
+end
+
+function ArenaLogicHelper:PreloadSelector()
+end
+
+return ArenaLogicHelper

@@ -1,0 +1,65 @@
+local StatusGiver = StatusGiver
+local StatusFactoryInst = StatusFactoryInst
+local FixMul = FixMath.mul
+local FixDiv = FixMath.div
+local FixMod = FixMath.mod
+local FixSub = FixMath.sub
+local FixAdd = FixMath.add
+local FixFloor = FixMath.floor
+local CtlBattleInst = CtlBattleInst
+local ActorManagerInst = ActorManagerInst
+local FixIntMul = FixMath.muli
+local BattleCameraMgr = BattleCameraMgr
+local EffectMgr = EffectMgr
+
+local SkillBase = require "GameLogic.Battle.Skill.SkillBase"
+local Skill10431 = BaseClass("Skill10431", SkillBase)
+
+function Skill10431:Perform(performer, target, performPos, special_param)
+    if not performer or not target or not target:IsLive() then
+        return
+    end
+
+    performer:ChangeAtkWay()
+    -- -- 号令群雄
+
+    -- 1 - 2
+    -- 选择一名敌方武将，使其成为所有我方武将的攻击目标，此时袁绍的普攻变为剑气法术攻击，持续{X1}秒。
+    -- 此段时间内袁绍每造成一次普攻伤害，就提升所有我方武将{Y1}%的双攻。
+
+    -- 3 - 4
+    -- 选择一名敌方武将，使其成为所有我方武将的攻击目标，并且在持续的时间内无法获取增益效果，此时袁绍的普攻变为剑气法术攻击，持续{X3}秒。
+    -- 此段时间内袁绍每造成一次普攻伤害，就提升所有我方武将{Y3}%的双攻。
+
+    -- 5 - 6
+    -- 选择一名敌方武将，使其成为所有我方武将的攻击目标，并且在持续的时间内无法获取增益效果，获得任何增益效果时受到袁绍{Z5}（+{e}%法攻)法术伤害，
+    -- 此时袁绍的普攻变为剑气法术攻击，持续{X5}秒。此段时间内袁绍每造成一次普攻伤害，就提升所有我方武将{Y5}%的双攻。
+
+    local battleLogic = CtlBattleInst:GetLogic()
+    local factory = StatusFactoryInst
+
+    if self:GetLevel() >= 5 then
+        local giver = StatusGiver.New(performer:GetActorID(), 10431)
+        local yuanshaoImmunePostiveStatus = factory:NewStatusYuanShaoImmunePositive(giver, FixIntMul(self:X(), 1000), self:Z())   
+        self:AddStatus(performer, target, yuanshaoImmunePostiveStatus) 
+    end
+
+    -- target:AddEffect(104306)
+    local effectKey = EffectMgr:AddEffect(target:GetActorID(), 104306, 0, nil, 7)
+    
+    ActorManagerInst:Walk(
+        function(tmpTarget)
+
+            if not battleLogic:IsFriend(performer, tmpTarget, true) then
+                return
+            end
+
+            local giver = StatusGiver.New(performer:GetActorID(), 10431)
+            local haolingStatus = factory:NewStatusYuanShaoHaoLing(giver, target:GetActorID(), FixIntMul(self:X(), 1000))
+            haolingStatus:SetTargetEffectKey(effectKey)
+            self:AddStatus(performer, tmpTarget, haolingStatus)
+        end
+    )
+end
+
+return Skill10431

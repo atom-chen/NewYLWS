@@ -1,0 +1,40 @@
+local CtlBattleInst = CtlBattleInst
+
+local AtkFunc1 = require "GameLogic.Battle.Skill.impl.AtkFunc1" 
+local Skill32071 = BaseClass("Skill32071", AtkFunc1)
+
+function Skill32071:Perform(performer, target, performPos, special_param)
+    if not performer or not performer:IsLive() then
+        return
+    end
+
+    if not target or not target:IsLive() then
+        performer:EndLife()
+        return
+    end
+
+    performer:SetTargetID(target:GetActorID())
+
+    local performerPos = performer:GetPosition()
+    local targetPos = target:GetPosition():Clone() 
+    local movehelper = performer:GetMoveHelper()
+    if movehelper then
+        local pathHandler = CtlBattleInst:GetPathHandler()
+        if pathHandler then
+            local x,y,z = performerPos:GetXYZ()
+            local x2, y2, z2 = targetPos:GetXYZ()
+            local hitPos = pathHandler:HitTest(x, y, z, x2, y2, z2)
+            if hitPos then
+                targetPos:SetXYZ(hitPos.x , performerPos.y, hitPos.z)
+            end
+        end
+
+        movehelper:Stop()
+        movehelper:Start({targetPos}, 15, function()
+            performer:MakeHurt()
+            performer:EndLife()
+        end, true)
+    end
+end
+
+return Skill32071

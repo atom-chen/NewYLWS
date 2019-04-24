@@ -1,0 +1,32 @@
+local Actor = require "GameLogic.Battle.Actors.Actor"
+local Actor3208 = BaseClass("Actor3208", Actor)
+
+function Actor3208:__init()
+    self.m_ownerLineUpPos = nil
+end
+
+function Actor3208:OnAttackEnd(skillCfg)
+    Actor.OnAttackEnd(self, skillCfg)
+
+    local ai = self:GetAI()
+    if ai then
+        ai:SelfAttackEnd()
+    end
+end
+
+function Actor3208:SetOwnerLineUpPos(lineUp)
+    self.m_ownerLineUpPos = lineUp
+end
+
+function Actor3208:GetOwnerLineUpPos()
+    return self.m_ownerLineUpPos
+end
+
+function Actor3208:LogicOnFightEnd()
+    local ai = self:GetAI()
+    if ai then
+        ai:SelfCheckMoveSpeed()
+    end
+end
+
+return Actor3208

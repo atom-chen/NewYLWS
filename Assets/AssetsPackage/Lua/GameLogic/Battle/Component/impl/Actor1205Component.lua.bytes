@@ -1,0 +1,62 @@
+local PreloadHelper = PreloadHelper
+local GameObjectPoolInst = GameObjectPoolInst
+local BattleEnum = BattleEnum
+
+local ActorComponent = require "GameLogic.Battle.Component.ActorComponent"
+local Actor1205Component = BaseClass("Actor1205Component", ActorComponent)
+local HorseShowClass = require "UI.UIWuJiang.HorseShow" 
+
+local Animator = CS.UnityEngine.Animator
+
+function Actor1205Component:__init()
+    self.m_idleEffectKey = -1
+end
+
+
+function Actor1205Component:CreateHorse()
+    local isPerform12052 = self.m_actor:IsPerformSkill12052()
+
+    if self.m_horseShow then
+        local sucMount = self:Mount()
+        if sucMount then
+            if isPerform12052 then
+                self.m_actor:OnMount()
+                self:PlayAnim(BattleEnum.ANIM_MOVE)
+            else
+                self:PlayAnim(BattleEnum.ANIM_IDLE)
+            end
+
+            return
+        end
+    end
+
+    local mountID, mountLevel = self.m_actor:GetMountIDLevel()
+    if mountID <= 0 and isPerform12052 then
+        mountID = 23002
+        mountLevel = 1
+    end
+
+    if mountID > 0 and mountLevel > 0 then
+        local horsePath = PreloadHelper.GetHorsePath(mountID, mountLevel)
+        GameObjectPoolInst:GetGameObjectAsync(horsePath,
+            function(go, self)
+                if IsNull(go) then
+                    return
+                end
+
+                self.m_horseShow = HorseShowClass.New(go, mountID, mountLevel)
+                
+                local sucMount = self:Mount()
+                if sucMount then
+                    if isPerform12052 then
+                        self:PlayAnim(BattleEnum.ANIM_MOVE)
+                        self.m_actor:OnMount()
+                    else
+                        self:PlayAnim(BattleEnum.ANIM_IDLE)
+                    end
+                end
+            end, self)
+    end
+end
+
+return Actor1205Component

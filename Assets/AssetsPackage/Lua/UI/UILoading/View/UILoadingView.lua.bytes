@@ -1,0 +1,32 @@
+local UILoadingView = BaseClass("UILoadingView", UIBaseView)
+local base = UIBaseView
+
+function UILoadingView:OnCreate()
+	base.OnCreate(self)
+	self.m_value = 0
+
+	self.loading_slider = self:AddComponent(UISlider, "ContentRoot/SliderBar")
+	self.loading_slider:SetValue(0.0)
+	-- self.m_loadingBg = UIUtil.AddComponent(UIImage, self, "ContentRoot/CountryImage", AtlasConfig.DynamicLoad)
+end
+
+function UILoadingView:SetValue(value)
+	self.m_value = value
+	self.loading_slider:SetValue(self.m_value)
+end
+
+function UILoadingView:GetValue()
+	return self.m_value
+end
+
+function UILoadingView:OnEnable(...)
+	base.OnEnable(self, ...)
+end
+
+function UILoadingView:OnDestroy()
+	self.loading_slider = nil
+	self.m_value = 0
+	base.OnDestroy(self)
+end
+
+return UILoadingView

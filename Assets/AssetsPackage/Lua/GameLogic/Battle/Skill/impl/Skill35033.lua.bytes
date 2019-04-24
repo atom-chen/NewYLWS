@@ -1,0 +1,21 @@
+local StatusGiver = StatusGiver
+local FixMul = FixMath.mul
+local FixDiv = FixMath.div
+local IsInCircle = SkillRangeHelper.IsInCircle
+local FixIntMul = FixMath.muli
+
+local SkillBase = require "GameLogic.Battle.Skill.SkillBase"
+local Skill35033 = BaseClass("Skill35033", SkillBase)
+
+function Skill35033:Perform(performer, target, performPos, special_param)
+    if not performer then
+        return
+    end
+
+    --朱雀双翅先后扇动，各自发出一股火焰旋风。火焰旋风按直线前进，对沿途敌人造成{x1}（+{E}%法攻)法术伤害，同时永久提升暴击伤害{y1}%
+
+    
+            
+end
+
+return Skill35033

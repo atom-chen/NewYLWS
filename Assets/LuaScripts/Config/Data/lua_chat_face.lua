@@ -1,0 +1,73 @@
+local config = {
+[1] = {
+id = 1,
+name = "滑稽",
+symbol = "<sprite=0>",
+sIcon = "bq01.png",
+sAtlas = "chatFace",
+},
+[2] = {
+id = 2,
+name = "喷",
+symbol = "<sprite=1>",
+sIcon = "bq02.png",
+sAtlas = "chatFace",
+},
+[3] = {
+id = 3,
+name = "真棒",
+symbol = "<sprite=2>",
+sIcon = "bq03.png",
+sAtlas = "chatFace",
+},
+[4] = {
+id = 4,
+name = "生气",
+symbol = "<sprite=3>",
+sIcon = "bq04.png",
+sAtlas = "chatFace",
+},
+[5] = {
+id = 5,
+name = "汗",
+symbol = "<sprite=4>",
+sIcon = "bq05.png",
+sAtlas = "chatFace",
+},
+[6] = {
+id = 6,
+name = "哈哈",
+symbol = "<sprite=5>",
+sIcon = "bq06.png",
+sAtlas = "chatFace",
+},
+[7] = {
+id = 7,
+name = "冷(无语)",
+symbol = "<sprite=6>",
+sIcon = "bq07.png",
+sAtlas = "chatFace",
+},
+[8] = {
+id = 8,
+name = "委屈",
+symbol = "<sprite=7>",
+sIcon = "bq08.png",
+sAtlas = "chatFace",
+},
+[9] = {
+id = 9,
+name = "酷",
+symbol = "<sprite=8>",
+sIcon = "bq09.png",
+sAtlas = "chatFace",
+},
+[10] = {
+id = 10,
+name = "惊哭",
+symbol = "<sprite=9>",
+sIcon = "bq10.png",
+sAtlas = "chatFace",
+},
+}
+return config

@@ -1,0 +1,49 @@
+
+local StatusAllTimeShield = require("GameLogic.Battle.Status.impl.StatusAllTimeShield")
+local table_insert = table.insert
+local StatusEnum = StatusEnum
+local FixAdd = FixMath.add
+local FixSub = FixMath.sub
+local ActorManagerInst = ActorManagerInst
+
+local StatusLuSuAllShieldJiangdong = BaseClass("StatusLuSuAllShieldJiangdong", StatusAllTimeShield)
+
+function StatusLuSuAllShieldJiangdong:__init()
+    self.m_storeHp = 0
+end
+
+function StatusLuSuAllShieldJiangdong:Init(giver, hpStore, leftMS, effect)
+    StatusAllTimeShield.Init(self, giver, hpStore, leftMS, effect)
+    self.m_storeHp = hpStore
+end
+
+function StatusLuSuAllShieldJiangdong:GetStatusType()
+    return StatusEnum.STATUSTYPE_LUSUALLSHIELDJIANGDONG
+end
+
+function StatusLuSuAllShieldJiangdong:ClearEffect(actor)
+    StatusAllTimeShield.ClearEffect(self, actor)
+
+    self:Active12172(actor)
+end
+
+function StatusLuSuAllShieldJiangdong:Merge(newStatus, actor) -- 合并规则：时间重置，护盾值重置，造成一次伤害
+    if not newStatus or newStatus:GetStatusType() ~= self:GetStatusType() then
+        return
+    end
+    self:Active12172(actor)
+
+    self.m_leftMS = self.m_totalMS
+    self.m_hpStore = self.m_storeHp
+end
+
+function StatusLuSuAllShieldJiangdong:Active12172(actor)
+    if actor and actor:IsLive() then
+        local giverActor = ActorManagerInst:GetActor(self.m_giver.actorID)
+        if giverActor and giverActor:IsLive() then
+            giverActor:ShouldActive12172(actor:GetActorID(), self.m_hpStore > 0)
+        end
+    end
+end
+
+return StatusLuSuAllShieldJiangdong

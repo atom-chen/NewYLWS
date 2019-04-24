@@ -1,0 +1,49 @@
+local FixIntMul = FixMath.muli
+local FixAdd = FixMath.add
+local FixDiv = FixMath.div
+local FixSub = FixMath.sub
+local FixMul = FixMath.mul
+local SkillUtil = SkillUtil
+local ConfigUtil = ConfigUtil
+local ACTOR_ATTR = ACTOR_ATTR
+local IsInCircle = SkillRangeHelper.IsInCircle
+local StatusFactoryInst = StatusFactoryInst
+local ActorManagerInst = ActorManagerInst
+local CtlBattleInst = CtlBattleInst
+local BattleEnum = BattleEnum
+local Formular = Formular
+local StatusEnum = StatusEnum
+
+local Actor = require "GameLogic.Battle.Actors.Actor"
+local Actor2012 = BaseClass("Actor2012", Actor)
+
+function Actor2012:__init()
+    self.m_effectKey20121 = -1
+
+    self.m_effectPercent = 0
+end 
+  
+function Actor2012:AddEffect20121(percent)
+    self.m_effectKey20121 = self:AddEffect(201204)
+    self.m_effectPercent = percent
+end
+
+function Actor2012:LogicUpdate(deltaMS)
+    if self.m_effectKey20121 > 0 then
+        local baseHP = self:GetData():GetAttrValue(ACTOR_ATTR.BASE_MAXHP)
+        local curHP = self:GetData():GetAttrValue(ACTOR_ATTR.FIGHT_HP)
+        local curHpPercent = FixDiv(curHP, baseHP)
+        if curHpPercent > self.m_effectPercent then
+            self:ClearEffect20121()
+        end
+    end
+end
+
+function Actor2012:ClearEffect20121()
+    if self.m_effectKey20121 > 0 then
+        EffectMgr:RemoveByKey(self.m_effectKey20121)
+        self.m_effectKey20121 = -1
+    end
+end
+
+return Actor2012

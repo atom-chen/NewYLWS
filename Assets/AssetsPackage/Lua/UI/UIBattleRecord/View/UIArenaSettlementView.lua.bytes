@@ -1,0 +1,37 @@
+local base = require "UI.UIBattleRecord.View.BattleSettlementView"
+local UIArenaSettlementView = BaseClass("UIArenaSettlementView", base)
+
+local CtlBattleInst = CtlBattleInst
+
+function UIArenaSettlementView:OnEnable(...)
+    base.OnEnable(self)
+    local order, playerWin = ...
+
+    if playerWin then
+        self:HandleWinOrLoseEffect(0)
+    else
+        self:HandleWinOrLoseEffect(1)
+    end
+
+    self.starListTrans.gameObject:SetActive(false)
+    self.m_bottomContentTr.gameObject:SetActive(false)
+
+    self:UpdateTimeout()
+end
+
+function UIArenaSettlementView:GetBattleResult()
+    local logic = CtlBattleInst:GetLogic()
+    if logic then
+        return logic:GetBattleResult()
+    end
+end
+
+function UIArenaSettlementView:UpdateTimeout()
+    if self:GetBattleResult() == 2 then
+        self.m_timeoutText.transform.localPosition = Vector3.New(0, 110, 0)
+    else
+        self.m_timeoutText.transform.localPosition = Vector3.New(0, 100, 0)
+    end
+end
+
+return UIArenaSettlementView

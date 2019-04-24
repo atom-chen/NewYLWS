@@ -1,0 +1,71 @@
+local BaseMedium = require("GameLogic.Battle.Medium.BaseMedium")
+local BattleEnum = BattleEnum
+local FixMath = FixMath
+local FixMul = FixMath.mul
+local FixSub = FixMath.sub
+local FixAdd = FixMath.add
+local FixDiv = FixMath.div
+local EffectMgr = EffectMgr
+local Formular = Formular
+local StatusFactoryInst = StatusFactoryInst
+local ActorManagerInst = ActorManagerInst
+local CtlBattleInst = CtlBattleInst
+
+local MediumDragon3601 = BaseClass("MediumDragon3601", BaseMedium)
+function MediumDragon3601:__init()
+    self.m_param = false
+    self.m_effectTime = 0
+    self.m_totalTime = 0
+end
+
+function MediumDragon3601:InitParam(param)
+    self.m_param = {}
+    if param then
+        self.m_param.effectPos = param.effectPos
+        self.m_param.camp = param.camp
+        self.m_param.recoverHP = param.recoverHP
+        self.m_param.recoverHPPercent = param.recoverHPPercent
+        self.m_totalTime = 2500
+    end
+end
+
+function MediumDragon3601:OnComponentBorn()
+    self:LookatPosOnlyShow(self.m_param.effectPos.x, self.m_param.effectPos.y, self.m_param.effectPos.z)
+end
+
+function MediumDragon3601:DoUpdate(deltaMS)
+    if self.m_effectTime < 500 then
+        self.m_effectTime = FixAdd(self.m_effectTime, deltaMS)
+        if self.m_effectTime >= 500 then
+            self:Effect()
+        end
+    else
+        self.m_effectTime = FixAdd(self.m_effectTime, deltaMS)
+        if self.m_effectTime >= self.m_totalTime then
+            self:Over()
+            return
+        end
+    end
+end
+
+--为我方全体回复{x}（+{y}%最大生命值）的血量。
+function MediumDragon3601:Effect()
+    local factory = StatusFactoryInst
+    ActorManagerInst:Walk(
+        function(tmpTarget)
+            if not CtlBattleInst:GetLogic():IsDragonFriend(self.m_param.camp, tmpTarget, BattleEnum.RelationReason_SKILL_RANGE) then
+                return
+            end
+            -- EffectMgr:AddEffect(tmpTarget:GetActorID(), 350601)
+
+            local performerCurHP = tmpTarget:GetData():GetAttrValue(ACTOR_ATTR.FIGHT_MAXHP)
+            local hpRecover = FixAdd(FixMul(performerCurHP, self.m_param.recoverHPPercent), self.m_param.recoverHP)
+            local statusHP = factory:NewStatusHP(self.m_giver, hpRecover, BattleEnum.HURTTYPE_REAL_HURT, BattleEnum.HPCHGREASON_BY_SKILL, BattleEnum.ROUNDJUDGE_NORMAL, 1)
+            tmpTarget:GetStatusContainer():Add(statusHP)
+
+            TimeScaleMgr:ChangeTimeScale(0.3, 0.5)
+        end
+    )
+end
+
+return MediumDragon3601

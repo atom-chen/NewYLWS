@@ -1,0 +1,133 @@
+local UILineupMainView = require("UI.Lineup.UILineupMainView")
+local UILineupArenaEditView = BaseClass("UILineupArenaEditView", UILineupMainView)
+local base = UILineupMainView
+local table_insert = table.insert
+local Language = Language
+local SplitString = CUtil.SplitString
+
+function UILineupArenaEditView:OnEnable(...)
+    base.OnEnable(self, ...)
+    
+    self.m_editText.gameObject:SetActive(true)
+    self.m_saveBtn.gameObject:SetActive(true)
+    self.m_fightBtn.gameObject:SetActive(false)
+    self.m_lineupManagerBtn.gameObject:SetActive(false)
+end
+
+function UILineupArenaEditView:OnDisable()
+    UIUtil.RemoveClickEvent(self.m_saveBtn.gameObject)
+
+    self.m_editText.gameObject:SetActive(false)
+    self.m_saveBtn.gameObject:SetActive(false)
+    self.m_fightBtn.gameObject:SetActive(true)
+    self.m_lineupManagerBtn.gameObject:SetActive(true)
+    base.OnDisable(self)
+end
+
+function UILineupArenaEditView:OnDestroy()
+    self.m_arenaMgr = nil
+
+	base.OnDestroy(self)
+end
+
+-- 初始化UI变量
+function UILineupArenaEditView:InitView()
+    base.InitView(self)
+    self.m_editText = self:AddComponent(UIText, "TopContainer/editText")
+    self.m_editText.text = Language.GetString(1105)
+    self.m_saveBtn = UIUtil.FindTrans(self.transform, "BottomContainer/center/saveBtn")
+
+    self.m_arenaMgr = Player:GetInstance():GetArenaMgr()
+end
+
+function UILineupArenaEditView:HandleClick()
+    base.HandleClick(self)
+
+    local onClick = Bind(self, self.OnClick)
+
+    UIUtil.AddClickEvent(self.m_saveBtn.gameObject, onClick)
+end
+
+function UILineupArenaEditView:OnClick(go, x, y)
+    local name = go.name
+    if name == "backBtn" then
+        UIManagerInst:CloseWindow(UIWindowNames.UILineupArenaEdit)
+    elseif string.contains(name, "itemBg_") then
+        local strList = SplitString(name, "_")
+        local standPos = tonumber(strList[2])
+        self:OpenWujiangSeleteUI(standPos)
+    elseif name == "lineupManageBtn" then
+        UIManagerInst:OpenWindow(UIWindowNames.UILineupManager)
+    elseif name == "clearBtn" then
+        self.m_arenaMgr:ClearLineup()
+        self:UpdateLineup()
+    elseif name == "saveBtn" then
+        self:CheckLineupBeforeSave()
+    else
+        
+    end
+end
+
+function UILineupArenaEditView:OpenWujiangSeleteUI(standPos)
+    UIManagerInst:OpenWindow(UIWindowNames.UIArenaEditRoleSelect, 0, standPos)
+end
+
+function UILineupArenaEditView:CheckLineupBeforeSave()
+    local lineupRoleCount = self:GetLineupRoleCount()
+    if lineupRoleCount == 0 then
+        UIManagerInst:OpenWindow(UIWindowNames.UITipsDialog, Language.GetString(1107),Language.GetString(1108), 
+                                           Language.GetString(1109))
+        return
+    end
+
+    local allRoleCount = Player:GetInstance():GetWujiangMgr():GetWujiangCount()
+    if lineupRoleCount < CommonDefine.LINEUP_WUJIANG_COUNT and lineupRoleCount < allRoleCount then
+        UIManagerInst:OpenWindow(UIWindowNames.UITipsDialog, Language.GetString(1107),Language.GetString(1106), 
+        Language.GetString(10), Bind(self, self.SaveLineup), Language.GetString(5))
+        return
+    end
+
+    self:SaveLineup()
+end
+
+function UILineupArenaEditView:GetLineupRoleCount()
+    local count = 0
+    Player:GetInstance():GetArenaMgr():WalkMain(function(standPos, wujiangBriefData)
+        if wujiangBriefData then
+            count = count + 1
+        end
+    end)
+
+    return count
+end
+
+function UILineupArenaEditView:SaveLineup()
+    self.m_arenaMgr:ReqEditDefendInfo()
+
+    self:CloseSelf()
+end
+
+function UILineupArenaEditView:UpdateLineup()
+    self:UpdateLineupIcons()
+    self:UpdateWujiang()
+
+    self.m_powerText.text = string.format("%d", self.m_arenaMgr:GetLineupTotalPower())
+end
+
+function UILineupArenaEditView:WalkLineup(filter)
+    self.m_arenaMgr:WalkMain(filter)
+end
+
+function UILineupArenaEditView:ModifyLineupSeq(standPos, newSeq)
+    self.m_arenaMgr:ModifyLineupSeq(standPos, newSeq)
+end
+
+function UILineupArenaEditView:SwapLineupSeq(standPos1, standPos2)
+    self.m_arenaMgr:SwapLineupSeq(standPos1, standPos2)
+end
+
+function UILineupMainView:IsCheckLineupIllegal()
+    return false
+end
+
+return UILineupArenaEditView

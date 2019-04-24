@@ -1,0 +1,23 @@
+local LineupWuJiangCardItem = require "UI.UIWuJiang.View.LineupWuJiangCardItem"
+local base = LineupWuJiangCardItem
+local Vector3 = Vector3
+
+local LieZhuanLineupCardItem = BaseClass("LieZhuanLineupCardItem", LineupWuJiangCardItem)
+
+function LieZhuanLineupCardItem:OnCreate()
+    base.OnCreate(self)
+end
+
+function LieZhuanLineupCardItem:OnClick(go, x, y)
+    if go == self.m_frameImage.gameObject and not self.m_bSelect then
+        UIManagerInst:Broadcast(UIMessageNames.MN_LINEUP_ITEM_SELECT, self.transform:GetSiblingIndex() + 1)
+    end
+end
+
+function LieZhuanLineupCardItem:OnDestroy()
+    self:ShowAll()
+    base.OnDestroy(self)
+end
+
+return LieZhuanLineupCardItem
+

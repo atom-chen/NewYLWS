@@ -1,0 +1,89 @@
+local custodianSingleItemClass = require "UI.GuildWar.GuildWarCustodianSingleItem" 
+local custodianSingleItemPrefab = "UI/Prefabs/Guild/UIGuildWarCustodianSingleItem.prefab"
+local UIGameObjectLoaderInst = UIGameObjectLoader:GetInstance() 
+
+local GuildWarEscortFailView = BaseClass("GuildWarEscortFailView", UIBaseView)
+local base = UIBaseView
+
+function GuildWarEscortFailView:OnCreate()
+    base.OnCreate() 
+    self.m_itemLoaderSeq = 0
+    self.m_item = nil
+
+    self.m_blackBgTr,
+    self.m_escortContentTr,
+    self.m_ensureBtnTr = UIUtil.GetChildTransforms(self.transform, {  
+        "BlackBg",
+        "Panel/Escort/EscortContent",
+        "Panel/EnsureBtn",
+    })
+
+    self.m_titleTxt,
+    self.m_desTxt,
+    self.m_ensureBtnTxt,
+    self.m_panelDesTxt = UIUtil.GetChildTexts(self.transform, {   
+        "Panel/TitleContent/TitleTxt",
+        "Panel/Escort/Des",
+        "Panel/EnsureBtn/Text",
+        "PanelDes",
+    })  
+
+    self.m_titleTxt.text = Language.GetString(2375)
+    self.m_desTxt.text = Language.GetString(2385)
+    self.m_ensureBtnTxt.text = Language.GetString(2386)
+    self.m_panelDesTxt = Language.GetString(2390)
+end
+
+function GuildWarEscortFailView:OnEnable(...)
+    base.OnEnable(self, ...)
+
+    local _, roberBrief = ...
+
+    if not roberBrief then
+        return
+    end
+    self:UpdateData(roberBrief)
+end
+
+function GuildWarEscortFailView:UpdateData(roberBrief)
+    if self.m_item then
+        self.m_item:UpdateData(roberBrief)
+    else
+        self.m_itemLoaderSeq = UIGameObjectLoaderInst:PrepareOneSeq()
+        UIGameObjectLoaderInst:GetGameObjects(self.m_itemLoaderSeq, custodianSingleItemPrefab, function(obj)
+            self.m_itemLoaderSeq = 0
+            if not obj then 
+                return 
+            end 
+            local singleItem = custodianSingleItemClass.New(obj, self.m_escortContentTr, custodianSingleItemPrefab) 
+            singleItem:UpdateData(roberBrief)    
+            singleItem:RemoveClick()  
+            self.m_item = singleItem
+        end)  
+    end
+end
+
+
+function GuildWarEscortFailView:HandleClick()
+    local onClick = Bind(self, self.OnClick)
+    UIUtil.AddClickEvent(self.m_blackBgTr.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_ensureBtnTr.gameObject, onClick)
+end
+
+function GuildWarEscortFailView:OnClick(go, x, y)
+    if go.name == "BlackBg" then
+        self:CloseSelf()
+    elseif go.name == "EnsureBtn" then
+        self:CloseSelf()
+    end
+end
+
+function GuildWarEscortFailView:OnDestroy()
+    UIGameObjectLoaderInst:CancelLoad(self.m_itemLoaderSeq)
+    self.m_itemLoaderSeq = 0
+    self.m_item:Delete()
+    self.m_item = nil
+
+end
+
+return GuildWarEscortFailView

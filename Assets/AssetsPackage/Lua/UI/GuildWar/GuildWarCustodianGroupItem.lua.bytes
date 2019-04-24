@@ -1,0 +1,18 @@
+local GuildWarCustodianGroupItem = BaseClass("GuildWarCustodianGroupItem", UIBaseItem)
+local base = UIBaseItem
+ 
+
+function GuildWarCustodianGroupItem:OnCreate()
+ 
+end
+
+function GuildWarCustodianGroupItem:ResetPosZ()
+    if self.rectTransform then
+        local x = self.rectTransform.anchoredPosition.x
+        local y = self.rectTransform.anchoredPosition.y
+        self.rectTransform.anchoredPosition = Vector3.New(x, y, 0)
+    end
+end
+
+
+return GuildWarCustodianGroupItem

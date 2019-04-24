@@ -1,0 +1,99 @@
+local UIUtil = UIUtil
+local UIImage = UIImage
+local math_ceil = math.ceil
+local ConfigUtil = ConfigUtil
+local UILogicUtil = UILogicUtil
+local AtlasConfig = AtlasConfig
+local GameUtility = CS.GameUtility
+local Type_Image = typeof(CS.UnityEngine.UI.Image)
+
+local UIWuJiangRankIconItem = BaseClass("UIWuJiangRankIconItem", UIBaseItem)
+local base = UIBaseItem 
+
+function UIWuJiangRankIconItem:OnCreate()
+    base.OnCreate(self)
+    self.m_selfOnClickCallback = nil  
+
+    self:InitView() 
+    self:HandleClick()
+end
+
+function UIWuJiangRankIconItem:InitView()
+    local star1Tr, star2Tr, star3Tr, star4Tr, star5Tr, star6Tr
+
+    star1Tr, star2Tr, star3Tr, star4Tr, star5Tr, star6Tr,
+    self.m_userFrameTrans = UIUtil.GetChildRectTrans(self.transform, {
+        "Stars/Star1", "Stars/Star2", "Stars/Star3", "Stars/Star4", "Stars/Star5", "Stars/Star6",
+        "UserFrame",
+    })
+
+    self.m_levelText = UIUtil.GetChildTexts(self.transform, {
+        "Level/LevelText"
+    })
+
+    self.m_userIcon = UIUtil.AddComponent(UIImage, self, "UserHeadIcon", AtlasConfig.RoleIcon)
+    self.m_userFrame = UIUtil.AddComponent(UIImage, self, "UserFrame", AtlasConfig.DynamicLoad)
+    self.m_userCountryImg = UIUtil.AddComponent(UIImage, self, "CountryImage", AtlasConfig.DynamicLoad)
+
+    self.m_userFrameTypeImg = self.m_userFrameTrans:GetComponent(Type_Image) 
+    self.m_starList = {star1Tr, star2Tr, star3Tr, star4Tr, star5Tr, star6Tr}
+end
+
+function UIWuJiangRankIconItem:HandleClick()
+    local onClick = Bind(self, self.OnClick)
+    
+    UIUtil.AddClickEvent(self.m_userFrame.gameObject, onClick)
+end
+
+function UIWuJiangRankIconItem:OnClick(go, x, y) 
+    if go == self.m_userFrame.gameObject then
+        if self.m_selfOnClickCallback then
+            self.m_selfOnClickCallback(self)
+        end
+    end
+end
+
+function UIWuJiangRankIconItem:OnDestroy()
+    UIUtil.RemoveClickEvent(self:GetGameObject())
+
+    if self.m_userIcon then
+        self.m_userIcon:Delete()
+        self.m_userIcon = nil
+    end
+    if self.m_userFrame then
+        self.m_userFrame:Delete()
+        self.m_userFrame = nil
+    end 
+    self.m_userFrameTypeImg = nil
+
+    self.m_selfOnClickCallback = nil 
+
+    base.OnDestroy(self)
+end
+
+function UIWuJiangRankIconItem:UpdateData(wujiang_id, level, starsCount, selfOnClickCallback)
+    self.m_wujiangCfg = ConfigUtil.GetWujiangCfgByID(wujiang_id)
+    if not self.m_wujiangCfg then
+        return
+    end
+
+    self.m_selfOnClickCallback = selfOnClickCallback 
+    GameUtility.SetRaycastTarget(self.m_userFrameTypeImg, selfOnClickCallback ~= nil)
+
+    UILogicUtil.SetWuJiangFrame(self.m_userFrame, self.m_wujiangCfg.rare)
+    UILogicUtil.SetWuJiangCountryImage(self.m_userCountryImg, self.m_wujiangCfg.country)
+
+    self.m_levelText.text = math_ceil(level)
+
+    for k, v in ipairs(self.m_starList) do
+        v.gameObject:SetActive(false)
+    end
+    for i = 1, starsCount do 
+        self.m_starList[i].gameObject:SetActive(true)
+    end
+
+    self.m_userIcon:SetAtlasSprite(math_ceil(wujiang_id)..".jpg")
+end
+
+
+return UIWuJiangRankIconItem

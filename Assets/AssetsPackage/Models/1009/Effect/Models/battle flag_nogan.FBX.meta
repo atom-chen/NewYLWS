@@ -1,0 +1,96 @@
+fileFormatVersion: 2
+guid: f3eefe8851e2a964b8a92766f5a17a18
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: battle flag
+    100002: //RootNode
+    100004: battle_flag_bone001
+    100006: battle_flag_bone002
+    100008: battle_flag_bone003
+    100010: battle_flag_bone004
+    100012: battle_flag_bone005
+    100014: battle_flag_bone006
+    100016: battle_flag_bone007
+    100018: battle_flag_bone008
+    100020: battle_flag_bone009
+    100022: battle_flag_bone010
+    100024: battle_flag_bone011
+    100026: battle_flag_bone012
+    100028: battle_flag_bone013
+    100030: battle_flag_bone014
+    100032: battle_flag_bone015
+    400000: battle flag
+    400002: //RootNode
+    400004: battle_flag_bone001
+    400006: battle_flag_bone002
+    400008: battle_flag_bone003
+    400010: battle_flag_bone004
+    400012: battle_flag_bone005
+    400014: battle_flag_bone006
+    400016: battle_flag_bone007
+    400018: battle_flag_bone008
+    400020: battle_flag_bone009
+    400022: battle_flag_bone010
+    400024: battle_flag_bone011
+    400026: battle_flag_bone012
+    400028: battle_flag_bone013
+    400030: battle_flag_bone014
+    400032: battle_flag_bone015
+    4300000: battle flag
+    9500000: //RootNode
+    13700000: battle flag
+  materials:
+    importMaterials: 0
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    motionNodeName: 
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: .00999999978
+    meshCompression: 3
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 2
+  importAnimation: 0
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  additionalBone: 0
+  userData: 

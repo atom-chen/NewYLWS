@@ -1,0 +1,164 @@
+
+
+local SkillHorseItem = BaseClass("SkillHorseItem")
+
+local GetSkillCfgByID = ConfigUtil.GetInscriptionAndHorseSkillCfgByID
+local FixMul = FixMath.mul
+local FixFloor = FixMath.floor
+local FixSub = FixMath.sub
+local FixMod = FixMath.mod
+local FixAdd = FixMath.add
+local FixDiv = FixMath.div
+local FixIntMul = FixMath.muli
+local table_insert = table.insert
+local FixRand = BattleRander.Rand
+local SkillUtil = SkillUtil
+local IsInCircle = SkillRangeHelper.IsInCircle
+local statusGiverNew = StatusGiver.New
+local factory = StatusFactoryInst
+local BattleEnum = BattleEnum
+local ACTOR_ATTR = ACTOR_ATTR
+
+function SkillHorseItem:__init(skillID, skillLevel)
+    self.m_skillID = skillID
+    self.m_skillLevel = skillLevel
+    self.m_skillCfg = GetSkillCfgByID(self.m_skillID)
+
+    self.m_time1 = 0
+    self.m_time2 = 0
+    
+    self.m_count = self:X() 
+
+    self.m_timeInterval = 1000
+end
+
+function SkillHorseItem:__delete()
+    self.m_skillID = 0
+    self.m_skillLevel = 0
+    self.m_skillCfg = nil
+    self.m_time1 = 0
+    self.m_time2 = 0
+    self.m_count = 0 
+end
+
+function SkillHorseItem:Update(deltaMS, performer)
+    if self.m_time1 > 0 then
+        self.m_time1 = FixSub(self.m_time1, deltaMS)
+        self.m_timeInterval = FixSub(self.m_timeInterval, deltaMS)
+        if self.m_timeInterval <= 0 then
+            self.m_timeInterval = 1000
+            self:OnPerformInsSkill60004(performer)
+        end
+    end
+end
+
+function SkillHorseItem:GetSkillID()
+    return self.m_skillID
+end
+
+function SkillHorseItem:GetSkillLevel()
+    return self.m_skillLevel
+end
+
+function SkillHorseItem:OnFightStart(performer)
+    if self.m_skillID == 60004 then
+        self.m_time1 = FixIntMul(self:X(), 1000)
+        self.m_time2 = self.m_time1
+        self.m_timeInterval = 1000
+    end
+
+    self.m_count = self:X() 
+
+    if self.m_skillID == 60001 then
+        self:OnPerformInsSkill60001(performer)
+    end
+end
+
+function SkillHorseItem:OnPerformInsSkill60001(performer)
+    -- 战斗开始后{x1}秒内，免疫{y1}次受到的控制技能
+    local giver = statusGiverNew(performer:GetActorID(), 60001)
+    local horseBuff = StatusFactoryInst:NewStatusHorse60001Buff(giver, FixIntMul(self:X(), 1000), self:Y())
+    performer:GetStatusContainer():DelayAdd(horseBuff)
+end
+
+function SkillHorseItem:OnPerformInsSkill60002()
+    -- 战斗开始时的前{x1}次普通攻击伤害提升{y1}%
+    if self.m_count <= 0 then
+        return 1
+    end
+    
+    self.m_count = FixSub(self.m_count, 1)
+    return FixAdd(FixDiv(self:Y(), 100), 1)
+end
+
+function SkillHorseItem:OnPerformInsSkill60003()
+    -- 战斗开始后受到的前{x1}次法术伤害减少{y1}%
+    if self.m_count <= 0 then
+        return 1
+    end
+    
+    self.m_count = FixSub(self.m_count, 1)
+    return FixSub(1, FixDiv(self:Y(), 100))
+end
+
+function SkillHorseItem:OnPerformInsSkill60004(performer)
+    -- 战斗开始后{x1}秒内，每秒回复{y1}%的最大生命值
+    if not performer or not performer:IsLive() then
+        return
+    end
+
+    local recoverPercent = FixDiv(self:Y(), 100)
+    local maxHp = performer:GetData():GetAttrValue(ACTOR_ATTR.BASE_MAXHP)
+    local curHp = performer:GetData():GetAttrValue(ACTOR_ATTR.FIGHT_HP)
+    local deltaHp = FixSub(maxHp, curHp)
+
+    local recoverHP = FixIntMul(maxHp, recoverPercent)
+    if recoverHP > 0 then
+        local giver = statusGiverNew(performer:GetActorID(), 60004)
+        local statusHP = StatusFactoryInst:NewStatusHP(giver, recoverHP, BattleEnum.HURTTYPE_REAL_HURT, BattleEnum.HPCHGREASON_BY_SKILL, BattleEnum.ROUNDJUDGE_NORMAL, 0)
+        local suc = performer:GetStatusContainer():Add(statusHP, performer)
+    end
+end
+
+function SkillHorseItem:OnPerformInsSkill60005()
+    -- 战斗开始时的前{x1}次技能伤害提升{y1}%
+    if self.m_count <= 0 then
+        return 1
+    end
+    
+    self.m_count = FixSub(self.m_count, 1)
+    return FixAdd(1, FixDiv(self:Y(), 100))
+end
+
+function SkillHorseItem:OnPerformInsSkill60006()
+    -- 战斗开始后受到的前{x1}次物理伤害减少{y1}%
+    if self.m_count <= 0 then
+        return 1
+    end
+
+    self.m_count = FixSub(self.m_count, 1)
+    return FixSub(1, FixDiv(self:Y(), 100))
+end
+
+
+function SkillHorseItem:X()
+    return SkillUtil.X(self.m_skillCfg, self.m_skillLevel)
+end
+
+function SkillHorseItem:Y()
+    return SkillUtil.Y(self.m_skillCfg, self.m_skillLevel)
+end
+
+function SkillHorseItem:A()
+    return SkillUtil.A(self.m_skillCfg, self.m_skillLevel)
+end
+
+function SkillHorseItem:B()
+    return SkillUtil.B(self.m_skillCfg, self.m_skillLevel)
+end
+
+function SkillHorseItem:C()
+    return SkillUtil.C(self.m_skillCfg, self.m_skillLevel)
+end
+
+return SkillHorseItem

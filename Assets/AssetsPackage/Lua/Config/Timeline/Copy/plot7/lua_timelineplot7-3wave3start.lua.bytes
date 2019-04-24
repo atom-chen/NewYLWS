@@ -1,0 +1,33 @@
+-- 笼罩相机
+local config = {
+
+    path = 'Timeline/Copy/plot7/plot7-3wave3start.prefab',
+    assetPath = 'Timeline/Copy/plot7/plot7-3wave3start.playable',
+	plotLanguage = 'SectionLanguage7',
+    track_list = {
+        {
+		    name = 'Cinemachine Track',
+            bindingType = 3,
+            bindingPath = false,
+            bindingWujiangCamp = false,
+            bindingWujiangID = false,
+            clipingType = 2,
+            clip_list = {},
+		},
+        {   
+		    name = 'Animation Track',	
+		    bindingType = 5,
+			bindingZhuZhanParam = {1001205, 5, 60, 300, 15},
+            clip_list = {},
+		},
+		{  
+		    name = 'Custom Anim Track',	
+		    bindingType = 2,
+			bindingWujiangCamp = 1,
+			bindingWujiangID = 1205,
+            clip_list = {},
+		},
+    },
+}
+
+return config

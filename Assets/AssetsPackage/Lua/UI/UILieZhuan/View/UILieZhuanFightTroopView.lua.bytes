@@ -1,0 +1,267 @@
+local GameObject = CS.UnityEngine.GameObject
+local GameUtility = CS.GameUtility
+local table_insert = table.insert
+local string_format = string.format
+local math_ceil = math.ceil
+local string_split = CUtil.SplitString
+
+local Quaternion = Quaternion
+local LieZhuanMemberItem = require "UI.UILieZhuan.View.LieZhuanMemberItem"
+local LieZhuanMgr = Player:GetInstance():GetLieZhuanMgr()
+
+local UILieZhuanFightTroopView = BaseClass("UILieZhuanFightTroopView", UIBaseView)
+local base = UIBaseView
+
+function UILieZhuanFightTroopView:OnCreate()
+    base.OnCreate(self)
+    self:InitView()
+end
+
+function UILieZhuanFightTroopView:InitView()
+    self.m_closeBtn, self.m_memberContent, self.m_leaveBtn, self.m_startBtn, self.m_talkBtn,
+    self.m_aotoBtn, self.m_memberItemPrefab, self.m_waitMask = UIUtil.GetChildRectTrans(self.transform, {
+        "closeBtn",
+        "Container/mid/memberContent",
+        "Container/bottom/leaveBtn",
+        "Container/bottom/startBtn",
+        "Container/mid/talkBtn",
+        "Container/mid/aotoBtn",
+        "memberItemPrefab",
+        "waitMask",
+    })
+
+    local waitMaskText, titleText, aimText, levelText, limitText, lockToggleLabel, aotoToggleLabel, leaveBtnText, startBtnText, consumeText
+    waitMaskText, titleText, aimText, levelText, limitText, aotoToggleLabel, leaveBtnText, startBtnText, consumeText,
+    self.m_aimContentText, self.m_levelContentText, self.m_limitContentText, self.m_tokenText, self.leaveTimeText, self.m_consumeNumText = UIUtil.GetChildTexts(self.transform, {
+        "waitMask/waitMaskText",
+        "Container/top/titleBg/titleText",
+        "Container/mid/aimText",
+        "Container/mid/levelText",
+        "Container/mid/limitText",
+        "Container/mid/aotoBtnText",
+        "Container/bottom/leaveBtn/leaveBtnText",
+        "Container/bottom/startBtn/startBtnText",
+        "Container/bottom/consumeBg/consumeText",
+        "Container/mid/aimText/aimContentText",
+        "Container/mid/levelText/levelContentText",
+        "Container/mid/limitText/limitContentText",
+        "Container/mid/tokenImage/tokenText",
+        "Container/bottom/leaveBtn/leaveTimeText",
+        "Container/bottom/consumeBg/consumeNumText",
+    })
+
+    waitMaskText.text = Language.GetString(3799)
+    titleText.text = Language.GetString(3767)
+    aimText.text = Language.GetString(3768)
+    levelText.text = Language.GetString(3769)
+    limitText.text = Language.GetString(3770)
+    aotoToggleLabel.text = Language.GetString(3772)
+    leaveBtnText.text = Language.GetString(3773)
+    startBtnText.text = Language.GetString(3774)
+    consumeText.text = Language.GetString(3762)
+
+    self.m_userMgr = Player:GetInstance():GetUserMgr()
+    self.m_sCountryNameList = string_split(Language.GetString(3750), ",")
+    self.m_sConditionList = string_split(Language.GetString(3785), ",")
+
+    self.m_memberItemPrefab = self.m_memberItemPrefab.gameObject
+    self.m_teamLeftTimer = 0
+    self.m_memberList = {}
+    self.m_leftTimeEnable = false
+
+    self.m_autoFightFlag = false
+    self.m_timer = 0
+end
+
+function UILieZhuanFightTroopView:OnClick(go, x, y)
+    if go.name == "leaveBtn" then     
+        if self.m_teamInfo then
+            LieZhuanMgr:ReqLiezhuanExitTeam(self.m_teamInfo.team_base_info.team_id)
+        end
+    elseif go.name == "startBtn" then
+        LieZhuanMgr:ReqLiezhuanStartBuZhen()
+    elseif go.name == "talkBtn" then
+
+    elseif go.name == "aotoBtn" then
+        self.m_autoFightFlag = not self.m_autoFightFlag
+        LieZhuanMgr:ReqLieZhuanSetAutoFight(self.m_autoFightFlag)
+    end
+end
+
+function UILieZhuanFightTroopView:OnExitTeam()
+    self:CloseSelf()
+end
+
+function UILieZhuanFightTroopView:HandleClick()
+    local onClick = Bind(self, self.OnClick)
+    UIUtil.AddClickEvent(self.m_closeBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_leaveBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_startBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_talkBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_aotoBtn.gameObject, onClick)
+end
+
+function UILieZhuanFightTroopView:RemoveClick()
+    UIUtil.RemoveClickEvent(self.m_closeBtn.gameObject)
+    UIUtil.RemoveClickEvent(self.m_leaveBtn.gameObject)
+    UIUtil.RemoveClickEvent(self.m_startBtn.gameObject)
+    UIUtil.RemoveClickEvent(self.m_talkBtn.gameObject)
+    UIUtil.RemoveClickEvent(self.m_aotoBtn.gameObject)
+end
+
+function UILieZhuanFightTroopView:OnEnable(...)
+    base.OnEnable(self, ...)
+    local order, teamInfo, showWaitMask
+    order, teamInfo, showWaitMask = ...
+    if showWaitMask then
+        self.m_waitMask.gameObject:SetActive(true)
+    else
+        self.m_waitMask.gameObject:SetActive(false)
+    end
+    self:HandleClick()
+    self:UpdateView(teamInfo,showWaitMask)
+end
+
+function UILieZhuanFightTroopView:OnDisable()
+    base.OnDisable(self)
+    self:RemoveClick()
+end
+
+function UILieZhuanFightTroopView:UpdateView(teamInfo, showWaitMask)
+    if showWaitMask then
+        self.m_waitMask.gameObject:SetActive(true)
+    else
+        self.m_waitMask.gameObject:SetActive(false)
+    end
+
+    if not teamInfo then
+        return
+    end
+    self.m_teamInfo = teamInfo
+    self.m_teamLeftTimer = Player:GetInstance():GetServerTime() + self.m_teamInfo.left_time
+    self.m_leftTimeEnable = true
+
+    if not self.m_teamInfo then
+        return
+    end
+    local taoFaLingCount = Player:GetInstance():GetItemMgr():GetItemCountByID(ItemDefine.TaoFaLing_ID)
+    local costTaoFaLingCount = LieZhuanMgr:GetAutoNeedTaoFaLing()
+    local num = taoFaLingCount > costTaoFaLingCount and 3628 or 3629
+    self.m_tokenText.text = string_format(Language.GetString(num), taoFaLingCount, costTaoFaLingCount)
+    local teamBaseInfo = self.m_teamInfo.team_base_info
+    if teamBaseInfo then
+        self.m_aimContentText.text = string_format(Language.GetString(3783), self.m_sCountryNameList[teamBaseInfo.country], teamBaseInfo.copy_id % 100)
+        self.m_levelContentText.text = string_format(Language.GetString(3784), teamBaseInfo.min_level, teamBaseInfo.max_level)
+        self.m_limitContentText.text = self.m_sConditionList[teamBaseInfo.permition + 1]
+        self.m_consumeNumText.text = math_ceil(LieZhuanMgr:GetTeamFightNeedTili())
+    end
+    if self.m_teamInfo.member_list then
+        self:UpdateMembers(self.m_teamInfo.member_list)
+    end
+    
+end
+
+function UILieZhuanFightTroopView:UpdateMembers(memberbriefList)
+    
+    if not memberbriefList then
+        return
+    end
+        
+    local myUid = self.m_userMgr:GetUserData().uid
+    local captainId = 0
+    if self.m_teamInfo and self.m_teamInfo.team_base_info then
+        captainId = self.m_teamInfo.team_base_info.captain_uid
+    end
+    
+    local flag = #self.m_teamInfo.member_list > 1 and myUid == captainId
+    UIUtil.TryBtnEnable(self.m_startBtn.gameObject, flag)
+
+    for i = 1, 3 do
+        local memberItem = self.m_memberList[i]
+        local userBrief = i <= #memberbriefList and memberbriefList[i].user_brief or nil
+        local isCaptain = userBrief ~= nil and captainId == userBrief.uid
+        if userBrief and userBrief.uid == myUid then
+            self.m_autoFightFlag = memberbriefList[i].is_auto_fight
+        end
+        if not memberItem then
+            local go = GameObject.Instantiate(self.m_memberItemPrefab)
+            if not IsNull(go) then
+               local memberItem  = LieZhuanMemberItem.New(go, self.m_memberContent)
+               memberItem:SetData(isCaptain, userBrief)
+               table_insert(self.m_memberList, memberItem)
+            end
+        else
+            memberItem:SetData(isCaptain, userBrief)
+        end
+    end
+end
+
+function UILieZhuanFightTroopView:Update()
+    if self.m_leftTimeEnable then
+        self:UpdateTimeText()
+    end
+
+    if self.m_autoFightFlag then
+        self.m_timer = self.m_timer - 5
+        if self.m_timer <= -360 then
+            self.m_timer = 0
+        end
+        self.m_aotoBtn.localRotation =  Quaternion.Euler(0, 0, self.m_timer)
+    end
+end
+
+function UILieZhuanFightTroopView:UpdateTimeText()
+    if not self.m_teamLeftTimer then
+        return
+    end
+    local refreshTime = self.m_teamLeftTimer
+    local curTime = Player:GetInstance():GetServerTime() 
+
+    local leftS = refreshTime - curTime
+    if leftS and leftS < 0 then
+        leftS = 0
+        self.m_leftTimeEnable = false
+        return
+    end
+    if leftS and leftS ~= self.lastLeftS then
+        local min = math.floor(leftS / 60) 
+        local sec = math.floor(leftS % 60)
+        self.leaveTimeText.text = string.format(Language.GetString(3775), min, sec)
+        self.lastLeftS = leftS
+    end 
+end
+
+function UILieZhuanFightTroopView:UpdateLeftTime(left_time)
+    if left_time and self.m_teamInfo then
+        self.m_teamInfo.left_time = left_time
+        self.m_teamLeftTimer = Player:GetInstance():GetServerTime() + self.m_teamInfo.left_time
+        self.m_leftTimeEnable = true
+    end
+end
+
+function UILieZhuanFightTroopView:UpdateAutoFight(is_auto_fight)
+    self.m_autoFightFlag = is_auto_fight
+end
+
+function UILieZhuanFightTroopView:OnDestroy()
+    base.OnDestroy(self)
+end
+
+function UILieZhuanFightTroopView:OnAddListener()
+    self:AddUIListener(UIMessageNames.MN_LIEZHUAN_EXIT_TEAM, self.OnExitTeam)
+    self:AddUIListener(UIMessageNames.MN_LIEZHUAN_TEAM_MEMBER_CHG, self.UpdateView)
+    self:AddUIListener(UIMessageNames.MN_LIEZHUAN_TEAM_STAT_TIME_CHG, self.UpdateLeftTime)
+    self:AddUIListener(UIMessageNames.MN_LIEZHUAN_RSP_AUTO_FIGHT, self.UpdateAutoFight)
+    
+	base.OnAddListener(self)
+end
+
+function UILieZhuanFightTroopView:OnRemoveListener()
+    self:RemoveUIListener(UIMessageNames.MN_LIEZHUAN_EXIT_TEAM, self.OnExitTeam)
+    self:RemoveUIListener(UIMessageNames.MN_LIEZHUAN_TEAM_MEMBER_CHG, self.UpdateView)
+    self:RemoveUIListener(UIMessageNames.MN_LIEZHUAN_TEAM_STAT_TIME_CHG, self.UpdateLeftTime)
+    self:RemoveUIListener(UIMessageNames.MN_LIEZHUAN_RSP_AUTO_FIGHT, self.UpdateAutoFight)
+	base.OnRemoveListener(self)
+end
+
+return UILieZhuanFightTroopView

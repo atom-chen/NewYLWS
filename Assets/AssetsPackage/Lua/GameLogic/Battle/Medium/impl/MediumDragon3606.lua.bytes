@@ -1,0 +1,77 @@
+local BaseMedium = require("GameLogic.Battle.Medium.BaseMedium")
+local MediumEnum = MediumEnum
+local BattleEnum = BattleEnum
+local FixMath = FixMath
+local FixMul = FixMath.mul
+local FixSub = FixMath.sub
+local FixAdd = FixMath.add
+local FixDiv = FixMath.div
+local EffectMgr = EffectMgr
+local Formular = Formular
+local StatusFactoryInst = StatusFactoryInst
+local ActorManagerInst = ActorManagerInst
+local CtlBattleInst = CtlBattleInst
+
+local MediumDragon3606 = BaseClass("MediumDragon3606", BaseMedium)
+function MediumDragon3606:__init()
+    self.m_param = false
+    self.m_effectTime = 0
+    self.m_totalTime = 0
+end
+
+function MediumDragon3606:InitParam(param)
+    self.m_param = {}
+    if param then
+        self.m_param.effectPos = param.effectPos
+        self.m_param.camp = param.camp
+        self.m_param.freezeTime = param.freezeTime
+        self.m_param.freezeLevel = param.freezeLevel
+        self.m_param.dragonLevel = param.dragonLevel
+        self.m_totalTime = FixAdd(FixMul(self.m_param.freezeTime, 1000), 500)
+    end
+end
+
+function MediumDragon3606:OnComponentBorn()
+    self:LookatPosOnlyShow(self.m_param.effectPos.x, self.m_param.effectPos.y, self.m_param.effectPos.z)
+end
+
+function MediumDragon3606:DoUpdate(deltaMS)
+    if self.m_effectTime < 500 then
+        self.m_effectTime = FixAdd(self.m_effectTime, deltaMS)
+        if self.m_effectTime >= 500 then
+            self:Effect()
+        end
+    else
+        self.m_effectTime = FixAdd(self.m_effectTime, deltaMS)
+        if self.m_effectTime >= self.m_totalTime then
+            self:Over()
+            return
+        end
+    end
+end
+
+--冰冻所有敌方角色，对{x}级及以下的敌人必定命中，持续{y}秒。
+function MediumDragon3606:Effect()
+    local factory = StatusFactoryInst
+    ActorManagerInst:Walk(
+        function(tmpTarget)
+            if not CtlBattleInst:GetLogic():IsDragonEnemy(self.m_param.camp, tmpTarget, BattleEnum.RelationReason_SKILL_RANGE) then
+                return
+            end
+            -- EffectMgr:AddEffect(tmpTarget:GetActorID(), 350601)
+
+            if tmpTarget:GetLevel() > self.m_param.freezeLevel then
+                local judge = Formular.SummonStatusRoundJudge(tmpTarget, self.m_param.dragonLevel)
+                if Formular.IsJudgeEnd(judge) then
+                    return
+                end
+            end
+
+            local dingshenStatus = factory:NewStatusDingShen(self.m_giver, FixMul(self.m_param.freezeTime, 1000), {30002})
+            tmpTarget:GetStatusContainer():Add(dingshenStatus)
+            TimeScaleMgr:ChangeTimeScale(0.3, 0.5)
+        end
+    )
+end
+
+return MediumDragon3606

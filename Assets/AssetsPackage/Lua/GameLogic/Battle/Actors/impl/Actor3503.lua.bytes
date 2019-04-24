@@ -1,0 +1,63 @@
+local FixSub = FixMath.sub
+local ConfigUtil = ConfigUtil
+local SkillUtil = SkillUtil
+local StatusGiver = StatusGiver
+
+
+local Actor = require "GameLogic.Battle.Actors.Actor"
+local Actor3503 = BaseClass("Actor3503", Actor)
+
+function Actor3503:__init(actorID)
+    self.m_35034SkillCfg = nil
+    self.m_35034A = 0
+    self.m_35034B = 0
+    self.m_35034C = 0
+    self.m_35034X = 0
+end
+
+function Actor3503:PerformSkill35032(leftMS)
+    self.m_35032MS = leftMS
+end
+
+function Actor3503:OnBorn(create_param)
+    Actor.OnBorn(self, create_param)
+
+    local skillItem = self.m_skillContainer:GetActiveByID(35034)
+    if skillItem then
+        local level = skillItem:GetLevel()
+        local skillCfg = ConfigUtil.GetSkillCfgByID(35034)
+        if skillCfg then
+            self.m_35034SkillCfg = skillCfg
+            self.m_35034A = SkillUtil.A(skillCfg, level)
+            self.m_35034B = SkillUtil.B(skillCfg, level)
+            self.m_35034C = SkillUtil.C(skillCfg, level)
+            self.m_35034X = SkillUtil.X(skillCfg, level)
+        end
+    end
+
+end
+
+
+function Actor3503:LogicUpdate(deltaMS)
+    
+end
+
+function Actor3503:HasHurtAnim()
+    return false
+end
+
+
+function Actor3503:NeedBlood()
+    return false
+end
+
+function Actor3503:CanMove(checkAlive)
+    return false
+end
+
+function Actor3503:CanBeatBack()
+    return false
+end
+
+
+return Actor3503

@@ -1,0 +1,416 @@
+local StatusGiver = StatusGiver
+local StatusFactoryInst = StatusFactoryInst
+local BattleEnum = BattleEnum
+local FixIntMul = FixMath.muli
+local FixAdd = FixMath.add
+local FixMod = FixMath.mod
+local FixDiv = FixMath.div
+local FixSub = FixMath.sub
+local FixMul = FixMath.mul
+local table_insert = table.insert
+local ACTOR_ATTR = ACTOR_ATTR
+local FixVetor3RotateAroundY = FixMath.Vector3RotateAroundY
+local ActorManagerInst = ActorManagerInst
+local ConfigUtil = ConfigUtil
+local SkillUtil = SkillUtil
+local FixRand = BattleRander.Rand
+local CtlBattleInst = CtlBattleInst
+
+local Actor = require "GameLogic.Battle.Actors.Actor"
+local Actor1205 = BaseClass("Actor1205", Actor)
+local ActorCreateParam = require "GameLogic.Battle.Actors.ActorCreateParam"
+
+function Actor1205:__init()
+    self.m_congyiIDList = {}
+    self.m_congyiCount = 0
+
+    self.m_12053Z = 0
+    self.m_12053XPercent = 0
+    self.m_12053Y = 0
+    self.m_12053C = 0
+    self.m_12053D = 0
+    self.m_12053SkillItem = nil
+    self.m_12053SkillCfg = nil
+    self.m_12053Level = 0
+
+    self.m_12052SkillCfg = nil
+    self.m_12502X = 0
+    self.m_12052C = 0
+    self.m_12052BPercent = 0
+    self.m_12052Level = 0
+
+
+    self.m_checkCongyi = false
+    self.m_checkTime = 0
+    self.m_callCount = 0
+    self.m_totalCallCount = 0
+    self.m_assaultID = 0
+
+    self.m_perform12052 = false
+    self.m_12052TargetID = 0
+end
+
+
+function Actor1205:OnBorn(create_param)
+    Actor.OnBorn(self, create_param)
+
+    local skillItem = self.m_skillContainer:GetPassiveByID(12053)
+    if skillItem then
+        self.m_12053SkillItem = skillItem
+        local level = skillItem:GetLevel()
+        self.m_12053Level = level
+        local skillCfg = ConfigUtil.GetSkillCfgByID(12053)
+        if skillCfg then
+            self.m_12053SkillCfg = skillCfg
+
+            self.m_12053Z = SkillUtil.Z(skillCfg, level)
+            self.m_12053XPercent = FixDiv(SkillUtil.X(skillCfg, level), 100)
+            self.m_12053Y = SkillUtil.Y(skillCfg, level)
+
+            if level >= 6 then
+                self.m_12053C = SkillUtil.C(skillCfg, level)
+                self.m_12053D = FixIntMul(SkillUtil.D(skillCfg, level), 1000)
+            end
+        end
+    end
+
+    local skillItem1 = self.m_skillContainer:GetActiveByID(12052)
+    if skillItem1 then
+        local level = skillItem1:GetLevel()
+        self.m_12052Level = level
+        local skillCfg = ConfigUtil.GetSkillCfgByID(12052)
+        if skillCfg then
+            self.m_12052SkillCfg = skillCfg
+
+            self.m_12502X = SkillUtil.X(skillCfg, level)
+            self.m_12052C = FixIntMul(SkillUtil.C(skillCfg, level), 1000)
+
+            if level >= 3 then
+                self.m_12052BPercent = FixDiv(SkillUtil.B(skillCfg, level), 100)
+            end
+        end
+    end
+end
+
+
+function Actor1205:Get12053Y()
+    return self.m_12053Y
+end
+
+
+function Actor1205:Get12053SkillCfg()
+    return self.m_12053SkillCfg
+end
+
+
+function Actor1205:IsStunTarget()
+    return self.m_12053Level >= 6
+end
+
+
+function Actor1205:Get12053C()
+    return self.m_12053C
+end
+
+
+function Actor1205:Get12053D()
+    return self.m_12053D
+end
+
+
+function Actor1205:PreChgHP(giver, chgHP, hurtType, reason)
+    chgHP = Actor.PreChgHP(self, giver, chgHP, hurtType, reason)
+
+    if chgHP < 0 then
+        if self.m_12053SkillCfg and self.m_12053SkillItem then
+            if self.m_congyiCount > 0 then
+                for yicongID,_ in pairs(self.m_congyiIDList) do 
+                    local yicongActor = ActorManagerInst:GetActor(yicongID)
+                    if yicongActor and yicongActor:IsLive() then
+                       local tmpChgHp = FixIntMul(chgHP, self.m_12053XPercent)
+                        chgHP = FixSub(chgHP, tmpChgHp)
+                    else
+                        self.m_congyiIDList[yicongID] = nil
+                    end
+                end
+            end
+        end
+    end
+
+    return chgHP
+end
+
+
+function Actor1205:ChangeHP(giver, hurtType, chgVal, reason, judge, keyFrame, showHit, showText)
+    Actor.ChangeHP(self, giver, hurtType, chgVal, reason, judge, keyFrame, showHit, showText)
+
+    for yicongID,_ in pairs(self.m_congyiIDList) do 
+        local yicongActor = ActorManagerInst:GetActor(yicongID)
+        if yicongActor and yicongActor:IsLive() then
+            local yicongAI = yicongActor:GetAI()
+            if yicongAI then
+                yicongAI:Assault(giver.actorID) -- 冲锋突击
+                return
+            end
+        else
+            self.m_congyiIDList[yicongID] = nil
+        end
+    end
+end
+
+
+function Actor1205:AddCongyiTargetID(targetID)
+    if not self.m_congyiIDList[targetID] then
+        self.m_congyiIDList[targetID] = true
+        self:ChangeCongyiCount(1)
+    end
+end
+
+
+function Actor1205:ChangeCongyiCount(count)
+    self.m_congyiCount = FixAdd(self.m_congyiCount, count)
+end
+
+
+function Actor1205:OnSBDie(dieActor, killerGiver)
+    local dieActorID = dieActor:GetActorID()
+    if self.m_congyiIDList[dieActorID] then
+        self:ChangeCongyiCount(-1)
+        self.m_congyiIDList[dieActorID] = nil
+    end
+end
+
+
+function Actor1205:LogicUpdate(deltaMS)
+    if self.m_checkCongyi then
+        self.m_checkTime = FixSub(self.m_checkTime, deltaMS)
+        if self.m_checkTime <= 0 then
+            self.m_checkCongyi = false
+            return
+        end
+
+        self:CheckCallCongyi()
+    end
+end
+
+
+function Actor1205:CheckCongyi(callCount, checkTime)
+    self.m_checkCongyi = true
+    self.m_checkTime = checkTime
+    self.m_callCount = callCount
+end
+
+
+function Actor1205:CheckCallCongyi()
+    if self.m_congyiCount <= 0 then
+        self:CalcCallStandIndex(self.m_callCount)
+    end
+end
+
+
+function Actor1205:CalcCallStandIndex(callCount)
+    for i=1,callCount do
+        local standIndex = FixMod(self.m_totalCallCount, 4)
+        standIndex = FixAdd(standIndex, 1)
+
+        self:Call(standIndex)
+    end
+end
+
+
+function Actor1205:LogicOnFightStart(currWave)
+    if self.m_12053SkillCfg and self.m_12053SkillItem then
+        self:CalcCallStandIndex(self.m_12053Z)
+    end
+end
+
+
+function Actor1205:Call(standIndex)
+    --  召唤{A}个新的白马义从
+    local roleCfg = ConfigUtil.GetWujiangCfgByID(3207)
+    if not roleCfg then
+        print('========== no 3207 role cfg ================')
+    end
+
+    local oneWujiang = OneBattleWujiang.New()
+    oneWujiang.wujiangID = roleCfg.id
+    oneWujiang.level = self.m_level
+    oneWujiang.lineUpPos = 1
+
+    local fightData = self:GetData()
+    oneWujiang.max_hp = fightData:GetAttrValue(ACTOR_ATTR.BASE_MAXHP)
+    oneWujiang.phy_atk = fightData:GetAttrValue(ACTOR_ATTR.BASE_PHY_ATK)
+    oneWujiang.phy_def = fightData:GetAttrValue(ACTOR_ATTR.BASE_PHY_DEF)
+    oneWujiang.magic_atk = fightData:GetAttrValue(ACTOR_ATTR.BASE_MAGIC_ATK)
+    oneWujiang.magic_def = fightData:GetAttrValue(ACTOR_ATTR.BASE_MAGIC_DEF)
+    oneWujiang.phy_baoji = fightData:GetAttrValue(ACTOR_ATTR.BASE_PHY_BAOJI)
+    oneWujiang.magic_baoji = fightData:GetAttrValue(ACTOR_ATTR.BASE_MAGIC_BAOJI)
+    oneWujiang.shanbi = fightData:GetAttrValue(ACTOR_ATTR.BASE_SHANBI)
+    oneWujiang.mingzhong = fightData:GetAttrValue(ACTOR_ATTR.BASE_MINGZHONG)
+    oneWujiang.move_speed = fightData:GetAttrValue(ACTOR_ATTR.BASE_MOVESPEED)
+    oneWujiang.atk_speed = fightData:GetAttrValue(ACTOR_ATTR.BASE_ATKSPEED)
+    oneWujiang.hp_recover = fightData:GetAttrValue(ACTOR_ATTR.BASE_HP_RECOVER)
+    oneWujiang.nuqi_recover = fightData:GetAttrValue(ACTOR_ATTR.BASE_NUQI_RECOVER)
+    oneWujiang.baoji_hurt = fightData:GetAttrValue(ACTOR_ATTR.BASE_BAOJI_HURT)
+    oneWujiang.init_nuqi = 1000
+
+    table_insert(oneWujiang.skillList, {skill_id = 32071, skill_level = 1})
+
+    local createParam = ActorCreateParam.New()
+    createParam:MakeSource(BattleEnum.ActorSource_CALLED, self:GetActorID())
+    createParam:MakeAI(BattleEnum.AITYPE_BAIMAYICONG)
+    createParam:MakeAttr(self:GetCamp(), oneWujiang)
+
+    local leftDir = nil
+    local dir = self:GetForward()
+    local pos = self:GetPosition()
+    if FixMod(standIndex, 2) == 0 then
+        leftDir = FixVetor3RotateAroundY(dir, -120.0)
+        if standIndex > 2 then
+            leftDir:Mul(2)
+        end
+        leftDir:Add(pos)
+    elseif FixMod(standIndex, 2) == 1 then
+        leftDir = FixVetor3RotateAroundY(dir, 120.0)
+        if standIndex > 2 then
+            leftDir:Mul(2)
+        end
+        leftDir:Add(pos)
+    end
+
+    local bornPos = leftDir
+    createParam:MakeLocation(bornPos, self:GetForward())
+    createParam:MakeRelationType(BattleEnum.RelationType_SON_NONINTERACTIVE)
+    createParam:SetImmediateCreateObj(true)
+
+    local congyiActor = ActorManagerInst:CreateActor(createParam)
+    congyiActor:SetStandIndex(standIndex)
+    self:AddCongyiTargetID(congyiActor:GetActorID())
+
+    self.m_totalCallCount = FixAdd(self.m_totalCallCount, 1)
+end
+
+function Actor1205:Set12052TargetID(targetID)
+    self.m_12052TargetID = targetID
+end
+
+function Actor1205:BeginMount()
+    self.m_perform12052 = true
+
+    if self.m_component then
+        self.m_component:CreateHorse()
+    end
+end
+
+function Actor1205:OnMount()
+    local target = ActorManagerInst:GetActor(self.m_12052TargetID)
+    if not target or not target:IsLive() then
+        if self.m_component then
+            self.m_component:Dismount()
+        end
+    end
+
+    local performerPos = self:GetPosition()
+    local targetPos = target:GetPosition() + target:GetForward()
+    local movehelper = self:GetMoveHelper()
+    if movehelper then
+        local pathHandler = CtlBattleInst:GetPathHandler()
+        if pathHandler then
+            local x,y,z = performerPos:GetXYZ()
+            local x2, y2, z2 = targetPos:GetXYZ()
+            local hitPos = pathHandler:HitTest(x, y, z, x2, y2, z2)
+            if hitPos then
+                targetPos:SetXYZ(hitPos.x , performerPos.y, hitPos.z)
+            end
+        end
+
+        movehelper:Stop()
+
+        movehelper:Start({targetPos}, 15, function()
+            if self.m_component then
+                self.m_perform12052 = false
+                self.m_component:Dismount()
+                self.m_component:PlayAnim(BattleEnum.ANIM_IDLE)
+            end
+
+            local target = ActorManagerInst:GetActor(self.m_12052TargetID)
+            if target or target:IsLive() then
+                local giver = StatusGiver.New(self:GetActorID(), 12052)
+                local stunBuff = StatusFactoryInst:NewStatusStun(giver, self.m_12052C)
+                target:GetStatusContainer():Add(stunBuff, self)
+
+                local judge = Formular.AtkRoundJudge(self, target, BattleEnum.HURTTYPE_PHY_HURT, true)
+                if not Formular.IsJudgeEnd(judge) then
+                    local injure = Formular.CalcInjure(self, target, self.m_12052SkillCfg, BattleEnum.HURTTYPE_PHY_HURT, judge, self.m_12502X)
+                    if injure > 0 then
+                        local giver = StatusGiver.New(self:GetActorID(), 12052)
+                        local status = StatusFactoryInst:NewStatusHP(giver, FixMul(-1, injure), BattleEnum.HURTTYPE_PHY_HURT, BattleEnum.HPCHGREASON_BY_SKILL, 
+                                                                                                                            judge, 1)
+                        target:GetStatusContainer():Add(status, self)
+                    end
+
+                    if self.m_12052BPercent > 0 then
+                        local randVal = FixMod(FixRand(), 100)
+                        if randVal <= self.m_12052BPercent then
+                            self:CalcCallStandIndex(1)
+                        end
+                    end
+                end
+            end
+
+        end, true)
+    end
+end
+
+function Actor1205:IsPerformSkill12052()
+    return self.m_perform12052
+end
+
+
+function Actor1205:OnAttackEnd(skillCfg)
+    Actor.OnAttackEnd(self, skillCfg)
+
+    if skillCfg.id == 12052 and self.m_perform12052 then
+        self.m_perform12052 = false
+        local movehelper = self:GetMoveHelper()
+        if movehelper then
+            movehelper:Stop()
+        end
+
+        if self.m_component then
+            self.m_component:Dismount()
+        end
+    end
+end
+
+
+function Actor1205:OnBeatBack(atker, backDis)    
+    self:EndMount()
+    
+    Actor.OnBeatBack(self, atker, backDis)
+end
+
+
+function Actor1205:OnBeatFly(atkWay, atkerPos, hurtFlyDis, inSkyTime)
+    self:EndMount()
+
+    Actor.OnBeatFly(self, atkWay, atkerPos, hurtFlyDis, inSkyTime)
+end
+
+
+function Actor1205:EndMount()
+    if self.m_perform12052 then
+        self.m_perform12052 = false
+        local movehelper = self:GetMoveHelper()
+        if movehelper then
+            movehelper:Stop()
+        end
+
+        if self.m_component then
+            self.m_component:Dismount()
+            self.m_component:PlayAnim(BattleEnum.ANIM_IDLE)
+        end
+    end
+end
+
+return Actor1205

@@ -1,0 +1,34 @@
+local FixIntMul = FixMath.muli
+local FixAdd = FixMath.add
+local FixDiv = FixMath.div
+local FixSub = FixMath.sub
+local FixMul = FixMath.mul
+local SkillUtil = SkillUtil
+local ConfigUtil = ConfigUtil
+local ACTOR_ATTR = ACTOR_ATTR
+local IsInCircle = SkillRangeHelper.IsInCircle
+local StatusFactoryInst = StatusFactoryInst
+local ActorManagerInst = ActorManagerInst
+local CtlBattleInst = CtlBattleInst
+local BattleEnum = BattleEnum
+local Formular = Formular
+local StatusEnum = StatusEnum
+local FixRand = BattleRander.Rand
+local FixMod = FixMath.mod
+
+local Actor = require "GameLogic.Battle.Actors.Actor"
+local Actor2014 = BaseClass("Actor2014", Actor)
+
+function Actor2014:__init()
+   
+end 
+
+function Actor2014:OnBorn(create_param)
+    Actor.OnBorn(self, create_param)
+ 
+end
+
+ 
+ 
+
+return Actor2014

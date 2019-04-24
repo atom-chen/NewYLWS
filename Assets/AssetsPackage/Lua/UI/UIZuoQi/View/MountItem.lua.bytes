@@ -1,0 +1,160 @@
+
+local string_format = string.format
+local math_ceil = math.ceil
+local math_floor = math.floor
+local GameUtility = CS.GameUtility
+local random = math.random
+local UILogicUtil = UILogicUtil
+local UIUtil = UIUtil
+local Language = Language
+local PreloadHelper = PreloadHelper
+local CommonDefine = CommonDefine
+local MountMgr = Player:GetInstance():GetMountMgr()
+
+local MountItem = BaseClass("MountItem", UIBaseItem)
+local base = UIBaseItem
+
+function MountItem:OnCreate()
+    base.OnCreate(self)
+    local stageAreaText, choiceBtnText
+    stageAreaText, self.m_attrText, choiceBtnText = UIUtil.GetChildTexts(self.transform, {
+        "stageArea/Text",
+        "AttributeText",
+        "ChoiceButton/Text",
+    })
+
+    stageAreaText.text = Language.GetString(3550)
+    choiceBtnText.text = Language.GetString(3546)
+    self.m_mountPos, self.m_choiceBtn = UIUtil.GetChildTransforms(self.transform, {"mountPos", "ChoiceButton"})
+    self.m_callback = nil
+    self.m_mountData = false
+
+    local function onClick(go)
+        if go.name == "ChoiceButton" then
+            if self.m_callback then
+                self.m_callback(self.m_mountData.index)
+                self.m_callback = nil
+            end
+        end
+    end
+    UIUtil.AddClickEvent(self.m_choiceBtn.gameObject, onClick)
+end
+
+function MountItem:HideChoiceBtn()
+    self.m_choiceBtn.gameObject:SetActive(false)
+end
+
+function MountItem:UpdateAttr()
+    local baseAttr = self.m_mountData.base_first_attr
+    if baseAttr then
+        local attrNameList = CommonDefine.first_attr_name_list
+        local attrStr = ""
+        for i, v in pairs(attrNameList) do
+            local val = math_ceil(baseAttr[v])
+            if val then
+                local attrType = CommonDefine[v]
+                if attrType then
+                    attrStr = attrStr..string_format(Language.GetString(3549), Language.GetString(attrType + 10), tostring(val))
+                    if i == 2 then
+                        attrStr = attrStr.."\n"
+                    elseif i == 1 or i == 3 then
+                        attrStr = attrStr.."    "
+                    end
+                end
+            end
+        end
+        self.m_attrText.text =  attrStr
+    end
+end
+
+function MountItem:SetData(mountData, randomseed, callback)
+    if not mountData then
+        return
+    end
+
+    self.m_callback = callback
+    self.m_mountData = mountData
+    self:ShowMountModel(mountData.id, mountData.stage)
+    local baseAttr = mountData.base_first_attr
+    if baseAttr then
+        local attrNameList = CommonDefine.first_attr_name_list
+        local attrStr = ""
+        math.randomseed(randomseed)
+        local randomCount = random(0, 2)
+        -- print("random1", randomCount)
+        local randomList= {}
+        if randomCount > 0 then
+            for i = 1, randomCount do
+                randomList[i] = random(1, 4)
+                -- print("randomList"..i..": "..randomList[i])
+                if i == 2 then
+                    while randomList[i] == randomList[i - 1] do
+                        randomList[i] = random(1, 4)
+                    end
+                end
+            end
+        end
+
+        for i, v in pairs(attrNameList) do
+            local val = math_ceil(baseAttr[v])
+            for _, j in pairs(randomList) do
+                if j == i then
+                    val = self:ChangeNumber(val)
+                end
+            end
+            if val then
+                local attrType = CommonDefine[v]
+                if attrType then
+                    attrStr = attrStr..string_format(Language.GetString(3549), Language.GetString(attrType + 10), tostring(val))
+                    if i == 2 then
+                        attrStr = attrStr.."\n"
+                    elseif i == 1 or i == 3 then
+                        attrStr = attrStr.."    "
+                    end
+                end
+            end
+        end
+        self.m_attrText.text =  attrStr
+    end
+end
+
+function MountItem:ChangeNumber(number)
+    local str = tostring(number)
+    local count = random(1, 2)
+    -- print("random2", count)
+    if #str == 1 then
+        return "?"
+    else
+        if count == 1 then
+            return math_floor(number / 10).."?"
+        else
+            return "??"
+        end
+    end
+end
+
+function MountItem:ShowMountModel(mountId, mountLevel)
+    if not mountId then
+        Logger.LogError("no mountId!")
+        return
+    end
+    local pool = GameObjectPoolInst
+    local resPath = PreloadHelper.GetHorsePath(mountId, mountLevel)
+
+    pool:GetGameObjectAsync(resPath, function(inst)
+        if IsNull(inst) then
+            pool:RecycleGameObject(resPath, inst)
+            return
+        end
+
+        inst.transform:SetParent(self.m_mountPos)
+        inst.transform.localScale = Vector3.New(200, 200, 200)
+        inst.transform.localPosition = Vector3.New(0, -102, 0)
+        inst.transform.localEulerAngles = Vector3.New(5, 150, 0)
+        
+        GameUtility.RecursiveSetLayer(inst, Layers.UI)
+    end)
+end
+
+
+return MountItem

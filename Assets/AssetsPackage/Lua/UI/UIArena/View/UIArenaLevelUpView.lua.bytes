@@ -1,0 +1,96 @@
+local UIUtil = UIUtil
+local UIImage = UIImage
+local UIEffect = UIEffect
+local TheGameIds = TheGameIds
+local AtlasConfig = AtlasConfig
+local GameUtility = CS.GameUtility
+local ArenaLevelUpEffect1 = TheGameIds.ArenaLevelUpEffect1
+local ArenaLevelUpEffect2 = TheGameIds.ArenaLevelUpEffect2
+local ArenaLevelUpEffect3 = TheGameIds.ArenaLevelUpEffect3
+local ArenaLevelUpEffect4 = TheGameIds.ArenaLevelUpEffect4
+
+local UIArenaLevelUpView = BaseClass("UIArenaLevelUpView", UIBaseView)
+local base = UIBaseView
+
+function UIArenaLevelUpView:OnCreate()
+    base.OnCreate(self)
+
+    self:InitView()
+
+    self:HandleClick()
+end
+
+function UIArenaLevelUpView:InitView()
+    self.m_blackBgTrans = UIUtil.GetChildRectTrans(self.transform, {"blackBg"})
+
+    self.m_rankNameText = UIUtil.GetChildTexts(self.transform, {"rankNameBg/rankNameText"})
+
+    self.m_rankIcon = UIUtil.AddComponent(UIImage, self, "rankIcon", AtlasConfig.DynamicLoad)
+
+    self.m_effectItem = nil
+end
+
+function UIArenaLevelUpView:HandleClick()
+    local onClick = Bind(self, self.OnClick)
+
+    UIUtil.AddClickEvent(self.m_blackBgTrans.gameObject, onClick)
+end
+
+function UIArenaLevelUpView:OnClick(go, x, y)
+    if not go then
+        return
+    end
+    local goName = go.name
+    if goName == "blackBg" then
+        self:CloseSelf()
+    end
+end
+
+function UIArenaLevelUpView:OnDestroy()
+    self.m_blackBgTrans = nil
+
+    self.m_rankNameText = nil
+
+    if self.m_rankIcon then
+        self.m_rankIcon:Delete()
+        self.m_rankIcon = nil
+    end
+    if self.m_effectItem then
+        self.m_effectItem:Delete()
+        self.m_effectItem = nil
+    end
+
+    base.OnDestroy(self)
+end
+
+function UIArenaLevelUpView:OnEnable(initOrder, currRankDan)
+    base.OnEnable(self)
+
+    local rankDanCfg = ConfigUtil.GetArenaDanAwardCfgByID(currRankDan)
+    if rankDanCfg then
+        self.m_rankIcon:SetAtlasSprite(rankDanCfg.sIcon, true, AtlasConfig[rankDanCfg.sAtlas])
+        self.m_rankNameText.text = rankDanCfg.dan_name
+    end
+
+    --创建特效
+    local effectPath = nil
+    if currRankDan == 1 then
+        effectPath = ArenaLevelUpEffect1
+    elseif currRankDan == 2 then
+        effectPath = ArenaLevelUpEffect2
+    elseif currRankDan == 3 then
+        effectPath = ArenaLevelUpEffect3
+    elseif currRankDan == 4 then
+        effectPath = ArenaLevelUpEffect4
+    end
+    if effectPath then
+        local sortOrder = self:PopSortingOrder()
+        UIUtil.AddComponent(UIEffect, self, "", sortOrder, effectPath, function(effect)
+            self.m_effectItem = effect
+            self.m_effectItem.m_effect.transform.localScale = Vector3.New(10, 10, 10)
+            GameUtility.SetLayer(self.m_effectItem:GetGameObject(), Layers.UI)
+        end)
+    end
+end
+
+return UIArenaLevelUpView

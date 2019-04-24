@@ -1,0 +1,82 @@
+
+
+local BossMgr = BaseClass("BossMgr")
+local table_insert = table.insert
+local table_remove = table.remove
+local table_sort = table.sort
+
+
+function BossMgr:__init()
+    self.m_todayBossIndex = 1
+    self.m_openBossFight = false
+
+    HallConnector:GetInstance():RegisterHandler(MsgIDDefine.WORLDBOSS_RSP_WORLD_BOSS_INFO, Bind(self, self.RspWorldBossInfo))
+    HallConnector:GetInstance():RegisterHandler(MsgIDDefine.WORLDBOSS_RSP_ENHANCE_ATK, Bind(self, self.RspEnHanceAtk))
+    HallConnector:GetInstance():RegisterHandler(MsgIDDefine.WORLDBOSS_RSP_BUY_FIGHT_BOSS_TIME, Bind(self, self.RspBuyFightBossTime))
+    HallConnector:GetInstance():RegisterHandler(MsgIDDefine.COMMONRANK_RSP_WORLD_BOSS_RANK, Bind(self, self.RspWorldBossRank))
+    HallConnector:GetInstance():RegisterHandler(MsgIDDefine.COMMONRANK_RSP_WORLD_BOSS_RANK_YESTERDAY, Bind(self, self.RspWorldBossRankYesterday))
+end
+
+
+function BossMgr:RspWorldBossInfo(msg_obj)
+    if not msg_obj or not msg_obj.result == 0 then
+        return
+    end
+
+    self.m_todayBossIndex = msg_obj.boss_index
+
+    if not self.m_openBossFight then
+        UIManagerInst:Broadcast(UIMessageNames.MN_BOSS_RSP_BOSSINFO, msg_obj)
+    else
+        self.m_openBossFight = false
+        UIManagerInst:OpenWindow(UIWindowNames.UIWorldBoss, "start", msg_obj)
+    end
+end
+
+
+function BossMgr:RspEnHanceAtk(msg_obj)
+    if not msg_obj or not msg_obj.result == 0 then
+        return
+    end
+    UIManagerInst:Broadcast(UIMessageNames.MN_BOSS_RSP_ENHANCEATK, msg_obj)
+end
+
+
+function BossMgr:RspBuyFightBossTime(msg_obj)
+    if not msg_obj or not msg_obj.result == 0 then
+        return
+    end
+    UIManagerInst:Broadcast(UIMessageNames.MN_BOSS_RSP_BUYFIGHTBOSS_TIME, msg_obj)
+end
+
+function BossMgr:RspWorldBossRank(msg_obj)
+    if not msg_obj or not msg_obj.result == 0 then
+        return
+    end
+
+    UIManagerInst:Broadcast(UIMessageNames.MN_BOSS_RSP_WORLDBOSS_RANK, msg_obj)
+end
+
+function BossMgr:RspWorldBossRankYesterday(msg_obj)
+    if not msg_obj or not msg_obj.result == 0 then
+        return
+    end
+    UIManagerInst:Broadcast(UIMessageNames.MN_BOSS_RSP_WORLDBOSS_RANK_YESTERDAY, msg_obj)
+end
+
+function BossMgr:GetTodayBattleType()
+    local cfg = ConfigUtil.GetWorldBossCfgByID(self.m_todayBossIndex)
+    if cfg then
+        return cfg.battle_type
+    end
+    return 0
+end
+
+function BossMgr:HelpReqBossFight()
+    local msg_id = MsgIDDefine.WORLDBOSS_REQ_WORLD_BOSS_INFO
+    local msg = (MsgIDMap[msg_id])()
+    HallConnector:GetInstance():SendMessage(msg_id, msg)
+    self.m_openBossFight = true
+end
+
+return BossMgr

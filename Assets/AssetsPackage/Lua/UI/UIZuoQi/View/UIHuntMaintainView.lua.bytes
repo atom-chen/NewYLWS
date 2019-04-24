@@ -1,0 +1,100 @@
+
+local Language = Language
+local AtlasConfig = AtlasConfig
+local UIUtil = UIUtil
+local ConfigUtil = ConfigUtil
+local GameObject = CS.UnityEngine.GameObject
+local GameUtility = CS.GameUtility
+
+local UIHuntMaintainView = BaseClass("UIHuntMaintainView", UIBaseView)
+local base = UIBaseView
+
+function UIHuntMaintainView:OnCreate()
+    base.OnCreate(self)
+    local cancelBtnText, spendBtnText,  titleText
+    titleText, cancelBtnText, spendBtnText = UIUtil.GetChildTexts(self.transform, {
+        "BgRoot/titleText",
+        "BgRoot/ContentRoot/btnGrid/ButtonTwo/ButtonTwoText",
+        "BgRoot/ContentRoot/btnGrid/ButtonOne/ButtonOneText"
+    })
+
+    self.m_itemGirdTr, self.m_itemPrefab, self.m_cancelBtn, self.m_spendBtn, self.m_closeBtn
+    = UIUtil.GetChildTransforms(self.transform, {
+        "BgRoot/ContentRoot/itemGrid",
+        "BgRoot/ContentRoot/ItemPrefab",
+        "BgRoot/ContentRoot/btnGrid/ButtonTwo",
+        "BgRoot/ContentRoot/btnGrid/ButtonOne",
+        "CloseBtn",
+    })
+
+    self.m_itemPrefab = self.m_itemPrefab.gameObject
+    cancelBtnText.text = Language.GetString(50)
+    spendBtnText.text = Language.GetString(3529)
+    titleText.text = Language.GetString(3532)
+    self.m_spendCallback = nil
+    
+    local function onClick(go)
+        if go.name == "CloseBtn" or go.name == "ButtonTwo" then
+            self:CloseSelf()
+        elseif go.name == "ButtonOne" then
+            if self.m_spendCallback then
+                self.m_spendCallback()
+                self.m_spendCallback = nil
+                self:CloseSelf()
+            end
+            
+            TimelineMgr:GetInstance():TriggerEvent(SequenceEventType.CLICK_UI, "ButtonOne")
+        end
+    end
+
+    UIUtil.AddClickEvent(self.m_cancelBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_closeBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_spendBtn.gameObject, onClick)
+end
+
+function UIHuntMaintainView:OnEnable(...)
+    base.OnEnable(self, ...)
+    local _, id, callback = ...
+
+    if not id then
+        return 
+    end
+    local levelUpCfg = ConfigUtil.GetHuntLevelUpCfgByID(id)
+
+    if levelUpCfg then
+        local itemCount = 0
+        if levelUpCfg.maintain_item_id1 > 0 then
+            itemCount = itemCount + 1
+        end
+        if levelUpCfg.maintain_item_id2 > 0 then
+            itemCount = itemCount + 1
+        end
+        if levelUpCfg.maintain_item_id3 > 0 then
+            itemCount = itemCount + 1
+        end
+        for i = 1, itemCount do
+            local itemCfg = ConfigUtil.GetItemCfgByID(levelUpCfg["maintain_item_id"..i])
+            local go = GameObject.Instantiate(self.m_itemPrefab, self.m_itemGirdTr)
+            local text = UIUtil.FindText(go.transform, "Text")
+            local image = UIUtil.AddComponent(UIImage, go.transform, "")
+            text.text = levelUpCfg["maintain_item_count"..i]
+            image:SetAtlasSprite(itemCfg.sIcon, false, AtlasConfig[itemCfg.sAtlas])
+        end
+    end
+    self.m_spendCallback = callback or nil
+end
+
+function UIHuntMaintainView:OnDisable()
+
+    GameUtility.DestroyChild(self.m_itemGirdTr.gameObject)
+    base.OnDisable(self)
+end
+
+function UIHuntMaintainView:OnTweenOpenComplete()
+
+    TimelineMgr:GetInstance():TriggerEvent(SequenceEventType.SHOW_UI_END, self.winName)
+    
+    base.OnTweenOpenComplete(self)
+end
+
+return UIHuntMaintainView

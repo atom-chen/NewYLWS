@@ -1,0 +1,96 @@
+local string_format = string.format
+local ConfigUtil = ConfigUtil
+local Vector3 = Vector3
+local Vector4 = Vector4
+local effectPath = TheGameIds.UI_bigmapmisson_select_blue_path
+
+local LieZhuanCopyItem = BaseClass("LieZhuanCopyItem", UIBaseItem)
+local base = UIBaseItem
+
+function LieZhuanCopyItem:OnCreate()
+    base.OnCreate(self)
+    self:InitView()
+end
+
+function LieZhuanCopyItem:InitView()
+    self.m_nameText = UIUtil.GetChildTexts(self.transform, { "content/nameText" })
+    self.m_selectImage, self.m_lockImage = UIUtil.GetChildTransforms(self.transform, { "selectImage", "content/lockImage" })
+
+    self.m_copyId = 0
+    self.m_islocked = false
+    self.m_selectEffect = nil
+    self.m_layerName = UILogicUtil.FindLayerName(self.transform)
+
+    local function onClick(go, x, y)
+        if go == self:GetGameObject() and self.m_onClickCallback then
+            if self.m_islocked then
+                local sCopyId = self.m_copyId % 100
+                UILogicUtil.FloatAlert(string.format(Language.GetString(3760), sCopyId - 1))
+            else
+                self.m_onClickCallback(self)
+            end
+        end
+    end
+    UIUtil.AddClickEvent(self:GetGameObject(), onClick)
+end
+
+function LieZhuanCopyItem:UpdateData(copyCfg, islocked, onClickCallback)
+    if copyCfg then
+        self.m_copyId = copyCfg.id
+        self.m_islocked = islocked
+    
+        if self.m_copyId == 0 then
+            self.m_nameText.text = Language.GetString(3761)
+        else
+            local sCopyId = self.m_copyId % 100
+            self.m_nameText.text = string_format(Language.GetString(3758), sCopyId)
+        end
+    end
+    self.m_lockImage.gameObject:SetActive(islocked)
+    self.m_onClickCallback = onClickCallback
+end
+
+function LieZhuanCopyItem:GetCopyId()
+    return self.m_copyId
+end
+
+function LieZhuanCopyItem:SetSelectState(show, showEffectBounds)
+    if self.m_selectImage then
+        self.m_selectImage.gameObject:SetActive(show)
+    end
+
+    if show then
+        if not self.m_selectEffect then
+            local sortOrder = UISortOrderMgr:GetInstance():PopSortingOrder(self, self.m_layerName)
+            UIUtil.AddComponent(UIEffect, self, "", sortOrder, effectPath, function(effect)
+                self.m_selectEffect = effect
+                self.m_selectEffect:SetLocalPosition(Vector3.New(5, 2, 0))
+                self.m_selectEffect:SetLocalScale(Vector3.New(0.6, 0.5, 1))
+                if showEffectBounds then
+                    local clipRegion = Vector4.New(showEffectBounds[0].x, showEffectBounds[0].y, showEffectBounds[2].x, showEffectBounds[2].y)
+                    self.m_selectEffect:ClipParticleWithBounds(clipRegion)
+                end
+            end)
+        end
+    else
+        self:ClearEffect()
+    end
+
+end
+
+function LieZhuanCopyItem:ClearEffect()
+    if self.m_selectEffect then
+        self.m_selectEffect:Delete()
+        self.m_selectEffect = nil
+    end 
+end
+
+function LieZhuanCopyItem:OnDestroy()
+    base.OnDestroy(self)
+    UISortOrderMgr:GetInstance():PushSortingOrder(self, self.m_layerName)
+    self:ClearEffect()
+    self.m_effectPath = nil
+end
+
+
+return LieZhuanCopyItem

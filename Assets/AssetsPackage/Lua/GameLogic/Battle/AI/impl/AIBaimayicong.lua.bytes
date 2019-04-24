@@ -1,0 +1,85 @@
+local ActorManagerInst = ActorManagerInst
+local FixVetor3RotateAroundY = FixMath.Vector3RotateAroundY
+local FixNormalize = FixMath.Vector3Normalize
+local FixMod = FixMath.mod
+local BattleEnum = BattleEnum
+
+local AIManual = require "GameLogic.Battle.AI.AIManual"
+local AIBaimayicong = BaseClass("AIBaimayicong", AIManual)
+
+function AIBaimayicong:__init()
+    self.m_assaultTargetID = 0
+end
+
+function AIBaimayicong:GetAiType()
+    return BattleEnum.AITYPE_BAIMAYICONG
+end
+
+function AIBaimayicong:AI(deltaMS)
+    if not self:CheckSpecialState(deltaMS) then
+        return
+    end
+
+    if not self:CanAI() then
+        return
+    end
+
+    if self.m_assaultTargetID <= 0 then
+        local owner = ActorManagerInst:GetActor(self.m_selfActor:GetOwnerID())
+        self:FollowOwner(owner, deltaMS)
+        return
+    end
+
+    local currState = self.m_selfActor:GetCurrStateID()
+    if currState == BattleEnum.ActorState_IDLE or currState == BattleEnum.ActorState_MOVE then        
+        local skillItem = self.m_selfActor:GetSkillContainer():GetByID(32071)
+        if skillItem then
+            local target = ActorManagerInst:GetActor(self.m_assaultTargetID)
+            if not target or not target:IsLive() then
+                self.m_assaultTargetID = 0
+                return
+            end
+
+            self:PerformSkill(target, skillItem, target:GetPosition(), SKILL_PERFORM_MODE.AI)
+        end
+    end
+end
+
+
+function AIBaimayicong:FollowOwner(owner, deltaMS)   
+    if not owner or not owner:IsLive() then
+        return
+    end
+    
+    
+    local targetPos = owner:GetPosition()
+    local dir = owner:GetForward() * 2
+    local leftDir = nil
+    local standIndex = self.m_selfActor:GetStandIndex()
+    if FixMod(standIndex, 2) == 0 then
+        leftDir = FixVetor3RotateAroundY(dir, -120)
+
+    elseif FixMod(standIndex, 2) == 1 then
+        leftDir = FixVetor3RotateAroundY(dir, 120)
+    end
+
+    leftDir:Add(targetPos)
+    targetPos = leftDir
+
+    local tmpDir = self.m_selfActor:GetPosition() - targetPos
+    tmpDir.y = 0
+    local distance = tmpDir:SqrMagnitude()
+    
+    if distance >= 2 then
+        self.m_selfActor:SimpleMove(targetPos)
+    end
+end
+
+
+function AIBaimayicong:Assault(targetID)
+    if self.m_assaultTargetID <= 0 then
+        self.m_assaultTargetID = targetID
+    end
+end
+
+return AIBaimayicong

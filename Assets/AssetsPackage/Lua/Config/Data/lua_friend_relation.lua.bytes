@@ -1,0 +1,43 @@
+local config = {
+[1] = {
+id = 1,
+sName = "一面之缘",
+desc = "你与他只是一面之缘。\n\n互相赠送体力可以提升关系。下一个关系等级可以开启赠送礼物功能和等级2的互助任务，互赠礼物可以快速提升关系值并收获情义，同时每次赠送体力获得额外2点情义。",
+need_value = 0,
+extra_qingyi = 0,
+open_gift = 0,
+sAtlas = "DynamicLoad",
+sIcon = "haoyou14.png",
+},
+[2] = {
+id = 2,
+sName = "志同道合",
+desc = "你与他志同道合。\n\n互相赠送体力和礼物可以快速提升关系。下一个关系等级可以开启等级3的互助任务，并且在赠送体力时可以获得额外3点情义值。",
+need_value = 30,
+extra_qingyi = 2,
+open_gift = 1,
+sAtlas = "DynamicLoad",
+sIcon = "haoyou15.png",
+},
+[3] = {
+id = 3,
+sName = "肝胆相照",
+desc = "你与他肝胆相照。\n\n互相赠送体力和礼物可以快速提升关系。下一个关系等级可以开启等级4的互助任务，并且在赠送体力时可以获得额外5点情义值。",
+need_value = 60,
+extra_qingyi = 3,
+open_gift = 1,
+sAtlas = "DynamicLoad",
+sIcon = "haoyou16.png",
+},
+[4] = {
+id = 4,
+sName = "义结金兰",
+desc = "你与他义结金兰。\n\n你与他的关系已经亲密无间，送礼已无法提升关系。",
+need_value = 100,
+extra_qingyi = 5,
+open_gift = 1,
+sAtlas = "DynamicLoad",
+sIcon = "haoyou17.png",
+},
+}
+return config

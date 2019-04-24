@@ -1,0 +1,115 @@
+local UIUtil = UIUtil
+local UIBattleMainView = require("UI.UIBattle.View.UIBattleMainView")
+local UIBattleBossMainView = BaseClass("UIBattleBossMainView", UIBattleMainView)
+local base = UIBattleMainView
+local ActorManagerInst = ActorManagerInst
+local CtlBattleInst = CtlBattleInst
+local BattleEnum = BattleEnum
+
+local UISliderHelper = typeof(CS.UISliderHelper)
+local Type_RectTransform = typeof(CS.UnityEngine.RectTransform)
+
+local blood_slider_path = "topMiddleContainer/bossBlood/bloodSlider"
+local boss_name_path = "topMiddleContainer/bossBlood/name"
+local boss_blood_percent_path = "topMiddleContainer/bossBlood/bloodPercent"
+
+function UIBattleBossMainView:OnEnable(...)
+    base.OnEnable(self,...)
+    local t1, bossName = ...
+    self.m_bossNameLabel.text = bossName
+
+    self.m_bossBloodTr.gameObject:SetActive(true)
+end
+
+function UIBattleBossMainView:OnCreate()
+	base.OnCreate(self)
+
+    self.m_bloodSlider = UIUtil.FindComponent(self.transform, UISliderHelper, blood_slider_path)
+    self.m_bossNameRT = UIUtil.FindComponent(self.transform, UISliderHelper, boss_name_path)
+    self.m_bloodPercentRT = UIUtil.FindComponent(self.transform, UISliderHelper, boss_blood_percent_path)
+    
+    self.m_bossNameLabel, self.m_bossBloodPercentLabel = UIUtil.GetChildTexts(self.transform, {
+        boss_name_path, boss_blood_percent_path,
+    })
+
+    self.m_bossBloodPercentLabel.text = "100%"
+
+    self.m_bossID = CtlBattleInst:GetLogic():GetBossID()
+
+    self.m_bloodSlider:UpdateSliderImmediately(1)
+
+    self.m_bossBloodTr = UIUtil.FindTrans(self.transform, "topMiddleContainer/bossBlood")
+end
+
+function UIBattleBossMainView:OnDestroy()
+    self.m_bloodSlider = false
+    self.m_bossNameLabel = false
+    self.m_bossNameRT = false
+    self.m_bloodPercentRT = false
+    self.m_bloodSlider = false
+    self.m_bossID = 0
+    self.m_bossBloodPercentLabel = false
+
+	base.OnDestroy(self)
+end
+
+function UIBattleBossMainView:Update()
+    base.Update(self)
+    self:UpdateBloodPercent()
+end
+
+function UIBattleBossMainView:GetBackLanguage()
+    if CtlBattleInst:GetLogic():GetBattleType() == BattleEnum.BattleType_SHENSHOU  then
+        return Language.GetString(3708)
+    else
+        return Language.GetString(6)
+    end
+end
+
+function UIBattleBossMainView:UpdateBloodPercent()
+    local btLogic = CtlBattleInst:GetLogic()
+    if not btLogic then
+        return
+    end
+
+    if self.m_bossID == 0 then
+        self.m_bossID = btLogic:GetBossID()
+    end
+    local actor = ActorManagerInst:GetActor(self.m_bossID)
+    if not actor then
+        return 
+    end
+
+    local actorData = actor:GetData()
+    if not actorData then
+        return
+    end
+
+    local curHP = actorData:GetAttrValue(ACTOR_ATTR.FIGHT_HP)
+    local maxHP = actorData:GetAttrValue(ACTOR_ATTR.FIGHT_MAXHP)
+    local newPercent = curHP / maxHP
+
+    self.m_bloodSlider:UpdateSliderImmediately(newPercent)
+
+    newPercent = newPercent * 100
+
+    newPercent = string.format("%.1f", newPercent) .. "%"
+    self.m_bossBloodPercentLabel.text = newPercent
+end
+
+function UIBattleBossMainView:OnActorDie(actorID)
+    base.OnActorDie(self, actorID)
+
+    if actorID == self.m_bossID then
+        if CtlBattleInst:GetLogic():GetBattleType() == BattleEnum.BattleType_GUILD_BOSS then
+            self.m_bossBloodTr.gameObject:SetActive(false)
+        else
+            self.m_bloodSlider:UpdateSliderImmediately(0)
+    
+            local newPercent = "0%"
+            self.m_bossBloodPercentLabel.text = newPercent
+		end
+    end
+end
+return UIBattleBossMainView
+

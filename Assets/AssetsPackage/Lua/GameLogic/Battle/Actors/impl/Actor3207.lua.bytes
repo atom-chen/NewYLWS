@@ -1,0 +1,104 @@
+local ActorManagerInst = ActorManagerInst
+local Formular = Formular
+local FixMul = FixMath.mul
+local FixRand = BattleRander.Rand
+local FixMod = FixMath.mod
+local StatusFactoryInst = StatusFactoryInst
+local BattleEnum = BattleEnum
+
+local Actor = require "GameLogic.Battle.Actors.Actor"
+local Actor3207 = BaseClass("Actor3207", Actor)
+
+function Actor3207:__init()
+    self.m_endLife = false
+    self.m_targetID = 0
+
+    self.m_standIndex = 0
+end
+
+function Actor3207:NeedBlood()
+    return false
+end
+
+function Actor3207:LogicOnFightEnd()
+    self:KillSelf(BattleEnum.DEADMODE_NODIESHOW)
+end
+ 
+
+function Actor3207:LogicUpdate(deltaMS)
+    local owner = ActorManagerInst:GetActor(self:GetOwnerID())
+    if not owner or not owner:IsLive() then
+        self:KillSelf(BattleEnum.DEADMODE_NODIESHOW)
+        return
+    end
+
+    if self.m_endLife then
+        self.m_endLife = false
+        self:KillSelf(BattleEnum.DEADMODE_NODIESHOW)
+    end
+end
+
+function Actor3207:EndLife()
+    self.m_endLife = true
+end
+
+function Actor3207:SetTargetID(targetID)
+    self.m_targetID = targetID
+end
+
+
+function Actor3207:MakeHurt()
+    local owner = ActorManagerInst:GetActor(self:GetOwnerID())
+    if not owner or not owner:IsLive() then
+        self.m_endLife = true
+        return
+    end
+
+    local target = ActorManagerInst:GetActor(self.m_targetID)
+    if not target or not target:IsLive() then
+        self.m_endLife = true
+        self.m_targetID = 0
+        return
+    end 
+
+    local hurtPercent = owner:Get12053Y()
+    local skillCfg = owner:Get12053SkillCfg()
+    if not skillCfg then
+        return
+    end
+
+    local judge = Formular.AtkRoundJudge(self, target, BattleEnum.HURTTYPE_PHY_HURT, true)
+    if Formular.IsJudgeEnd(judge) then
+        return
+    end
+
+    local injure = Formular.CalcInjure(self, target, skillCfg, BattleEnum.HURTTYPE_PHY_HURT, judge, hurtPercent)
+    if injure > 0 then
+        local giver = StatusGiver.New(self:GetActorID(), 32071)
+        local status = StatusFactoryInst:NewStatusHP(giver, FixMul(injure, -1), BattleEnum.HURTTYPE_PHY_HURT, BattleEnum.HPCHGREASON_BY_SKILL,
+                judge, 0)
+        target:GetStatusContainer():Add(status, self)
+
+        local isStun = owner:IsStunTarget()
+        if isStun then
+            local randVal = FixMod(FixRand(), 100)
+            local rand = owner:Get12053C()
+            if randVal <= rand then
+                local stunTime = owner:Get12053D()
+                local giver = StatusGiver.New(self:GetActorID(), 32071)
+                local stunBuff = StatusFactoryInst:NewStatusStun(giver, stunTime)
+                target:GetStatusContainer():Add(stunBuff, self)
+            end
+        end
+    end
+end
+
+function Actor3207:SetStandIndex(index)
+    self.m_standIndex = index
+end
+
+function Actor3207:GetStandIndex()
+    return self.m_standIndex
+end
+
+return Actor3207

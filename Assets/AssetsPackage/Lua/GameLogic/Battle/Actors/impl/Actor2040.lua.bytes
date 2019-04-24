@@ -1,0 +1,103 @@
+local FixDiv = FixMath.div
+local FixAdd = FixMath.add
+local FixIntMul = FixMath.muli
+local GetSkillCfgByID = ConfigUtil.GetSkillCfgByID
+local SkillUtil = SkillUtil
+
+local Actor = require "GameLogic.Battle.Actors.Actor"
+local Actor2040 = BaseClass("Actor2040", Actor)
+
+function Actor2040:__init()
+    self.m_20401AtkList = {}
+    self.m_20401AtkCount = 0
+
+    self.m_20403A = false
+    self.m_20403B = false
+    self.m_20403XPercent = false
+    self.m_20403Level = 0
+    
+    self.m_eatLegCount = 0
+    self.m_desPos = nil
+end
+
+function Actor2040:SetDesPos(pos)
+    self.m_desPos = pos
+end
+
+function Actor2040:GetDesPos()
+    return self.m_desPos
+end
+
+function Actor2040:OnBorn(create_param)
+    Actor.OnBorn(self, create_param)
+
+    local skillItem = self.m_skillContainer:GetPassiveByID(20403)
+    if skillItem  then
+        self.m_20403Level = skillItem:GetLevel()
+
+        local skillCfg = ConfigUtil.GetSkillCfgByID(20403)
+        if skillCfg then
+            self.m_20403A = SkillUtil.A(skillCfg, self.m_20403Level)
+            self.m_20403B = FixIntMul(SkillUtil.B(skillCfg, self.m_20403Level), 1000)
+            self.m_20403XPercent = FixDiv(SkillUtil.X(skillCfg, self.m_20403Level), 100)
+        end
+    end
+end
+
+function Actor2040:AddEatLegCount()
+    self.m_eatLegCount = FixAdd(self.m_eatLegCount, 1)
+end
+
+function Actor2040:GetEatLegCount(count)
+   return self.m_eatLegCount
+end
+
+function Actor2040:IsDingshenTarget()
+    if not self.m_20403A or self.m_20403Level <= 1 then
+        return false
+    end
+    return self.m_eatLegCount >= self.m_20403A
+end
+
+function Actor2040:Get2043B()
+    return self.m_20403B
+end
+
+function Actor2040:Get2043XPercent()
+    return self.m_20403XPercent
+end
+
+function Actor2040:Add20401AtkList(targetID)
+    if self.m_20401AtkList[targetID] then
+        return true
+    end
+
+    self.m_20401AtkList[targetID] = true
+    return false
+end
+
+function Actor2040:Get20401AtkList()
+    return self.m_20401AtkList
+end
+
+function Actor2040:Add20401AtkCount()
+    self.m_20401AtkCount = FixAdd(self.m_20401AtkCount, 1)
+end
+
+function Actor2040:Get20401AtkCount()
+    return self.m_20401AtkCount
+end
+
+function Actor2040:Clear20401Data()
+    self.m_20401AtkList = {}
+    self.m_20401AtkCount = 0
+end
+
+function Actor2040:ShowBoneham(isShow)
+    local com = self:GetComponent()
+    if com then
+        com:ShowBoneham(isShow)
+    end
+end
+
+return Actor2040

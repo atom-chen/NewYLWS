@@ -1,0 +1,49 @@
+local BattleEnum = BattleEnum
+local FixNewVector3 = FixMath.NewFixVector3
+
+local base = require "GameLogic.Battle.DieShow.impl.NormalDieShow"
+local ZhangjiaoHufaDieShow = BaseClass("ZhangjiaoHufaDieShow", base)
+
+function ZhangjiaoHufaDieShow:Start(...)
+    base.Start(self, ...)
+
+    self.m_anim = BattleEnum.ANIM_IDLE
+    self.m_deadMode = BattleEnum.DEADMODE_DEFAULT
+end
+
+function ZhangjiaoHufaDieShow:ShowDeath(anim)
+    self.m_deadTime = 0.8 --这里没有马上获得动画时间
+    self.m_alphaTime = 1.2
+    self.m_fakeActor:PlayAnim(BattleEnum.ANIM_IDLE)
+    self.m_effectKey = EffectMgr:AddEffect(self.m_fakeActor, 20012)
+end
+
+function ZhangjiaoHufaDieShow:StartDead(anim)
+    self:ShowDeath(anim)
+end
+
+function ZhangjiaoHufaDieShow:StayUpdate(deltaTime)
+    self.m_deadTime = self.m_deadTime - deltaTime
+    if self.m_deadTime <= 0 then
+        if self.m_alphaTime >= 1.2 then
+            self.m_alphaTime = self.m_alphaTime - deltaTime
+
+            local actorColor = self.m_fakeActor:GetActorColor()
+            if actorColor then
+                local alpha = actorColor:GetActorAlpha()
+                if alpha > 0 then
+                    actorColor:AddAlphaFactor(0, 1.5, 1.5)
+                end
+            end
+
+        else
+            self.m_alphaTime = self.m_alphaTime - deltaTime
+            if self.m_alphaTime <= 0 then
+                self.m_fakeActor:SetPosition(FixNewVector3(0,-100,0))
+                self.m_isOver = true
+            end
+        end
+    end
+end
+
+return ZhangjiaoHufaDieShow

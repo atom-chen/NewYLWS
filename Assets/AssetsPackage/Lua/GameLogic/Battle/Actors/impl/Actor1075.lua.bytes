@@ -1,0 +1,106 @@
+local FixIntMul = FixMath.muli
+local FixAdd = FixMath.add
+local FixDiv = FixMath.div
+local FixMul = FixMath.mul
+local FixFloor = FixMath.floor
+local SkillUtil = SkillUtil
+local ConfigUtil = ConfigUtil
+local ACTOR_ATTR = ACTOR_ATTR
+local BattleEnum = BattleEnum
+local StatusFactoryInst = StatusFactoryInst
+local StatusEnum = StatusEnum
+
+local Actor = require "GameLogic.Battle.Actors.Actor"
+local Actor1075 = BaseClass("Actor1075", Actor)
+
+function Actor1075:__init()
+    self.m_10753APercent = 0
+    self.m_10753BPercent = 0
+    self.m_10753X = 0
+    self.m_10753YPercent = 0
+    self.m_10753Level = 0
+    self.m_10753SkillCfg = nil
+
+    self.m_addSuckPercent = 0
+    self.m_orignalPos = nil
+end
+
+function Actor1075:SetOrignalPos(pos)
+    self.m_orignalPos = pos
+end
+
+function Actor1075:GetOrignalPos()
+    return self.m_orignalPos
+end
+
+function Actor1075:AddSuck(percent)
+    self.m_addSuckPercent = percent
+end
+
+function Actor1075:Get10753A()
+    return self.m_10753APercent
+end
+
+function Actor1075:CalcSuck(other, skillCfg, keyFrame, chgVal, hurtType, judge)
+    local suckPnt = 0
+    if hurtType == BattleEnum.HURTTYPE_PHY_HURT then
+        suckPnt = self.m_fightData:GetAttrValue(ACTOR_ATTR.FIGHT_PHY_SUCKBLOOD)
+    elseif hurtType == BattleEnum.HURTTYPE_MAGIC_HURT then
+        suckPnt = self.m_fightData:GetAttrValue(ACTOR_ATTR.FIGHT_MAGIC_SUCKBLOOD)
+    end
+
+    if self.m_addSuckPercent > 0 then
+        suckPnt = FixAdd(suckPnt, FixIntMul(suckPnt, self.m_addSuckPercent))
+        self.m_addSuckPercent = 0
+    end
+
+    if suckPnt > 0 then
+        local suckHP = FixMul(-chgVal, suckPnt)
+        if suckHP > 0 then
+            suckHP = FixFloor(suckHP)
+            local giver = StatusGiver.New(self.m_actorID, skillCfg.id)
+            local status = StatusFactoryInst:NewStatusHP(giver, suckHP, BattleEnum.HURTTYPE_REAL_HURT, BattleEnum.HPCHGREASON_BY_ATTACK,
+                            BattleEnum.ROUNDJUDGE_NORMAL, keyFrame)            
+            self.m_statusContainer:Add(status, self)
+        end
+    end
+end
+
+function Actor1075:OnBorn(create_param)
+    Actor.OnBorn(self, create_param)
+
+    local skillItem = self.m_skillContainer:GetPassiveByID(10753)
+    if skillItem  then
+        self.m_10753Level = skillItem:GetLevel()
+        local skillCfg = ConfigUtil.GetSkillCfgByID(10753)
+        self.m_10753SkillCfg = skillCfg
+        if skillCfg then
+            self.m_10753APercent = FixDiv(SkillUtil.A(skillCfg, self.m_10753Level), 100)
+            self.m_10753X = FixIntMul(SkillUtil.X(skillCfg, self.m_10753Level), 1000)
+            if self.m_10753Level >= 4 then
+                self.m_10753BPercent = FixDiv(SkillUtil.B(skillCfg, self.m_10753Level), 100)
+                self.m_10753YPercent = FixDiv(SkillUtil.Y(skillCfg, self.m_10753Level), 100)
+            end
+        end
+    end
+end
+
+function Actor1075:OnHurtOther(other, skillCfg, keyFrame, chgVal, hurtType, judge)
+    Actor.OnHurtOther(self, other, skillCfg, keyFrame, chgVal, hurtType, judge)
+
+    if judge == BattleEnum.ROUNDJUDGE_BAOJI and self.m_10753SkillCfg then
+        local baojiPercent = 0
+        local phyDef = 0
+        if self.m_10753Level >= 4 then
+            baojiPercent = self.m_10753BPercent
+            phyDefPercent = self.m_10753YPercent
+        end
+
+        local giver = StatusGiver.New(self.m_actorID, 10753)
+        local statusCanren = StatusFactoryInst:NewStatusYanliangCanren(giver, self.m_10753X, baojiPercent, phyDefPercent, {107506})
+        statusCanren:SetMergeRule(StatusEnum.MERGERULE_MERGE)
+        self.m_statusContainer:Add(statusCanren, self)
+    end
+end
+
+return Actor1075

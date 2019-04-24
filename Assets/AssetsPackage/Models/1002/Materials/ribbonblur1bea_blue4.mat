@@ -1,0 +1,46 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: ribbonblur1bea_blue4
+  m_Shader: {fileID: 4800000, guid: b8ef9e1e85f1bda4d8e2c063a25d44b6, type: 3}
+  m_ShaderKeywords: GLOW11_MULTIPLY_GLOWCOLOR
+  m_LightmapFlags: 0
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3000
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _Diffuse:
+        m_Texture: {fileID: 2800000, guid: 9518ed0bf72ed8747b250d6ee42f4301, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _GlowTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: da7ec0c7afec8964bb27abec3b56ed80, type: 3}
+        m_Scale: {x: -1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Noise:
+        m_Texture: {fileID: 2800000, guid: e21401299398ed7488954da37d04f817, type: 3}
+        m_Scale: {x: 3, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - _0_: 1
+    - _1_: 1
+    - _2_diffuse: 2.5
+    - _4_: 1
+    - _Cutoff: 0.5
+    - _GlowStrength: 1
+    m_Colors:
+    - _3_color: {r: 0.21226418, g: 0.47196603, b: 1, a: 1}
+    - _GlowColor: {r: 0.49264705, g: 0.9370183, b: 1, a: 1}

@@ -1,0 +1,84 @@
+local GetSkillCfgByID = ConfigUtil.GetSkillCfgByID
+local UIUtil = UIUtil
+local string_format = string.format
+
+local UIWuJiangDetailIconItem = BaseClass("UIWuJiangDetailIconItem", UIBaseItem)
+local base = UIBaseItem
+
+
+function UIWuJiangDetailIconItem:OnCreate()
+    self.m_iconImage = UIUtil.AddComponent(UIImage, self, "", AtlasConfig.DynamicLoad)
+    self.m_skillIconImage = UIUtil.AddComponent(UIImage, self, "SkillIconMask/SkillIcon", ImageConfig.SkillIcon)
+    self.m_selectImage = UIUtil.FindComponent(self.transform, typeof(CS.UnityEngine.RectTransform), "SelectImage")
+    
+    local onClick = Bind(self, self.OnClick)
+
+    UIUtil.AddClickEvent(self.m_skillIconImage.gameObject, onClick)
+
+    self.m_skillID = 0
+    self.m_wujiangIndex = 0
+    self.iconIndex = 0
+
+    self.m_skillLevelText = false
+end
+
+function UIWuJiangDetailIconItem:GetSkillID()
+   return  self.m_skillID
+end
+
+function UIWuJiangDetailIconItem:GetIconIndex()
+    return  self.iconIndex
+ end
+
+function UIWuJiangDetailIconItem:SetData(skillData, qingyuanData, wujiangIndex, index, selfOnClickCallback, bShowSkillLevel)
+    self.m_skillID = 0
+    self.m_wujiangIndex = wujiangIndex
+    self.m_iconImage:SetAtlasSprite("wj15.png")
+    self.iconIndex = index
+    self.m_selfOnClickCallback = selfOnClickCallback
+
+    if skillData then
+        local skillCfg = GetSkillCfgByID(skillData.id)
+        if skillCfg then
+            self.m_skillIconImage:SetAtlasSprite(skillCfg.sIcon..".png", false)
+            self.m_skillID = skillData.id
+
+            if bShowSkillLevel then
+                if not self.m_skillLevelText then
+                    self.m_skillLevelText =  UIUtil.FindText(self.transform, "levelText")
+                end
+        
+                self.m_skillLevelText.text = string_format(Language.GetString(85), skillData.skillLevel)
+            end
+        end
+    elseif qingyuanData then
+        self.m_skillIconImage:SetAtlasSprite("wj23.png", false)
+    end
+end
+
+function UIWuJiangDetailIconItem:SetSelect(isSelect)
+    self.m_selectImage.gameObject:SetActive(isSelect)
+end
+
+function UIWuJiangDetailIconItem:OnClick(go, x, y)
+    if self.m_selfOnClickCallback then
+        self.m_selfOnClickCallback(self)
+    end
+
+    if self.m_skillID > 0 then
+      -- UIManagerInst:Broadcast(UIMessageNames.MN_WUJIANG_SKILL_DETAIL_SHOW, true, self.m_skillID, self.iconIndex)
+    end
+end
+
+function UIWuJiangDetailIconItem:OnDestroy()
+
+    self.m_iconImage:Delete()
+    self.m_iconImage = nil
+
+    self.m_skillIconImage:Delete()
+    self.m_skillIconImage = nil
+    
+    base.OnDestroy(self)
+end
+
+return UIWuJiangDetailIconItem

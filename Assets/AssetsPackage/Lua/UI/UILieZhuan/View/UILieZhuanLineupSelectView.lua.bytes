@@ -1,0 +1,15 @@
+local UILineupSelectView = require("UI.Lineup.UILineupSelectView")
+local UILieZhuanLineupSelectView = BaseClass("UILieZhuanLineupSelectView", UILineupSelectView)
+local base = UILineupSelectView
+local LieZhuanMgr = Player:GetInstance():GetLieZhuanMgr()
+
+function UILieZhuanLineupSelectView:OnEnable(...)
+   
+    base.OnEnable(self, ...)
+    self.m_employTr.gameObject:SetActive(false)
+    self.m_countrySortType = LieZhuanMgr:GetSelectCountry()
+    self:UpdateData()
+    UIUtil.RemoveClickEvent(self.m_countrySortBtn.gameObject)
+end
+
+return UILieZhuanLineupSelectView

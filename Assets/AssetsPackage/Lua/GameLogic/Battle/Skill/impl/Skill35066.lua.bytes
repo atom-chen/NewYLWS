@@ -1,0 +1,5 @@
+
+local AtkFunc1 = require "GameLogic.Battle.Skill.impl.AtkFunc1" 
+local Skill35066 = BaseClass("Skill35066", AtkFunc1)
+
+return Skill35066

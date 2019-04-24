@@ -1,0 +1,97 @@
+local ConfigUtil = ConfigUtil
+local UIUtil = UIUtil
+local string_format = string.format
+local math_ceil = math.ceil
+local string_split = CUtil.SplitString
+local UIGodBeastTalentItem = BaseClass("UIGodBeastTalentItem", UIBaseItem)
+local base = UIBaseItem
+
+function UIGodBeastTalentItem:OnCreate()
+    self.m_talentCaseImage = UIUtil.AddComponent(UIImage, self, "talentCaseImage", AtlasConfig.DynamicLoad)
+    self.m_talentIconImage = UIUtil.AddComponent(UIImage, self, "talentCaseImage/talentIcon", ImageConfig.GodBeast)
+    self.m_selectImage = UIUtil.GetChildTransforms(self.transform, { "talentCaseImage/SelectImage" })
+    self.m_talentDesText, self.m_talentNameText, self.m_talentExplainText = UIUtil.GetChildTexts(self.transform, {
+        "talentDesText",
+        "talentDesText/talentNameText",
+        "talentExplainText",
+    })
+
+    local onClick = Bind(self, self.OnClick)
+    UIUtil.AddClickEvent(self.m_talentCaseImage.gameObject, onClick)
+
+    self.m_talentIndex = 0
+    self.m_talentInfo = nil
+end
+
+function UIGodBeastTalentItem:GetTalentIndex()
+    return  self.m_talentIndex
+end
+
+function UIGodBeastTalentItem:GetTalentInfo()
+    return self.m_talentInfo
+end
+
+function UIGodBeastTalentItem:GetTalentUnlocked()
+    return self.m_unlocked
+end
+
+function UIGodBeastTalentItem:SetData(talentIndex, talentInfo, unlocked, selfOnClickCallback)
+    self.m_talentIndex = talentIndex
+    self.m_talentInfo = talentInfo
+    self.m_unlocked = unlocked
+    self.m_selfOnClickCallback = selfOnClickCallback
+
+    local haveTalent = false
+
+    if talentInfo then
+        if talentInfo.talent_id ~= 0 then
+            local talentCfg = ConfigUtil.GetGodBeastTalentCfgByID(self.m_talentInfo.talent_id)
+            if talentCfg then
+                local str = talentCfg.exdesc
+                local x1 = math_ceil(talentCfg.x + talentCfg.ax * talentInfo.talent_level)
+                local y1 = math_ceil(talentCfg.y + talentCfg.ay * talentInfo.talent_level)
+                str = str:gsub("{(.-)}", {x=x1, y=y1})
+                self.m_talentDesText.text = str
+
+                self.m_talentNameText.text = string_format(string_split(Language.GetString(3630), ",")[talentInfo.talent_level],talentCfg.name)
+            end
+            self.m_talentIconImage:SetAtlasSprite(talentCfg.sIcon, false)
+            haveTalent = true
+        end
+    end
+
+    if unlocked then
+        self.m_talentExplainText.text = Language.GetString(3612)
+        self.m_talentCaseImage:SetAtlasSprite("talent01.png",false)
+    else
+        self.m_talentExplainText.text = string_format(Language.GetString(3613), talentIndex)
+        self.m_talentCaseImage:SetAtlasSprite("talent02.png",false)
+    end
+    
+    if haveTalent then
+        self.m_talentExplainText.gameObject:SetActive(false)
+    else
+        self.m_talentExplainText.gameObject:SetActive(true)
+    end
+    self.m_talentDesText.gameObject:SetActive(haveTalent)  
+end
+
+function UIGodBeastTalentItem:SetSelect(isSelect)
+    self.m_selectImage.gameObject:SetActive(isSelect)
+end
+
+function UIGodBeastTalentItem:OnClick(go, x, y)
+    if self.m_selfOnClickCallback then
+        self.m_selfOnClickCallback(self)
+    end
+end
+
+function UIGodBeastTalentItem:OnDestroy()
+    self.m_talentCaseImage:Delete()
+    self.m_talentCaseImage = nil
+    self.m_talentIconImage:Delete()
+    self.m_talentIconImage = nil    
+    base.OnDestroy(self)
+end
+
+return UIGodBeastTalentItem

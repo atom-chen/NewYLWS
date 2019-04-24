@@ -1,0 +1,4 @@
+local DragonTimelineBase = require("GameLogic.Battle.DragonTimeline.DragonTimelineBase")
+local DragonTimeline3601 = BaseClass("DragonTimeline3601", DragonTimelineBase)
+
+return DragonTimeline3601

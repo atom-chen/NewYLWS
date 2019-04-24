@@ -1,0 +1,93 @@
+local string_format = string.format
+
+local GuildDonationItem = BaseClass("GuildDonationItem", UIBaseItem)
+local base = UIBaseItem
+
+local GuildMgr = Player:GetInstance().GuildMgr
+
+function GuildDonationItem:OnCreate()
+
+    self.m_cfgID = false
+
+    self:InitView()
+end
+
+function GuildDonationItem:InitView()
+    self.m_donateBtn, self.m_donationStatusTextGo = UIUtil.GetChildTransforms(self.transform, {
+        "DonateBtn",
+        "DonationStatusText",
+    })
+
+    self.m_donateBtn = self.m_donateBtn.gameObject
+    self.m_donationStatusTextGo = self.m_donationStatusTextGo.gameObject
+
+    local donationText, awardText, awardDonationText, donateBtnText
+    self.m_nameText, awardText, awardDonationText, self.m_awardDonationValText, self.m_awardItemCountText,
+    donationText, self.m_donationItemCountText, donateBtnText, self.m_donationStatusText =  
+
+    UIUtil.GetChildTexts(self.transform, {
+        "NameBg/NameText",
+        "AwardText",
+        "AwardDonationText",
+        "AwardDonationText/AwardDonationValText",
+        "AwardItem/AwardItemCountText",
+        "DonationItem/DonationText",
+        "DonationItem/DonationItemCountText",
+        "DonateBtn/DonateBtnText",
+        "DonationStatusText" ,  
+    })
+
+    awardText.text = Language.GetString(1350)
+    donationText.text = Language.GetString(1349)
+    awardDonationText.text = Language.GetString(1351)
+    donateBtnText.text = Language.GetString(1348)
+
+    self.m_donationItemImage = UIUtil.AddComponent(UIImage, self, "DonationItem", AtlasConfig.ItemIcon)
+
+    local function onClick(go, x, y)
+        if go == self.m_donateBtn then
+            if self.m_cfgID then
+                GuildMgr:ReqDonate(self.m_cfgID)
+            end
+        end
+    end
+   
+    UIUtil.AddClickEvent(self.m_donateBtn, onClick)
+end
+
+function GuildDonationItem:UpdateData(id)
+    
+    local cfg = ConfigUtil.GetGuildDonateCfgByID(id)
+    if cfg then
+        self.m_cfgID = id
+        self.m_nameText.text = cfg.name
+        self.m_awardDonationValText.text = cfg.award_huoyue
+        if cfg.award_item_list  then
+            local awardItem = cfg.award_item_list[1]
+            self.m_awardItemCountText.text = awardItem[2]
+        end
+
+        local donateID = cfg.donate_info[1]
+        if donateID == ItemDefine.TongQian_ID then
+            self.m_donationItemImage:SetAtlasSprite("10001.png")
+        elseif donateID == ItemDefine.YuanBao_ID then
+            self.m_donationItemImage:SetAtlasSprite("10002.png")
+        end
+        self.m_donationItemCountText.text = cfg.donate_info[2]
+
+        local status = GuildMgr:GetDonationStatus(id)
+        
+        if status == 1 then
+            self.m_donateBtn:SetActive(false)
+            self.m_donationStatusText.text = Language.GetString(1352)
+        else
+            local userData =  Player:GetInstance():GetUserMgr():GetUserData()
+            if userData.vip_level < cfg.need_vip_level then
+               self.m_donationStatusText.text = string_format(Language.GetString(1353), cfg.need_vip_level)
+               self.m_donateBtn:SetActive(false)
+            end
+        end
+    end
+end
+
+return GuildDonationItem

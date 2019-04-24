@@ -1,0 +1,150 @@
+
+
+local guildWarMgr = Player:GetInstance():GetGuildWarMgr()
+local custodianGroupItemClass = require "UI.GuildWar.GuildWarCustodianGroupItem" 
+local custodianGroupItemPrefab = "UI/Prefabs/Guild/UIGuildWarCustodianGroupItem.prefab" 
+local custodianSingleItemClass = require "UI.GuildWar.GuildWarCustodianSingleItem" 
+local custodianSingleItemPrefab = "UI/Prefabs/Guild/UIGuildWarCustodianSingleItem.prefab"
+local UIGameObjectLoaderInst = UIGameObjectLoader:GetInstance() 
+local Type_RectTransform = typeof(CS.UnityEngine.RectTransform)
+
+local UILogicUtil = UILogicUtil
+
+local GuildWarInviteCustodianView = BaseClass("GuildWarInviteCustodianView", UIBaseView)
+local base = UIBaseView 
+
+function GuildWarInviteCustodianView:OnCreate()
+    base.OnCreate(self) 
+    self.m_groupItemTrSeq = 0
+    self.m_groupItemTrList = {}
+    self.m_singleItemList = {}
+    self.m_singleItemSeq = 0 
+
+
+    self.m_blackBgTr, 
+    self.m_custodianItemContentTr,
+    self.m_inviteBtnTr = UIUtil.GetChildTransforms(self.transform, {
+        "BlackBg", 
+        "Panel/ItemScrollView/Viewport/ItemContent",
+        "Panel/InviteReqBtn",
+    })
+
+    self.m_titleTxt,
+    self.m_inviteBtnTxt = UIUtil.GetChildTexts(self.transform, { 
+        "Panel/TitleContent/TitleTxt", 
+        "Panel/InviteReqBtn/Text",
+    })  
+    self.m_titleTxt.text = Language.GetString(2387)
+    self.m_inviteBtnTxt.text = Language.GetString(2388)
+
+    self:HandleClick()
+end 
+
+function GuildWarInviteCustodianView:OnEnable(...)
+    base.OnEnable(self, ...) 
+    local _, userBriefList = ...
+    if not userBriefList then
+        return
+    end
+    self.m_userBriefList = userBriefList
+    self:UpdateData(userBriefList)
+end 
+
+function GuildWarInviteCustodianView:UpdateData()
+    local userCount = #self.m_userBriefList 
+    if userCount > 0 then
+        local halfUserCount = math.ceil(userCount / 2)  
+        if #self.m_groupItemTrList <= 0 then 
+            self.m_groupItemTrSeq = UIGameObjectLoaderInst:PrepareOneSeq()
+            UIGameObjectLoaderInst:GetGameObjects(self.m_groupItemTrSeq, custodianGroupItemPrefab, halfUserCount, function(objs)
+                self.m_groupItemTrSeq = 0
+                if not objs then 
+                    return 
+                end
+                for i = 1, #objs do   
+                    local groupItemTr = custodianGroupItemClass.New(objs[i], self.m_custodianItemContentTr, custodianGroupItemPrefab)  
+                    groupItemTr:SetLocalScale(Vector3.one)
+                    groupItemTr:ResetPosZ()
+                    table.insert(self.m_groupItemTrList, groupItemTr)
+                end
+            end)  
+        end 
+        coroutine.start(GuildWarInviteCustodianView.CreateSingleItems,self)
+    end
+end
+
+function GuildWarInviteCustodianView:CreateSingleItems()
+    coroutine.waitforframes(5)  
+    local userCount = #self.m_userBriefList 
+    if #self.m_groupItemTrList > 0 then 
+        if #self.m_singleItemList > 0 then
+            for i = 1,#self.m_singleItemList do
+                self.m_singleItemList[i]:UpdateData(self.m_userBriefList[i]) 
+            end
+        else
+            self.m_singleItemSeq = UIGameObjectLoaderInst:PrepareOneSeq()
+            UIGameObjectLoaderInst:GetGameObjects(self.m_singleItemSeq, custodianSingleItemPrefab, userCount, function(objs)
+                self.m_singleItemSeq = 0
+                if not objs then 
+                    return 
+                end  
+                for i = 1, #objs do  
+                    local groupIndex = math.ceil(i / 2)
+                    local parentTr = self.m_groupItemTrList[groupIndex].transform
+                    local singleItem = custodianSingleItemClass.New(objs[i], parentTr, custodianSingleItemPrefab) 
+                    singleItem:UpdateData(self.m_userBriefList[i])  
+                    singleItem:ResetPosZ() 
+                    table.insert(self.m_singleItemList, singleItem)
+                end
+            end)  
+        end  
+    end
+end
+
+function GuildWarInviteCustodianView:OnAddListener()
+	base.OnAddListener(self) 
+end
+
+function GuildWarInviteCustodianView:OnRemoveListener()
+	base.OnRemoveListener(self) 
+end 
+
+function GuildWarInviteCustodianView:HandleClick()
+    local onClick = Bind(self, self.OnClick)
+    UIUtil.AddClickEvent(self.m_blackBgTr.gameObject, onClick)   
+    UIUtil.AddClickEvent(self.m_inviteBtnTr.gameObject, onClick)   
+end
+
+function GuildWarInviteCustodianView:OnClick(go, x, y)
+    if go.name == "BlackBg" then
+        self:CloseSelf()
+    elseif go.name == "InviteReqBtn" then 
+        local hufaIDList = guildWarMgr:GetHuFaIDList() 
+        if #hufaIDList <= 0 then
+            UILogicUtil.FloatAlert(Language.GetString(2291))
+            return
+        end
+        guildWarMgr:ReqHuFaInvite(hufaIDList)
+    end 
+end
+
+function GuildWarInviteCustodianView:OnDisable()
+    UIGameObjectLoaderInst:CancelLoad(self.m_groupItemTrSeq)
+    self.m_groupItemTrSeq = 0
+    for i = 1,#self.m_groupItemTrList do
+        self.m_groupItemTrList[i]:Delete() 
+    end
+    self.m_groupItemTrList = {}
+
+    UIGameObjectLoaderInst:CancelLoad(self.m_singleItemSeq)
+    self.m_singleItemSeq = 0
+    for i = 1,#self.m_singleItemList do
+        self.m_singleItemList[i]:Delete()
+    end
+    self.m_singleItemList = {}
+
+    guildWarMgr:ClearHuFaIDList()
+end
+
+
+return GuildWarInviteCustodianView

@@ -1,0 +1,28 @@
+local config = {
+[25001] = {
+id = 25001,
+desc = "酥",
+intimacy = 3,
+},
+[25002] = {
+id = 25002,
+desc = "烧鸡",
+intimacy = 4,
+},
+[25003] = {
+id = 25003,
+desc = "老酒",
+intimacy = 5,
+},
+[25004] = {
+id = 25004,
+desc = "陶器",
+intimacy = 6,
+},
+[25005] = {
+id = 25005,
+desc = "圭璋",
+intimacy = 7,
+},
+}
+return config

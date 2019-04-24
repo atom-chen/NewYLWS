@@ -1,0 +1,139 @@
+local base = require("UnitTest.SyncTestBase")
+local GameUtility = CS.GameUtility
+local table_insert = table.insert
+local Random = Mathf.Random
+local table_sort = table.sort
+local DragonCopyTest = BaseClass("DragonCopyTest", base)
+
+function DragonCopyTest:__init()
+    self.m_curCopyIndex = 1
+    self.m_dragonIndex = 1
+    -- todo 3502 3503还没有 先打两个
+    self.m_dragonCopyList = {{},{}}
+    local cfgList = ConfigUtil.GetGragonCopyCfgList()
+    for _, v in pairs(cfgList) do
+        if v.id <= 350110 then
+            table_insert(self.m_dragonCopyList[1], v.id)
+        elseif v.id <= 350210 then
+            -- table_insert(self.m_dragonCopyList[2], v.id)
+        elseif v.id <= 350310 then
+            -- table_insert(self.m_dragonCopyList[3], v.id)
+        elseif v.id <= 350610 then
+            table_insert(self.m_dragonCopyList[2], v.id)
+        end
+    end
+    for _, dataList in ipairs(self.m_dragonCopyList) do
+        table_sort(dataList, function(a, b)
+            return a < b
+        end)
+    end
+
+    self:RegisterHandler(MsgIDDefine.DRAGONCOPY_RSP_FINISH_COPY, Bind(self, self.RspBattleFinish))
+    self:RegisterHandler(MsgIDDefine.DRAGONCOPY_RSP_ENTER_COPY, Bind(self, self.RspEnterShenShouCopy), 0)
+end
+
+function DragonCopyTest:Start()
+    base.Start(self)
+
+    print("****************DragonCopyTest : " .. self.m_dragonCopyList[self.m_dragonIndex][self.m_curCopyIndex])
+    self:ReqEnterShenShouCopy(self.m_dragonCopyList[self.m_dragonIndex][self.m_curCopyIndex])
+end
+
+function DragonCopyTest:ReqEnterShenShouCopy(copyID)
+	local msg_id = MsgIDDefine.DRAGONCOPY_REQ_ENTER_COPY
+    local msg = (MsgIDMap[msg_id])()
+    msg.copy_id = copyID
+    local buzhenID = Utils.GetBuZhenIDByBattleType(BattleEnum.BattleType_SHENSHOU)
+    PBUtil.ConvertLineupDataToProto(buzhenID, msg.buzhen_info, self:GenerateLineupData(BattleEnum.BattleType_SHENSHOU))
+
+	HallConnector:GetInstance():SendMessage(msg_id, msg)
+end
+
+function DragonCopyTest:RspEnterShenShouCopy(msg_obj)
+    self:ResetState()
+    local result = msg_obj.result
+    if result ~= 0 then
+        self.m_curCopyIndex = 1
+        self.m_dragonIndex = self.m_dragonIndex + 1
+        if self.m_dragonIndex > #self.m_dragonCopyList then
+            self.m_dragonIndex = 1
+        end
+        self:End()
+		return
+    end
+    
+    local copyID = msg_obj.battle_info.copy_id
+	local battleid = msg_obj.battle_info.battle_id
+	local leftFormation = msg_obj.battle_info.left_formation
+	local rightFormation = msg_obj.battle_info.right_formation
+	local randSeeds = msg_obj.battle_info.battle_random_seeds
+    local cmdList = msg_obj.battle_info.cmd_list
+    local challengeCount = msg_obj.battle_info.param1
+    local bossLevel = msg_obj.battle_info.param2
+
+    CtlBattleInst:InitBattle(BattleEnum.BattleType_SHENSHOU, randSeeds, battleid)
+    CtlBattleInst:InitCommandQueue(cmdList)
+    local enterParam = BattleProtoConvert.ConvertShenShouProto(copyID, leftFormation, challengeCount, bossLevel)
+    CtlBattleInst.m_battleLogic:OnEnterParam(enterParam)
+    
+    self:SwitchScene(SceneConfig.BattleScene)
+    self:StartFight()
+    -- coroutine.start(self.StartFight, self)
+    self:ReqBattleFinish()
+end
+
+function DragonCopyTest:ReqBattleFinish()
+    local msg_id = MsgIDDefine.DRAGONCOPY_REQ_FINISH_COPY
+    local msg = (MsgIDMap[msg_id])()
+    local logic = CtlBattleInst.m_battleLogic
+    msg.copy_id = logic.m_battleParam.copyID
+    msg.take_time = logic:GetLeftS()
+    msg.finish_result = logic:GetBattleResult()
+
+    local frameCmdList = CtlBattleInst:GetFrameCmdList()
+    PBUtil.ConvertCmdListToProto(msg.battle_info.cmd_list, frameCmdList)
+    self:GenerateResultInfoProto(msg.battle_result)
+    HallConnector:GetInstance():SendMessage(msg_id, msg)
+end
+
+function DragonCopyTest:RspBattleFinish(msg_obj)
+	local result = msg_obj.result
+	if result ~= 0 then
+		return
+    end
+    
+    local isEqual = self:CompareBattleResult(msg_obj.battle_result)
+    if isEqual then
+        self.m_curCopyIndex = self.m_curCopyIndex + 1
+        if self.m_curCopyIndex > #self.m_dragonCopyList[self.m_dragonIndex] then
+            self.m_curCopyIndex = 1
+            self.m_dragonIndex = self.m_dragonIndex + 1
+            if self.m_dragonIndex > #self.m_dragonCopyList then
+                self.m_dragonIndex = 1
+            end
+        end
+   
+        self:End()
+    else
+        Logger.LogError("Do not sync, report frame data to server")
+        self:SaveBattleInfo()
+        self.m_curCopyIndex = self.m_curCopyIndex + 1
+        if self.m_curCopyIndex > #self.m_dragonCopyList[self.m_dragonIndex] then
+            self.m_curCopyIndex = 1
+            self.m_dragonIndex = self.m_dragonIndex + 1
+            if self.m_dragonIndex > #self.m_dragonCopyList then
+                self.m_dragonIndex = 1
+            end
+        end
+        self:ReqReportFrameData()
+    end
+end
+
+function DragonCopyTest:SaveBattleInfo()
+    GameUtility.SafeWriteAllText("./FrameDebug/DragonCopy" .. CtlBattleInst.m_battleLogic:GetBattleID() .. ".txt", 
+            "CopyID:" .. self.m_dragonCopyList[self.m_dragonIndex][self.m_curCopyIndex] .. ", wujiang:" .. self.m_lineupData.roleSeqList[1] .. 
+            "|" .. self.m_lineupData.roleSeqList[2] .. "|" .. self.m_lineupData.roleSeqList[3] .. "|" .. self.m_lineupData.roleSeqList[4] ..
+            "|" .. self.m_lineupData.roleSeqList[5] .. " , dragonID: " .. self.m_lineupData.summon)
+end
+
+return DragonCopyTest

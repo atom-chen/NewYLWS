@@ -1,0 +1,123 @@
+
+local table_insert = table.insert
+local Language = Language
+local UIUtil = UIUtil
+local GameObject = CS.UnityEngine.GameObject
+local DOTween = CS.DOTween.DOTween
+local GardenItem = require "UI.UIZuoQi.View.GardenItem"
+local MountMgr = Player:GetInstance():GetMountMgr()
+local DOTweenSettings = CS.DOTween.DOTweenSettings
+
+local UIHuntView = BaseClass("UIHuntView", UIBaseView)
+local base = UIBaseView
+
+function UIHuntView:OnCreate()
+    base.OnCreate(self)
+    local myMountText, horseShowText = UIUtil.GetChildTexts(self.transform, {
+        "BtnRoot/MyMountBtn/Text",
+        "BtnRoot/HorseShowBtn/Text"
+    })
+
+    self.m_gardensParent, self.m_backBtn, self.m_gardenItemPrefab, self.m_myMountBtn,
+    self.m_horseShowBtn, self.m_bg, self.m_buttonRoot = UIUtil.GetChildRectTrans(self.transform, {
+        "Gardens",
+        "backBtn",
+        "GradenItemPrefab",
+        "BtnRoot/MyMountBtn",
+        "BtnRoot/HorseShowBtn",
+        "bg",
+        "BtnRoot",
+    })
+    myMountText.text = Language.GetString(3520)
+    horseShowText.text = Language.GetString(3521)
+    self.m_gardenItemPrefab = self.m_gardenItemPrefab.gameObject
+
+    self.m_huntList = {}
+
+    local function onClick(go)
+        if go.name == "backBtn" then
+            self:CloseSelf()
+        elseif go.name == "MyMountBtn" then
+            UIManagerInst:OpenWindow(UIWindowNames.UIMyMount)
+        elseif go.name == "HorseShowBtn" then
+            TimelineMgr:GetInstance():TriggerEvent(SequenceEventType.CLICK_UI, self.winName)
+            UIManagerInst:OpenWindow(UIWindowNames.UIMountShow)
+        end
+    end
+
+    UIUtil.AddClickEvent(self.m_backBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_myMountBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_horseShowBtn.gameObject, onClick)
+end
+
+function UIHuntView:OnEnable(...)
+    base.OnEnable(self, ...)
+    
+    UIManagerInst:Broadcast(UIMessageNames.MN_MAIN_TOP_RIGHT_CURRENCY_TYPE, ItemDefine.LieYuan_ID)
+    MountMgr:ReqHuntPanel()
+
+    self:TweenOpen()
+end
+
+function UIHuntView:OnAddListener()
+    base.OnAddListener(self)
+
+    self:AddUIListener(UIMessageNames.MN_HUNT_RSP_HUNT_PANEL, self.UpdateHunt)
+end
+
+function UIHuntView:OnRemoveListener()
+    base.OnRemoveListener(self)
+
+    self:RemoveUIListener(UIMessageNames.MN_HUNT_RSP_HUNT_PANEL, self.UpdateHunt)
+end
+
+function UIHuntView:UpdateHunt(huntList)
+    for i, v in pairs(huntList) do
+        local gardenItem = self.m_huntList[i]
+        if not gardenItem then
+            local go = GameObject.Instantiate(self.m_gardenItemPrefab)
+            gardenItem = GardenItem.New(go, self.m_gardensParent:GetChild(v.id - 1))
+        end
+        gardenItem:SetData(v.id, v.level, v.status, v.finish_levelup_time)
+        table_insert(self.m_huntList, gardenItem)
+    end
+
+end
+
+function UIHuntView:Update()
+    if #self.m_huntList > 0 then
+        for _, v in ipairs(self.m_huntList) do
+            v:Update()
+        end
+    end
+end
+
+function UIHuntView:OnDisable()
+    UIManagerInst:Broadcast(UIMessageNames.MN_MAIN_TOP_RIGHT_CURRENCY_TYPE, ItemDefine.Stamina_ID)
+    for _, v in ipairs(self.m_huntList) do
+        v:Delete()
+    end
+    self.m_huntList = {}
+
+    base.OnDisable(self)
+end
+
+function UIHuntView:TweenOpen()
+    local tweener = DOTween.ToFloatValue(function()
+        return 0
+    end, 
+    function(value)
+        self.m_backBtn.anchoredPosition = Vector3.New(118, 100 - 145.8 * value, 0)
+        self.m_buttonRoot.anchoredPosition = Vector3.New(-133 + 260 * value, 214, 0)
+        local scale = 1.5 - 0.5 * value
+        self.m_bg.localScale = Vector3.New(scale, scale, scale)
+        local scale = 1.25 - 0.25 * value
+        self.m_gardensParent.localScale = Vector3.New(scale, scale, scale)
+    end, 1, 0.3)
+
+    DOTweenSettings.OnComplete(tweener, function()
+        TimelineMgr:GetInstance():TriggerEvent(SequenceEventType.SHOW_UI_END, self.winName)
+    end)
+end
+
+return UIHuntView

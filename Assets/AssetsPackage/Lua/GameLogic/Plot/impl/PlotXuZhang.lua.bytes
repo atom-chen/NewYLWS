@@ -1,0 +1,52 @@
+local PlotBase = require "GameLogic.Plot.PlotBase"
+local PlotCommonStep = require "GameLogic.Plot.PlotCommonStep"
+
+local CtlBattleInst = CtlBattleInst
+local PlotXuZhang = BaseClass("PlotXuZhang", PlotBase)
+
+function PlotXuZhang:__init()
+    self.steps = {
+        self:S_Begin(),
+        self:S_Init(),
+        self:S_EnterScene(),
+        self:S_PlayPlotBeforeGO(),
+        self:S_StartCamera(),
+        self:S_PlayPlotBeforeStart(),
+        self:S_Wave1Start(),
+        self:S_Wave1End(),
+        self:S_PlayPlotBetweenBattle(),
+        self:S_Wave3Start(),
+        self:S_PlayPlotWhenBattleEnd(),
+    }
+end
+
+function PlotXuZhang:S_PlayPlotBeforeGO()
+    return SequenceStep.New('S_PlayPlotBeforeGO', function()
+        CtlBattleInst:GetLogic():PlayPlotBeforeGO()
+        return SequenceCommonCmd.Async.WaitForEvent(SequenceEventType.PLOT_TIMELINE_END)
+    end)
+end
+
+function PlotXuZhang:S_PlayPlotBeforeStart()
+    return SequenceStep.New('S_PlayPlotBeforeStart', function()
+        CtlBattleInst:GetLogic():PlayPlotBeforeStart()
+        return SequenceCommonCmd.Async.WaitForEvent(SequenceEventType.PLOT_TIMELINE_END)
+    end)
+end
+
+function PlotXuZhang:S_PlayPlotWhenBattleEnd()
+    return SequenceStep.New('S_PlayPlotWhenBattleEnd', function()
+        CtlBattleInst:GetLogic():PlayPlotWhenBattleEnd()
+        return SequenceCommonCmd.Async.WaitForEvent(SequenceEventType.PLOT_TIMELINE_END)
+    end)
+end
+
+function PlotXuZhang:S_PlayPlotBetweenBattle()
+    return SequenceStep.New('S_PlayPlotBetweenBattle', function()
+        CtlBattleInst:GetLogic():PlayPlotBetweenBattle()
+        return SequenceCommonCmd.Async.WaitForEvent(SequenceEventType.PLOT_TIMELINE_END)
+    end)
+end
+
+
+return PlotXuZhang

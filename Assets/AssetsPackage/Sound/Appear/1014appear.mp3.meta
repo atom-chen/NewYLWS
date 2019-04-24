@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 0783666bc8d20cf4db4e2ddc79ff1fec
+AudioImporter:
+  externalObjects: {}
+  serializedVersion: 6
+  defaultSettings:
+    loadType: 0
+    sampleRateSetting: 0
+    sampleRateOverride: 44100
+    compressionFormat: 1
+    quality: 1
+    conversionMode: 0
+  platformSettingOverrides: {}
+  forceToMono: 0
+  normalize: 1
+  preloadAudioData: 1
+  loadInBackground: 0
+  ambisonic: 0
+  3D: 1
+  userData: 
+  assetBundleName: sound/appear/appear1014appear_mp3.assetbundle
+  assetBundleVariant: 

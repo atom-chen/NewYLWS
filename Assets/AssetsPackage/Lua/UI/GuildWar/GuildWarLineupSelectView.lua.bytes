@@ -1,0 +1,99 @@
+local UIWuJiangSelectView = require("UI.Lineup.UIWuJiangSelectView")
+local UILineupSelectView = require("UI.Lineup.UILineupSelectView")
+local GuildWarLineupSelectView = BaseClass("GuildWarLineupSelectView", UILineupSelectView)
+local BattleEnum = BattleEnum
+
+
+local LineupMgr = Player:GetInstance():GetLineupMgr()
+local WuJiangMgr = Player:GetInstance().WujiangMgr
+
+local employCfg = {
+    [BattleEnum.BattleType_COPY]=true,
+    [BattleEnum.BattleType_CAMPSRUSH]=true,
+    [BattleEnum.BattleType_GUILD_BOSS]=true,
+    [BattleEnum.BattleType_GRAVE]=true,
+    [BattleEnum.BattleType_YUANMEN]=true,
+    [BattleEnum.BattleType_INSCRIPTION]=true,
+    [BattleEnum.BattleType_BOSS1]=true,
+    [BattleEnum.BattleType_BOSS2]=true,
+    [BattleEnum.BattleType_SHENBING]=true,
+    [BattleEnum.BattleType_SHENSHOU]=true,
+    [BattleEnum.BattleType_HUARONG_ROAD]=true,
+}
+
+function GuildWarLineupSelectView:OnSelectEmployWuJiangItem(employBriefData)
+    local isExist = false
+    local buzhenID = self.m_data1
+    LineupMgr:Walk(buzhenID, function(wujiangBriefData, isMain, isEmploy)
+        if isEmploy then
+            return
+        end
+        local bRet = self:IsWujiangCanLineup(wujiangBriefData, employBriefData.wujiangBriefData)
+        if not bRet then
+            isExist = true
+        end
+    end)
+
+    if isExist then
+        return
+    end
+
+    LineupMgr:SaveEmployWujiang(buzhenID, self.m_data2, employBriefData)
+    UIWuJiangSelectView.SelectWuJiangCardItem(self, -1)
+end
+
+function GuildWarLineupSelectView:IsWujiangCanLineup(curWujiangData, selectWujiangData)
+    if curWujiangData.index == selectWujiangData.index then
+        UILogicUtil.FloatAlert(Language.GetString(1224))
+        return false
+    end
+
+    if curWujiangData.pos ~= self.m_data2 then
+        if curWujiangData.id == selectWujiangData.id then            
+            UILogicUtil.FloatAlert(Language.GetString(1224))
+            return false
+        end
+    end
+
+    return true
+end
+
+function GuildWarLineupSelectView:SelectWuJiangCardItem(wujiangIndex)
+    local selectWujiangData = WuJiangMgr:GetWuJiangBriefData(wujiangIndex)
+    if not selectWujiangData then
+        return false
+    end
+
+    local isExist = false
+    local buzhenID = self.m_data1
+    LineupMgr:Walk(buzhenID, function(wujiangBriefData)
+        local bRet = self:IsWujiangCanLineup(wujiangBriefData, selectWujiangData)
+        if not bRet then
+            isExist = true
+        end
+    end)
+  
+    if isExist then
+        return
+    end
+
+    UIWuJiangSelectView.SelectWuJiangCardItem(self, wujiangIndex)
+end
+
+function GuildWarLineupSelectView:UpdateWuJiangItem(item, realIndex)
+    if self.m_wujiangList then
+        if item and realIndex > 0 and realIndex <= #self.m_wujiangList then
+            local data = self.m_wujiangList[realIndex]
+            item:SetData(data, true)
+            local buzhenID = self.m_data1
+            item:DoSelect(LineupMgr:IsLineupRole(buzhenID, data.index))
+        end
+    end
+end
+
+function GuildWarLineupSelectView:CanEmployWujiang()
+    return false
+end
+
+return GuildWarLineupSelectView
+

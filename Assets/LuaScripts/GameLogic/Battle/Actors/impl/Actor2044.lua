@@ -1,0 +1,166 @@
+local FixDiv = FixMath.div
+local FixMul = FixMath.mul
+local FixIntMul = FixMath.muli
+local table_insert = table.insert
+local BattleEnum = BattleEnum
+local ACTOR_ATTR = ACTOR_ATTR
+local FixVetor3RotateAroundY = FixMath.Vector3RotateAroundY
+local FixNormalize = FixMath.Vector3Normalize
+local ConfigUtil = ConfigUtil
+local GetSkillCfgByID = ConfigUtil.GetSkillCfgByID
+local SkillUtil = SkillUtil
+local ActorManagerInst = ActorManagerInst
+
+local ActorCreateParam = require "GameLogic.Battle.Actors.ActorCreateParam"
+
+local Actor = require "GameLogic.Battle.Actors.Actor"
+local Actor2044 = BaseClass("Actor2044", Actor)
+
+function Actor2044:__init(actorID)
+    self.m_bearID = 0
+    self.m_chgPhyAtk = 0
+    self.m_chgPhyDef = 0
+
+    self.m_20442A = 0
+    self.m_20442X = 0
+
+    self.m_20442Level = 0
+end
+
+function Actor2044:SetMyBear(bearID)
+    self.m_bearID = bearID
+end
+
+function Actor2044:GetMyBear()
+    return self.m_bearID
+end
+
+function Actor2044:OnBorn(creat_param)
+    Actor.OnBorn(self, creat_param)
+
+    local roleCfg = ConfigUtil.GetWujiangCfgByID(4008)
+    if roleCfg then
+        self:MakeAttr(roleCfg)
+    end
+
+    local skillItem = self.m_skillContainer:GetPassiveByID(20442)
+    if skillItem then
+        local skillCfg = ConfigUtil.GetSkillCfgByID(20442)
+        if skillCfg then
+            self.m_20442X = SkillUtil.X(skillCfg, skillItem:GetLevel())
+            self.m_20442A = SkillUtil.A(skillCfg, skillItem:GetLevel())
+
+            self.m_20442Level = skillItem:GetLevel()
+        end
+    end
+end
+
+function Actor2044:MakeAttr(roleCfg)    
+    local attrMul = 1
+
+    local skillItem = self.m_skillContainer:GetActiveByID(20441)
+    if not skillItem then 
+        return
+    end
+
+    local skillCfg = ConfigUtil.GetSkillCfgByID(20441)
+    if skillCfg then
+        attrMul = FixDiv(SkillUtil.Y(skillCfg, skillItem:GetLevel()), 100)
+    end
+    
+    local oneWujiang = OneBattleWujiang.New()
+    oneWujiang.wujiangID = roleCfg.id
+    oneWujiang.level = self.m_level
+    oneWujiang.lineUpPos = 1
+
+    local fightData = self:GetData()
+    oneWujiang.phy_atk = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_PHY_ATK), attrMul)
+    oneWujiang.phy_def = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_PHY_DEF), attrMul)
+    oneWujiang.magic_atk = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_MAGIC_ATK), attrMul)
+    oneWujiang.magic_def = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_MAGIC_DEF), attrMul)
+    oneWujiang.phy_baoji = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_PHY_BAOJI), attrMul)
+    oneWujiang.magic_baoji = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_MAGIC_BAOJI), attrMul)
+    oneWujiang.shanbi = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_SHANBI), attrMul)
+    oneWujiang.mingzhong = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_MINGZHONG), attrMul)
+    oneWujiang.move_speed = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_MOVESPEED), 1)
+    oneWujiang.atk_speed = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_ATKSPEED), 1)
+    oneWujiang.hp_recover = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_HP_RECOVER), attrMul)
+    oneWujiang.nuqi_recover = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_NUQI_RECOVER), attrMul)
+    oneWujiang.baoji_hurt = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_BAOJI_HURT), attrMul)
+
+    if skillItem:GetLevel() == 2 then -- 生命上限额外翻倍。
+        oneWujiang.max_hp = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_MAXHP), FixMul(attrMul, 2))
+    else
+        oneWujiang.max_hp = FixIntMul(fightData:GetAttrValue(ACTOR_ATTR.BASE_MAXHP), attrMul)
+    end
+    
+    oneWujiang.init_nuqi = roleCfg.initNuqi
+
+    table_insert(oneWujiang.skillList, {skill_id = 40081, skill_level = 1})
+    table_insert(oneWujiang.skillList, {skill_id = 40082, skill_level = 1})
+    table_insert(oneWujiang.skillList, {skill_id = 40083, skill_level = 1})
+    table_insert(oneWujiang.skillList, {skill_id = 40084, skill_level = 1})
+
+    local createParam = ActorCreateParam.New()
+    createParam:MakeSource(BattleEnum.ActorSource_CALLED, self.m_actorID)
+    createParam:MakeAI(BattleEnum.AITYPE_XILIANGBEAR)
+    createParam:MakeAttr(self:GetCamp(), oneWujiang)
+
+    local dir = self:GetForward()
+    local leftDir = FixVetor3RotateAroundY(dir, -89.9)
+    local targetPos = FixNormalize(leftDir)
+    targetPos:Add(self:GetPosition())
+
+    createParam:MakeLocation(targetPos, self:GetForward())
+    createParam:MakeRelationType(BattleEnum.RelationType_NORMAL)
+    createParam:SetImmediateCreateObj(true)
+    
+    local bearActor = ActorManagerInst:CreateActor(createParam)
+    bearActor:SetOwnerLineUpPos(self:GetLineupPos())
+    self:SetMyBear(bearActor:GetActorID())
+end
+
+function Actor2044:LogicUpdate(deltaMS)
+    if self.m_20442Level > 0 then        
+        local bear = ActorManagerInst:GetActor(self:GetMyBear())
+        if not bear or not bear:IsLive() then
+            return
+        end
+        
+        -- 当黑熊处于驯熊师身周{a}米半径范围内时，驯熊师的物理攻击提升{X1}%。
+
+        local dir = self:GetPosition() - bear:GetPosition()
+        dir.y = 0
+        local disSqr = dir:SqrMagnitude()
+        if disSqr > FixMul(self.m_20442A, self.m_20442A) then
+            local isShowed = true
+            if self.m_chgPhyAtk > 0 then
+                self:GetData():AddFightAttr(ACTOR_ATTR.FIGHT_PHY_ATK, FixMul(self.m_chgPhyAtk, -1))
+                self.m_chgPhyAtk = 0
+                isShowed = false
+            end
+
+            if self.m_chgPhyDef > 0 then
+                self:GetData():AddFightAttr(ACTOR_ATTR.FIGHT_PHY_DEF, FixMul(self.m_chgPhyDef, -1), isShowed)
+                self.m_chgPhyDef = 0
+                isShowed = false
+            end
+
+            return
+        end
+
+        if self.m_chgPhyAtk > 0 then
+            return
+        end
+        
+        local attrMul = FixDiv(self.m_20442X, 100)
+        self.m_chgPhyAtk = FixMul(self:GetData():GetAttrValue(ACTOR_ATTR.BASE_PHY_ATK), attrMul)
+        self:GetData():AddFightAttr(ACTOR_ATTR.FIGHT_PHY_ATK, self.m_chgPhyAtk)
+        if self.m_20442Level == 2 then
+            self.m_chgPhyDef = FixMul(self:GetData():GetAttrValue(ACTOR_ATTR.BASE_PHY_DEF), attrMul)
+            self:GetData():AddFightAttr(ACTOR_ATTR.FIGHT_PHY_DEF, self.m_chgPhyDef, false)
+        end
+    end
+end
+
+return Actor2044

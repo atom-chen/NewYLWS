@@ -1,0 +1,22 @@
+fileFormatVersion: 2
+guid: 4edac7fd44031404e8a777d8814b15d0
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: SimHei
+  fontNames:
+  - FZZhengHei-DB-GBK
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: ui/fonts/hei_simple_ttf.assetbundle
+  assetBundleVariant: 

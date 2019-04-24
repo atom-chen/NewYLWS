@@ -1,0 +1,78 @@
+local Type_Toggle = typeof(CS.UnityEngine.UI.Toggle)
+local LieZhuanMgr = Player:GetInstance():GetLieZhuanMgr()
+local UILieZhuanAutoTipsView = BaseClass("UILieZhuanAutoTipsView", UIBaseView)
+base = UIBaseView
+
+function UILieZhuanAutoTipsView:OnCreate()
+    base.OnCreate(self)
+
+    msgText, cancelBtnText, sureBtnText, toggleText
+    = UIUtil.GetChildTexts(self.transform, {
+        "BgRoot/msgText",
+        "BgRoot/cancelBtn/cancelBtnText",
+        "BgRoot/sureBtn/sureBtnText",
+        "BgRoot/aotoToggle/toggleText"
+    })
+
+    local aotoToggle
+    self.m_cancelBtn, self.m_sureBtn, self.m_closeBtn, aotoToggle = UIUtil.GetChildTransforms(self.transform, {
+        "BgRoot/cancelBtn",
+        "BgRoot/sureBtn",
+        "CloseBtn",
+        "BgRoot/aotoToggle",
+    })
+
+    msgText.text = Language.GetString(3788)
+    cancelBtnText.text = Language.GetString(5)
+    sureBtnText.text = Language.GetString(10)
+    toggleText.text = Language.GetString(3789)
+
+    self.m_aotoToggle = aotoToggle:GetComponent(Type_Toggle)
+
+    self:HandleClick()
+end
+
+function UILieZhuanAutoTipsView:OnEnable(...)
+    base.OnEnable(self, ...)
+    local initOrder = ...
+end
+
+function UILieZhuanAutoTipsView:HandleClick()
+    local onClick = Bind(self, self.OnClick)  
+    UIUtil.AddClickEvent(self.m_cancelBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_sureBtn.gameObject, onClick)
+    UIUtil.AddClickEvent(self.m_closeBtn.gameObject, onClick)
+end
+
+function UILieZhuanAutoTipsView:RemoveClick()
+    UIUtil.RemoveClickEvent(self.m_cancelBtn.gameObject)
+    UIUtil.RemoveClickEvent(self.m_sureBtn.gameObject)
+    UIUtil.RemoveClickEvent(self.m_closeBtn.gameObject)
+end
+
+function UILieZhuanAutoTipsView:OnDestroy()
+    base.OnDestroy(self)
+    self:RemoveClick()
+end
+
+function UILieZhuanAutoTipsView:OnAddListener()
+	base.OnAddListener(self)
+	-- UI消息注册
+end
+
+function UILieZhuanAutoTipsView:OnRemoveListener()
+	base.OnRemoveListener(self)
+	-- UI消息注销
+end
+
+function UILieZhuanAutoTipsView:OnClick(go, x, y)
+    if go.name == "sureBtn" then
+        if self.m_aotoToggle then            
+            LieZhuanMgr:ReqZhuanSetAutoInvite(self.m_aotoToggle.isOn)
+        end
+    elseif go.name == "CloseBtn" or go.name == "cancelBtn" then
+    end
+    self:CloseSelf()
+end
+
+return UILieZhuanAutoTipsView

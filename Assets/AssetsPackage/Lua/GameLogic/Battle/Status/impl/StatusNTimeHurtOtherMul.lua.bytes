@@ -1,0 +1,51 @@
+local StatusEnum = StatusEnum
+local FixSub = FixMath.sub
+local FixAdd = FixMath.add
+
+local StatusBase = require("GameLogic.Battle.Status.StatusBase")
+local StatusNTimeHurtOtherMul = BaseClass("StatusNTimeHurtOtherMul", StatusBase)   --时间n内，造成伤害调整
+ 
+
+function StatusNTimeHurtOtherMul:__init()
+    self.m_giver = nil
+    self.m_hurtMulList = {}
+end
+
+function StatusNTimeHurtOtherMul:Init(giver,leftMS, hurtTypeList, effect)
+    self.m_giver = giver 
+    self.m_hurtMulList = {}
+    self:InitHurtTypeList(hurtTypeList)
+    self:SetLeftMS(leftMS)
+end
+
+function StatusNTimeHurtOtherMul:InitHurtTypeList(hurtTypeList)
+    if hurtTypeList then
+        for _,v in pairs(hurtTypeList) do
+            self.m_hurtMulList[v.hurtType] = {m_hurtPercent = v.hurtPercent}
+        end
+    end
+end
+
+function StatusNTimeHurtOtherMul:GetStatusType()
+    return StatusEnum.STAUTSTYPE_NEXT_NTIME_HURTOTHERMUL
+end 
+
+function StatusNTimeHurtOtherMul:Update(deltaMS, actor)
+    self.m_leftMS = FixSub(self.m_leftMS, deltaMS)
+    if self.m_leftMS <= 0 then 
+        return StatusEnum.STATUSCONDITION_END
+    end
+
+    self:ClearEffect()
+    return StatusEnum.STATUSCONDITION_CONTINUE
+end 
+
+function StatusNTimeHurtOtherMul:GetHurtOhterMul(hurtType)
+    return self.m_hurtMulList[hurtType]
+end
+
+function StatusNTimeHurtOtherMul:IsHurtMulType(hurtType)
+    return self.m_hurtMulList[hurtType]
+end 
+
+return StatusNTimeHurtOtherMul

@@ -1,0 +1,35 @@
+
+local base = UIBaseView
+local UINotificationSettingView = BaseClass("UINotificationSettingView",UIBaseView)
+
+function UINotificationSettingView:OnCreate()
+    base.OnCreate(self)
+    
+    self:InitView()
+end
+
+function UINotificationSettingView:InitView()
+
+
+
+    self.m_closeBtn = UIUtil.GetChildTransforms(self.transform, {
+        "closeBtn",
+    })
+
+
+
+
+    
+    local onClick = Bind(self, self.OnClick)
+    UIUtil.AddClickEvent(self.m_closeBtn.gameObject, onClick)
+end
+
+
+
+function UINotificationSettingView:OnClick(go, x, y)
+    if go.name == "closeBtn" then
+        self:CloseSelf()
+    end
+end
+
+return UINotificationSettingView

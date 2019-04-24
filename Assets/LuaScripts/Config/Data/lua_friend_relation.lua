@@ -1,0 +1,43 @@
+local config = {
+[1] = {
+id = 1,
+sName = "一面之缘",
+desc = "你与他只是一面之缘。\n互相赠送体力可以提升关系值，并且可以进行第二层和难度1的协同任务。\n赠送体力获得1枚情义币。",
+need_value = 0,
+extra_qingyi = 1,
+open_gift = 1,
+sAtlas = "DynamicLoad",
+sIcon = "haoyou14.png",
+},
+[2] = {
+id = 2,
+sName = "志同道合",
+desc = "你与他志同道合。\n赠送体力可以获得2枚情义币。\n开启第三层和难度2的协同任务。",
+need_value = 30,
+extra_qingyi = 2,
+open_gift = 1,
+sAtlas = "DynamicLoad",
+sIcon = "haoyou15.png",
+},
+[3] = {
+id = 3,
+sName = "肝胆相照",
+desc = "你与他肝胆相照。\n赠送体力可以获得额外3个情义币。\n开启第四层和难度3的协同任务。",
+need_value = 60,
+extra_qingyi = 3,
+open_gift = 1,
+sAtlas = "DynamicLoad",
+sIcon = "haoyou16.png",
+},
+[4] = {
+id = 4,
+sName = "义结金兰",
+desc = "你与他义结金兰。\n赠送体力可以获得额外5个情义币。\n开启第五层和难度4的协同任务。",
+need_value = 180,
+extra_qingyi = 5,
+open_gift = 1,
+sAtlas = "DynamicLoad",
+sIcon = "haoyou17.png",
+},
+}
+return config
