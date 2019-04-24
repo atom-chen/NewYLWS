@@ -1,0 +1,90 @@
+package db;
+import 'db_common.proto';
+
+message one_chat_brief_info
+{
+	optional int32 seq = 1[default = 0];
+	optional int32 unread = 2[default = 0];//1未读，0已读
+}
+
+message one_friend_info
+{
+	optional uint32 uid = 1[default = 0];			// 好友id
+	optional int32 friendship = 2[default = 0]; 	// 关系值
+}
+
+message one_apply_info
+{
+	optional uint32 uid = 1[default = 0];
+	optional int32 apply_time = 2[default = 0];				// 申请时间
+	optional string verification_message = 3[default = ""]; // 验证消息
+	optional int32 is_view = 4[default = 0];				// 是否查看
+}
+
+message one_reply_info
+{
+	optional uint32 uid = 1[default = 0];
+	optional int32 answer_time = 2[default = 0];
+	optional int32 answer = 3[default = 0];					//1通过 
+}
+
+message one_got_stamina_info
+{
+	optional uint32 uid = 1[default = 0];
+	optional int32 got_time = 2[default = 0];
+}
+
+message rentout_wujiang_info
+{
+	message one_rent_record
+	{
+		optional uint32 renter_uid = 1[default = 0];
+		optional int32 battle_type = 2[default = 0];				// 玩法
+		optional int32 rent_time = 3[default = 0];					
+		optional int32 qingyi_count = 4[default = 0];				// 获得情谊值
+		optional int32 rent_wujiang_id = 5[default = 0];
+	}
+	message one_rent_info
+	{
+		optional uint32 uid = 1[default = 0];
+		optional int32 rent_times = 2[default = 0];
+	}
+	optional one_battle_wujiang_info rentout_battle_wujiang = 1;	// 供别人雇佣的武将	-- todo 挪到offline里
+	optional int32 be_hired_times = 2[default = 0];			// 武将被雇佣次数
+	optional int32 qingyi_count = 3[default = 0];					// 武将被雇佣获得情谊值
+	optional int32 box_flag = 4[default = 0];						// 武将被雇佣次数宝箱标志
+	repeated one_rent_record rent_record_list = 5;					// 好友雇佣我的武将记录
+	repeated one_rent_info rent_list = 6;                          // 我雇佣好友武将
+}
+
+message cooperative_task_info
+{
+	message one_task_info
+	{
+		optional int32 id = 1[default = 0];	//活动ID
+		optional int32 progress = 2[default = 0];	//进度
+		optional uint32 accept_uid = 3[default = 0];//accept_uid接受了该任务
+		repeated uint32 taken_award_list = 4;//已领取列表
+	}
+	optional uint32 accept_uid = 1[default = 0];//接受了accept_uid的协同任务邀请
+	optional uint32 friend_uid = 2[default = 0];//friend_uid接受了我的协同任务邀请
+	repeated one_task_info task_list = 3;
+	repeated uint32 invite_list = 4;
+	repeated uint32 box_taken_list = 5;
+}
+
+message Friend
+{
+	repeated one_friend_info friend_list = 1;						// 好友列表
+	repeated one_apply_info applylist = 2;							// 申请好友列表(别人请求加我)
+	repeated one_reply_info replylist = 3;							// 别人回复我的
+	repeated one_got_stamina_info got_stamina_list = 4;			    // 别人赠送体力列表
+	repeated uint32 black_list = 5;									// 黑名单列表
+	optional int32 is_close_apply = 6[default = 0];					// 是否关闭申请(0: 不关闭 1：关闭)
+	optional rentout_wujiang_info rentout_wujiang_data = 7;			// 外租武将数据
+	repeated uint32 send_stamina_list = 8; 			 			    // 每日赠送好友list 
+	repeated one_chat_brief_info chat_list = 9;
+	repeated uint32 qiecuo_list = 10;								// 每日切磋过好友list
+	optional int32 last_crossday_time = 11;
+	optional cooperative_task_info task_data = 12;
+}

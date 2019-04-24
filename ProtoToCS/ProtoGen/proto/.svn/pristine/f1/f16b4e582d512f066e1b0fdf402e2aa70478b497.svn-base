@@ -1,0 +1,209 @@
+package liezhuan;
+
+/// 三国列传
+import "common.proto";
+import "battle.proto";
+
+
+message one_country_pass_info
+{
+	optional int32 country = 1[default = 0];
+	optional int32 max_pass_copy = 2[default = 0];
+}
+
+// 面板
+message req_lizhuan_pannel
+{
+}
+
+message rsp_lizhuan_pannel
+{
+	optional int32 result = 1[default = 0];	
+
+	// 个人通关信息
+	repeated one_country_pass_info country_pass_info_list = 10;
+
+	// 一些配置信息
+	optional int32 cfg_single_fight_need_tili = 20[default = 0];
+	optional int32 cfg_team_fight_need_tili = 21[default = 0];
+	optional int32 cfg_team_auto_start_wait_time = 22[default = 0];  /// 组队自动开始战斗的等待时间
+}
+
+/// 个人闯关
+message req_enter_single_fight
+{
+	optional int32 copy_id = 2[default = 0]; 
+	optional common.one_buzhen buzhen_info = 10;
+}
+message rsp_enter_single_fight
+{
+	optional int32 result = 1[default = 0];	
+	optional int32 copy_id = 2[default = 0]; 
+
+	optional battle.battle_info battle_info = 10;	// battle.battle_info 
+}
+
+message req_finish_single_fight
+{
+
+	optional battle.battle_info battle_info = 10;	// battle.battle_info 
+    optional battle.result_info battle_result = 11;
+}
+
+message rsp_finish_single_fight
+{
+	optional int32 result = 1[default = 0];	
+	optional int32 copy_id = 2[default = 0];
+	repeated common.award_info award_list = 3;
+    optional battle.result_info battle_result = 10;
+}
+
+
+message one_team_base_info
+{
+	optional int32 team_id = 1[default = 0];
+	optional int32 country = 3[default = 0];
+	optional int32 copy_id = 4[default = 0];
+	optional uint32 captain_uid = 5[default = 0];
+	optional int32 permition = 6[default = 0]; //0 所有人可加入， 1 好友和军团成员可加入 2 被邀请才可加入
+	optional int32 min_level = 7[default = 0];
+	optional int32 max_level = 8[default = 0];
+	optional int32 time_count = 9[default = 0];  /// 计时
+}
+
+message one_team_info
+{
+	optional one_team_base_info team_base_info = 1;
+	repeated common.one_user_brief user_brief_lsit = 10;
+}
+
+message req_refresh_team_list
+{
+	optional int32 country = 1[default = 0];
+	optional int32 copy_id = 2[default = 0];
+}
+
+message rsp_refresh_team_list
+{
+	optional int32 result = 1[default = 0];	
+
+	repeated one_team_info team_info_list = 10;
+}
+
+message req_create_team
+{
+	optional one_team_base_info team_base_info = 1;
+}
+
+message rsp_create_team
+{
+
+	optional int32 result = 1[default = 0];	
+	optional one_team_info team_info = 2;
+}
+
+message req_join_team
+{
+	optional int32 team_id = 1[default = 0];
+	optional bool is_refuse = 2[default = false];  /// 拒绝要求, 应邀的时候填
+	optional uint32 inviter_uid = 3[default = 0];  /// 邀请者， 可以没有
+}
+
+message rsp_join_team
+{
+	optional int32 result = 1[default = 0];	
+	optional one_team_info team_info = 10;
+}
+
+// 通知有人加入或者离开
+message ntf_player_in_team
+{
+	optional int32 action = 1[default = 0];  //1 加入  2退出
+	optional uint32 uid = 2[default = 0];
+	optional one_team_info team_info = 10;
+}
+
+message req_exit_team
+{
+	optional int32 team_id = 1[default = 0];
+}
+
+message rsp_exit_team
+{
+	optional int32 result = 1[default = 0];
+}
+
+/// 邀请
+message req_invite_to_team
+{
+	optional int32 team_id = 1[default = 0];
+	optional uint32 target_uid = 2[default = 0];
+}
+
+message rsp_invite_to_team
+{
+	optional int32 result = 1[default = 0];	
+}
+
+message ntf_player_invite_to_team
+{
+	optional int32 team_id = 1[default = 0];
+	optional uint32 inviter_uid = 2[default = 0];
+	optional one_team_info team_info = 3;
+}
+
+message one_wujiang_in_buzhen
+{
+	optional int32 wujiang_seq = 1[default = 0];	
+	optional int32 wujiang_id = 2[default = 0];	
+	optional int32 pos = 3[default = 0];	
+	optional uint32 uid = 4[default = 0];	
+}
+message req_select_wujiang_to_buzhen
+{
+	optional int32 wujiang_seq = 1[default = 0];
+	optional int32 pos = 2[default = 0];
+	optional int32 is_default = 3[default = 0];
+}
+
+message rsp_select_wujiang_to_buzhen
+{
+	optional int32 result = 1[default = 0];
+	optional int32 is_default = 3[default = 0];
+	repeated one_wujiang_in_buzhen curr_wujiang_list_in_buzhen = 10;
+}
+
+message ntf_select_wujiang_to_buzhen
+{
+	optional int32 team_id = 1[default = 0];
+	optional uint32 uid  = 2[default = 0];
+	optional int32 wujiang_id  = 3[default = 0];
+	optional int32 wujiang_seq  = 4[default = 0];
+	optional int32 pos  = 5[default = 0];
+}
+
+message req_ready_to_fight
+{
+	optional int32 team_id = 1[default = 0];
+}
+
+message rsp_ready_to_fight
+{
+	optional int32 result = 1[default = 0];
+	optional int32 team_id = 2[default = 0];
+}
+
+message ntf_player_ready_to_fight
+{
+	optional int32 team_id = 1[default = 0];
+	optional uint32 uid = 2[default = 0];
+}
+
+message ntf_team_fight
+{
+	/// TODO 其它
+
+	
+	optional battle.battle_info battle_info = 10;
+    optional battle.result_info battle_result_info = 11;	//
+}

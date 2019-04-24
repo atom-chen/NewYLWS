@@ -1,0 +1,336 @@
+package act;
+
+import "common.proto";
+
+message one_act_award
+{
+	optional int32 item_id = 1[default = 0];
+	optional int32 count = 2[default = 0];
+}
+
+message one_cross_award
+{
+	optional int32 item_id = 1[default = 0];
+	optional int32 count = 2[default = 0];
+	optional int32 star = 3[default = 0];
+}
+
+message one_act_record
+{
+	message one_act_tag
+	{
+		optional string tag_name = 1[default = ''];	//标签名
+		optional string progress = 2[default = '']; //完成进度
+		repeated common.award_info award_list = 3;	//奖励列表
+		optional int32 price = 4[default = 0];	//购买价格
+		optional int32 btn_status = 5[default = 0];	//按钮状态:[0:不可领取][1:可领取][2:前往充值][3:购买按钮,4:已领取,5:已售罄][6:购买月票][7:可以分享,8:不可以分享][9:可以兑换,10:不可以兑换]
+		optional int32 param1 = 6[default = 0]; //639最大折扣
+		optional int32 param2 = 7[default = 0]; //639最小折扣
+		repeated one_act_award expend_list = 8;	//消耗道具列表
+		optional int32 ori_price = 9[default = 0];	//原价
+	}
+
+	optional uint32 act_id = 1[default = 0];
+	optional int32 act_type = 2[default = 0];
+	optional int32 start_time = 3[default = 0];	//开始时间
+	optional int32 end_time = 4[default = 0];	//结束时间
+	optional string act_name = 5[default = ''];	//活动名称
+	optional string act_content = 6[default = ''];
+	optional string act_rules = 7[default = ''];	//活动规则
+	optional string act_bg = 8[default = ''];	//背景编号
+	repeated one_act_tag tag_list = 9;	//活动的标签列表
+	
+	optional int32 param1 = 12[default = 0];			//(620 635 638  1表示显示红点)
+	optional int32 param3 = 13[default = 0];	//
+	
+	optional int32 rank = 20[default = 0];	//排名
+	optional int32 param2 = 21[default = 0];			//
+	
+	optional int32 param4 = 24[default = 0]; //聚宝盆充值截止时间  528最小上榜消费元宝数 527最小上榜充值元宝数
+	
+}
+
+message req_act_list
+{
+	repeated uint32 cached_act_id_list = 1;	//客户端已经缓存过的活动id
+}
+
+message rsp_act_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_act_record act_list = 2;	//活动列表
+	repeated uint32 red_tips_list = 3;	//红点提示活动列表
+}
+
+message req_take_award
+{
+	optional uint32 act_id = 1[default = 0];
+	optional int32 tag_index = 2[default = 0];	//标签序号，从1开始
+	optional int32 param1 = 3[default = 0];
+}
+
+message rsp_take_award
+{
+	optional int32 result = 1[default = 0];
+	optional int32 tag_index = 2[default = 0];	//标签序号，从1开始
+	repeated common.award_info award_list = 3;	//奖励
+	optional uint32 act_id = 4[default = 0];
+}
+
+message ntf_act_chg
+{
+	optional one_act_record act_info = 1;	//变化了的活动
+}
+
+message req_turntable_interface
+{
+	optional uint32 act_id = 1[default = 0];
+}
+
+message rsp_turntable_interface
+{
+	message leiji_award
+	{
+		optional int32 lottery_times = 1[default = 0];		//领奖条件
+		repeated common.award_info award_list = 2;          //宝箱奖励
+		optional int32 btn_status = 3[default = 0];	//按钮	
+	}
+	optional int32 result = 1[default = 0];	
+	optional uint32 act_id = 2[default = 0];
+	optional int32 act_end_time = 3[default = 0];
+	repeated common.award_info lottery_list = 4;	//抽奖奖品列表
+	optional int32 once_price = 5[default = 0];//抽一次元宝
+	optional int32 ten_times_price = 6[default = 0];//抽十次元宝
+	optional int32 lottery_times = 7[default = 0];//累计转动次数
+	repeated leiji_award leiji_award_list = 8;//抽奖累计奖励列表
+	optional int32 vip_level = 9[default = 0];
+	optional int32 wujiang_id = 10[default = 0];
+}
+
+message req_turntable_lottery
+{
+	optional uint32 act_id = 1[default = 0];
+	optional int32 lottery_times = 2[default = 1];
+}
+
+message rsp_turntable_lottery
+{
+	optional int32 result = 1[default = 0];
+	optional int32 lottery_pos = 2[default = 0]; //抽中位置 1开始  抽10次最后一次的位置
+	repeated common.award_info award_list = 3;	//得到的奖励列表
+	optional int32 lottery_times = 4[default = 1];
+}
+
+message req_take_turntable_box_award
+{
+	optional uint32 act_id = 1[default = 0];
+	optional int32 tag_index = 2[default = 0];
+}
+
+message rsp_take_turntable_box_award
+{
+	optional int32 result = 1[default = 0];
+	optional int32 tag_index = 2[default = 0];
+	repeated common.award_info award_list = 3;	
+}
+
+message req_duobao_interface
+{
+	optional uint32 act_id = 1[default = 0];
+}
+
+message rsp_duobao_interface
+{
+	message one_duobao_award
+	{
+		optional int32 tag_index = 3[default = 0];
+		optional int32 total_times = 4[default = 0];
+		optional int32 left_times = 5[default = 0];
+		optional common.award_info one_award = 6; 
+	}
+	message one_duobao_record
+	{
+		optional int32 time = 1[default = 0];
+		optional string user_name = 2[default = ""];
+		optional int32 item_id = 3[default = 0];
+		optional int32 count = 4[default = 0];
+	}
+	optional int32 result = 1[default = 0];
+	optional uint32 act_id = 2[default = 0];
+	optional int32 total_charge = 3[default = 0];
+	optional int32 total_times = 4[default = 0];
+	optional int32 left_times = 5[default = 0];
+	optional int32 once_price = 6[default = 0];
+	repeated one_duobao_award duobao_award_list = 7;
+	repeated one_duobao_record duobao_record_list = 8;
+	optional int32 wujiang_id = 9[default = 0];
+}
+
+message req_duobao
+{
+	optional uint32 act_id = 1[default = 0];
+}
+
+message rsp_duobao
+{
+	optional int32 result = 1[default = 0];
+	optional int32 tag_index = 2[default = 0];
+	repeated common.award_info award_list = 3;	//奖励
+}
+
+message req_group_charge_interface
+{
+	optional uint32 act_id = 1[default = 0];
+}
+
+message rsp_group_charge_interface
+{
+	message one_box
+	{
+		optional int32 box_index = 1[default = 0];
+		optional int32 cond = 2[default = 0];
+		optional int32 status = 3[default = 0];
+		repeated common.award_info award_list = 4;
+	}
+	message one_group_charge_entry
+	{
+		optional int32 total_count = 1[default = 0];
+		repeated one_box box_list = 2;
+	}
+
+	optional int32 result = 1[default = 0];
+	optional uint32 act_id = 2[default = 0];
+	optional one_group_charge_entry charge_entry = 3;
+	optional one_group_charge_entry vip5_entry = 4;
+	optional one_group_charge_entry vip5_extra_entry = 5;
+}
+
+message req_take_group_charge_award
+{
+	optional uint32 act_id = 1[default = 0];
+	optional int32 box_index = 2[default = 0];
+}
+
+message rsp_take_group_charge_award
+{
+	optional int32 result = 1[default = 0];
+	optional int32 box_index = 2[default = 0];
+	repeated common.award_info award_list = 3;	//奖励
+}
+
+message ntf_act_info_to_gamesvr
+{
+	repeated one_act_record act_list = 1;
+}
+
+message req_jixinggaozhao_interface
+{
+	optional uint32 act_id = 1[default = 0];
+}
+
+message rsp_jixinggaozhao_interface
+{
+	message one_jixinggaozhao_record
+	{
+		optional int32 time = 1[default = 0];
+		optional common.one_user_brief user_brief = 2;
+		optional int32 item_id = 3[default = 0];
+		optional int32 count = 4[default = 0];
+		optional int32 param1 = 5[default = 0];
+	}
+	optional int32 result = 1[default = 0];
+	optional uint32 act_id = 2[default = 0];
+	repeated common.award_info lottery_list = 4;	//抽奖奖品列表
+	optional int32 once_price = 5[default = 0];//抽一次价格
+	optional int32 ten_times_price = 6[default = 0];//抽十次价格
+	optional int32 currency = 7[default = 0];//货币
+	repeated one_jixinggaozhao_record record_list = 8;
+	optional int32 bonus_count = 9[default = 0];
+	
+	
+	//
+	repeated one_cross_award cross_award_list = 10;
+}
+
+message req_jixinggaozhao_lottery
+{
+	optional uint32 act_id = 1[default = 0];
+	optional int32 lottery_times = 2[default = 1];
+	
+	//不需要客户端填写
+	optional common.one_user_brief user_brief = 3;
+}
+
+message rsp_jixinggaozhao_lottery
+{
+	optional int32 result = 1[default = 0];
+	optional int32 lottery_pos = 2[default = 0]; //抽中位置 1开始  抽10次最后一次的位置
+	repeated common.award_info award_list = 3;	//得到的奖励列表
+	optional int32 lottery_times = 4[default = 1];
+	optional int32 act_id = 5[default = 0];
+	
+	//
+	repeated one_cross_award cross_award_list = 6;
+}
+
+message req_jixinggaozhao_deduct
+{
+	optional int32 currency = 1[default = 0];
+	optional int32 price = 2[default = 0];
+}
+
+message rsp_jixinggaozhao_deduct
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_rebate_shop_info
+{
+	optional uint32 act_id = 1[default = 0];
+	optional int32 tag_index = 2[default = 0];
+}
+
+message rsp_rebate_shop_info
+{
+	message one_goods
+	{
+		optional common.award_info one_award = 1;
+		optional int32 price = 2[default = 0];
+		optional int32 rebate_price = 3[default = 0];
+		optional int32 sell_out = 4[default = 0];//1卖完 0可买
+		optional int32 goods_index = 5[default = 0];
+	}
+	optional int32 result = 1[default = 0];
+	optional uint32 act_id = 2[default = 0];
+	optional int32 rebate = 3[default = 0];//折扣 0无折扣
+	repeated one_goods goods_list = 4;
+	optional int32 tag_index = 5[default = 0];
+}
+
+message req_buy_rebate_shop_goods
+{
+	optional uint32 act_id = 1[default = 0];
+	optional int32 tag_index = 2[default = 0];
+	optional int32 goods_index = 3[default = 0];
+}
+
+message rsp_buy_rebate_shop_goods
+{
+	optional int32 result = 1[default = 0];
+	optional int32 act_id = 2[default = 0];
+	repeated common.award_info award_list = 3;
+}
+
+message req_get_rebate
+{
+	optional uint32 act_id = 1[default = 0];
+	optional int32 tag_index = 2[default = 0];
+}
+
+message rsp_get_rebate
+{
+	optional int32 result = 1[default = 0];
+	optional int32 act_id = 2[default = 0];
+	optional int32 tag_index = 3[default = 0];
+	optional int32 rebate = 4[default = 0];
+}

@@ -1,0 +1,96 @@
+package commonrank;
+import "common.proto";
+
+message one_user_info
+{
+	optional uint32 uid = 1[default = 0];
+	optional int32 top_floor = 2[default = 0]; //挑战到第几层
+	optional string user_name = 3[default = ''];  //主公名号
+	optional common.one_user_icon use_icon = 4;	  //正在使用的头像
+	optional int32 user_level = 5[default = 0];	  //玩家等级
+	optional string guild_name = 6[default = ''];
+	optional int32 rank = 7[default = 0]; //名次
+}
+
+message one_common_rank
+{
+	optional common.one_user_brief user_brief = 1;
+	optional int32 rank = 2[default = 0]; //名次
+	optional int32 param1 = 3[default = 0];// 闯连营:层数 命签副本:层数（难度），墓穴副本:层数（难度） 辕门：星级（难度） 武将榜: 胜点积分
+	optional int32 param2 = 4[default = 0];// 命签副本:分数，墓穴副本:时长，辕门：分数									武将榜: 武将id
+	optional int32 param3 = 5[default = 0];// 命签副本:时长，墓穴副本:铜钱数量， 辕门：上榜时间							武将榜: 武将等级
+	optional int32 param4 = 6[default = 0];//																		武将榜: 武将星级 
+}
+
+message req_rank
+{
+	optional int32 rank_type = 1[default = 0];
+	optional int32 update_time = 2[default = 0];//排名更新时间
+	optional int32 param1 = 3[default = 0];// 
+}
+
+message rsp_rank
+{
+	optional int32 result = 1[default = 0];
+	optional int32 rank_type = 2[default = 0];
+	repeated one_common_rank rank_list = 3;
+	optional one_common_rank my_rank = 4; //名次 0 未上榜
+	optional int32 update_time = 5[default = 0];//排名更新时间
+}
+
+message req_one_rank_buzhen
+{
+	optional int32 rank_type = 1[default = 0];
+	optional int32 rank = 2[default = 0];
+}
+
+message rsp_one_rank_buzhen
+{
+	optional int32 result = 1[default = 0];
+	repeated common.one_wujiang_brief wujiang_list = 2;
+}
+
+message one_world_boss_rank
+{
+	optional uint32 uid = 1[default = 0];
+	optional string name = 3[default = ''];
+	optional common.one_user_icon use_icon = 4;	//正在使用的头像
+	optional string guild_name = 5[default = ''];
+	optional int32 level = 6[default = 0];
+	optional int32 kill_time = 7[default = 0];
+	optional int32 harm_num = 8[default = 0];	//伤害总量
+}
+
+message req_world_boss_rank
+{
+}
+
+message rsp_world_boss_rank
+{
+	optional int32 result = 1[default = 0];
+	optional int32 my_rank = 2[default = 0];
+	repeated one_world_boss_rank rank_list = 3;
+}
+
+message req_world_boss_rank_yesterday
+{
+}
+
+message rsp_world_boss_rank_yesterday
+{
+	optional int32 result = 1[default = 0];
+	repeated one_world_boss_rank rank_list = 2;
+	optional int32 my_rank = 3[default = 0];
+}
+
+message req_wujiang_rank_wujiang_detail
+{
+	optional int32 rank = 1[default = 0];
+	optional int32 rank_type = 3[default = 0];
+}
+
+message rsp_wujiang_rank_wujiang_detail
+{
+	optional int32 result = 1[default = 0];
+	optional common.one_wujiang_detail wujiang_detail = 2;
+}

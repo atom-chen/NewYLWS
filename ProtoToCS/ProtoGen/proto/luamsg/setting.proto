@@ -1,0 +1,8 @@
+package setting;
+
+import 'common.proto';
+//活动的信息
+message ntf_activity_setting
+{
+	optional common.game_setting setting = 1;
+}

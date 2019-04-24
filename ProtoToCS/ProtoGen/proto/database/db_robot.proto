@@ -1,0 +1,13 @@
+package db;
+import 'db_common.proto';
+
+message Robot
+{
+	optional uint32 uid = 1[default = 0];	//机器人的UID从1-10000，与玩家UID区分开来
+	optional int32 rank = 2[default = 0];	//机器人的排名，这个是会变化的 
+	optional int32 dan = 3[default = 0];	//机器人的排名，这个是会变化的 
+	optional int32 type = 4[default = 0];	//机器人的配置类型
+	optional string name = 5[default = ''];
+	optional int32 level = 6[default = 0];	//机器人的等级
+	optional int32 for_dan_advance = 7[default = 0];	//段位进阶专属
+}

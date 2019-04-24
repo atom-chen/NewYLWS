@@ -1,0 +1,87 @@
+package worldboss;
+
+import "common.proto";
+import "battle.proto";
+
+message req_world_boss_info
+{
+
+}
+
+message rsp_world_boss_info
+{
+	optional int32 result = 1[default = 0];
+	optional int32 fought_flag = 2[default = 0];// 与0x1表示上午场次已经打过了，与上0x2表示下午场次已经打过
+	optional int32 noon_boss_hp = 3[default = 0];
+	optional int32 noon_harm_num = 4[default = 0];	//上午的伤害百分比
+	optional int32 noon_kill_time = 5[default = 0];	//上午的击杀时间
+
+	optional int32 night_boss_hp = 6[default = 0];
+	optional int32 night_harm_num = 7[default = 0];
+	optional int32 night_kill_time = 9[default = 0];
+	optional int32 boss_index = 10[default = 0];//boss在配置表中的序号
+	optional int32 enhanced_atk = 11[default = 0];	//攻击增强百分比次数
+	optional int32 boss_id = 12[default = 0];
+	
+	optional int32 can_buy_fight_boss_count = 13[default = 0];	// 还能购买几次
+	optional int32 left_fight_boss_count = 14[default = 0]; // 还能打几次
+
+	optional int32 can_fight = 15[default = 0];//1可以挑战
+}
+
+message req_enter_fight
+{
+	optional uint32 copy_seq = 1[default = 0];
+	optional common.one_buzhen buzhen_info = 3;
+}
+
+message rsp_enter_fight
+{
+	optional int32 result=1[default = 0];
+	optional int32 boss_level = 2[default = 0];
+	optional uint32 fighting_seq = 5[default = 0];	//战斗的序号
+	optional battle.battle_info battle_info = 10;	// battle.battle_info 
+	optional int32 boss_id = 11[default = 0];
+}
+
+message req_finish_fight
+{
+	optional battle.battle_info battle_info = 1;		///battle.battle_info 
+    optional battle.result_info battle_result = 2;
+}
+
+message rsp_finish_fight
+{
+	optional int32 result = 1[default = 0];//1战斗结果异常，2超时了，
+	repeated common.award_info award_list1 = 3;
+	repeated common.award_info award_list2 = 4;
+	repeated common.award_info award_list3 = 5;
+	repeated common.award_info award_list4 = 6;
+	repeated common.award_info award_list5 = 7;
+	optional float harm_percent = 8[default = 0];//乘以1000的 
+	optional int32 consumed_time = 9[default = 0];//乘以10的
+	optional int32 my_rank = 10[default = 0];	//我的排名，0代表未上榜
+    optional battle.result_info battle_result = 13;
+}
+
+message req_enhance_atk
+{
+
+}
+
+message rsp_enhance_atk
+{
+	optional int32 result = 1[default = 0];
+	optional int32 enhanced_atk = 2[default = 0];	//当前提升的攻击次数
+}
+
+message req_buy_fight_boss_time
+{
+}
+
+message rsp_buy_fight_boss_time
+{
+	optional int32 result = 1[default = 0];
+	optional int32 can_buy_fight_boss_count = 2[default = 0];	// 还能购买几次
+	optional int32 left_fight_boss_count = 3[default = 0]; // 还能打几次
+}

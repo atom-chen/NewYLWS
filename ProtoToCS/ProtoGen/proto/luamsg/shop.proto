@@ -1,0 +1,52 @@
+package shop;
+
+import "common.proto";
+
+message one_goods
+{
+	optional int32 goods_id = 1[default = 0];
+	optional int32 discount = 2[default = 10];//1-9一到九折 10无折扣
+	optional int32 left_buy_times = 3[default = 0];//0:售罄
+	optional int32 cond_desc_index = 4[default = 0];//条件描述序号 0无条件
+	optional int32 without_limit = 5[default = 0];//1商品数量无限制
+}
+
+message req_shop_panel
+{
+	optional int32 shop_type = 1[default = 0];//1:特殊  2:竞技 3:军团 4:情义 5:神秘商人 6:群雄逐鹿 10点将兑换商店 
+}
+
+message rsp_shop_panel
+{
+	optional int32 result = 1[default = 0];
+	optional int32 shop_type = 2[default = 0];
+	repeated one_goods goods_list = 3;
+	optional int32 refresh_time = 4[default = 0];
+	optional int32 refresh_price = 5[default = 0];
+	optional int32 left_refresh_times = 6[default = 0];//剩余刷新次数
+}
+
+message req_refresh
+{
+	optional int32 shop_type = 1[default = 0];
+}
+
+message rsp_refresh
+{
+	optional int32 result = 1[default = 0];
+	//send rsp_shop_panel
+}
+
+message req_buy_goods
+{
+	optional int32 goods_id = 1[default = 0];
+	optional int32 goods_count = 2[default = 0];
+	optional int32 shop_type = 3[default = 0];
+}
+
+message rsp_buy_goods
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 2;
+	//send rsp_shop_panel
+}

@@ -1,0 +1,19 @@
+package db;
+import 'db_common.proto';
+
+
+
+message GuildWarcraft
+{
+    optional int32 war_day  = 1[default = 0];
+    optional int32 war_week = 2[default = 0];      
+    optional int32 war_season = 3[default = 0];      
+    optional int32 total_day_count = 7[default = 0];
+    optional uint32 curr_stat  = 4[default = 0];
+    optional uint32 curr_stat_start_time  = 5[default = 0];
+    optional uint32 last_update_time  = 8[default = 0];
+    optional uint32 war_start_time  = 6[default = 0];   /// 校准到当日备战阶段开始的时间
+    optional uint32 real_war_start_time  = 9[default = 0];  // 真正开始的时间
+    optional bool first_arrange_done = 10[default = false];  /// 首次对战安排是否已经执行
+    optional int32 day_battle_count = 11[default = 0]; /// 当天的战斗计数，用于生成战斗索引
+}

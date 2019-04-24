@@ -1,0 +1,84 @@
+package yuanmen;
+
+import "common.proto";
+
+message one_yuanmen_wujiang
+{
+    optional int32 seq = 1[default = 0];
+    optional int32 wujiang_id = 2[default = 0];
+	optional int32 level = 4[default = 0];	//当前等级
+	optional int32 star = 5[default = 0];
+    optional int32 max_hp = 6[default = 0];
+    optional int32 hp = 7[default = 0];
+    optional int32 nuqi = 8[default = 0];
+}
+
+message one_yuanmen_monster
+{
+    optional int32 monster_seq = 1[default = 0];
+    repeated one_yuanmen_wujiang wujiang_list = 2;
+    optional bool  passed = 3[default = false];
+    // TODO 其它效果
+}
+
+message yuanmen_pannel_info
+{
+    optional int32 time_to_next_refresh = 10[default = 0];
+    optional int32 success_battle_count = 11[default = 0];
+    optional int32 best_score = 12[default = 0];
+    optional int32 world_rank = 13[default = 0];
+}
+
+message yuanmen_cfg_info
+{
+    optional int32 cfg_refresh_duration = 1[default = 0];
+    optional int32 cfg_manual_refresh_cost_yuanbao = 2[default = 0];
+    optional int32 cfg_addition_award_need_pass_battle = 3[default = 0];  /// 额外奖励需要通过的关卡数
+    optional int32 cfg_one_battle_cost_coin = 4[default = 0];   /// 单次挑战消耗的挑战令数
+    optional int32 cfg_open_level = 5[default = 0];   /// 玩法开启等级
+}
+
+message req_yuanmen_pannel
+{
+
+}
+
+message rsp_yuanmen_pannel
+{
+	optional int32 result = 1[default = 0];
+    optional yuanmen_pannel_info pannel_info = 2;
+    optional yuanmen_cfg_info cfg_info = 3;
+}
+
+message req_refresh_yuanmen
+{
+
+}
+
+message rsp_refresh_yuanmen
+{
+	optional int32 result = 1[default = 0];
+    optional yuanmen_pannel_info pannel_info = 2;
+}
+
+message req_yuanmen_battle
+{
+    optional int32 monster_seq = 1[default = 0];
+    /// TODO 阵容信息
+}
+
+message rsp_yuanmen_battle
+{
+	optional int32 result = 1[default = 0];
+}
+
+
+message req_yuanmen_world_ranklist
+{
+
+}
+
+message rsp_yuanmen_world_ranklist
+{
+	optional int32 result = 1[default = 0];
+}

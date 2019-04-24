@@ -1,0 +1,193 @@
+package qunxiongzhulu;
+
+import "common.proto";
+import "battle.proto";
+
+message one_wujiang_win_times //一个武将的胜势
+{
+	optional int32 wujiang_index = 1[default = 0];
+	optional int32 win_times = 2[default = 0];
+}
+
+message one_season_record
+{
+	optional int32 season = 1[default = 0];
+	optional int32 total_times = 2[default = 0];
+	optional int32 win_times = 3[default = 0];
+	optional int32 world_rank = 4[default = 0];
+}
+
+message one_rival
+{
+	optional common.one_user_brief user_brief = 1; 
+	optional int32 score = 2[default = 0];
+	repeated common.one_wujiang_brief def_wujiang_list = 3;	
+	optional common.one_buzhen buzhen_info = 4;
+}
+
+message one_battle_record
+{
+	optional int32 battle_result = 1[default = 0];//1胜利0失败  //有需要可表示详细类别
+	optional int32 score_chg = 2[default = 0];
+	optional int32 time = 3[default = 0];
+	optional common.one_user_brief user_brief = 4; 
+	optional string video_id = 5[default = ""];	//录像ID
+}
+
+message req_panel
+{
+	//以下客户端不需要
+	optional common.one_user_brief user_brief = 1;
+}
+
+message rsp_panel
+{
+	optional int32 result = 1[default = 0];
+	optional int32 score = 2[default = 0]; 
+	optional int32 total_times = 3[default = 0]; 
+	optional int32 win_times = 4[default = 0]; 
+	optional int32 rank = 5[default = 0]; //跨服数据
+	optional int32 status = 6[default = 0];//跨服数据 //0不在对战时间 1可对战 2取消匹配 
+	optional int32 deadline = 7[default = 0];//跨服数据 //对战截止时间 
+	optional int32 max_continue_win_times = 8[default = 0];//最高胜势 //gamesvr 根据wujiang_win_times_list计算
+	repeated one_wujiang_win_times wujiang_win_times_list = 9; //gamesvr 筛选下，去除无效武将
+	optional int32 season = 10[default = 0]; 
+	optional int32 season_start_time = 11[default = 0]; 
+	optional int32 season_end_time = 12[default = 0]; 
+}
+
+message req_season_records
+{
+
+}
+
+message rsp_season_records
+{
+	optional int32 result = 1[default = 0];
+	repeated one_season_record season_record_list = 2;
+}
+
+message req_battle_record
+{
+
+}
+
+message rsp_battle_record
+{
+	optional int32 result = 1[default = 0];
+	repeated one_battle_record battle_record_list = 2;
+}
+
+message req_match
+{
+
+}
+
+message rsp_match
+{
+	optional int32 result = 1[default = 0];
+	optional int32 estimating_matching_time = 2[default = 0];//预计匹配时间
+	optional int32 match_start_time = 3[default = 0];
+}
+
+message req_match_cancel
+{
+
+}
+
+message rsp_match_cancel
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_ready
+{
+
+}
+
+message rsp_ready
+{
+	optional int32 result = 1[default = 0];
+}
+
+message ntf_match_result
+{
+	optional one_rival rival_info = 1;
+	optional int32 prepare_deadline = 2[default = 0];
+}
+
+message ntf_match_failed
+{
+	optional int32 reason = 1[default = 0];//0异常 1找不到对手 2进入非匹配时间段 
+}
+
+message req_arrange_buzhen
+{
+	optional common.one_buzhen buzhen_info = 1;
+	//无需客户端填写
+	optional common.one_battle_formation battle_formation = 2;
+}
+
+message rsp_arrange_buzhen
+{
+	optional int32 result = 1[default = 0];
+}
+
+message ntf_rival_buzhen_chg
+{
+	repeated common.one_wujiang_brief def_wujiang_list = 1;	
+	optional common.one_buzhen buzhen_info = 2;
+}
+
+message ntf_qunxiongzhulu_enable //
+{
+	optional int32 deadline = 1[default = 0];
+}
+
+message ntf_season_info //注册服 以及 赛季变更
+{
+	optional int32 season = 1[default = 0]; 
+	optional int32 season_start_time = 2[default = 0]; 
+	optional int32 season_end_time = 3[default = 0]; 
+}
+
+message ntf_battle_result
+{
+	optional uint32 uid = 8[default = 0];
+	optional int32 battle_result = 1[default = 0]; //负数 战斗异常
+	optional int32 src_score = 2[default = 0];
+	optional int32 score_chg = 3[default = 0];
+	repeated common.award_info drop_list = 4; //奖励
+    optional battle.battle_info battle_info = 6;	//录像
+    optional battle.result_info battle_result_info = 7;	//
+	optional string video_id = 9[default = ''];
+	optional common.one_user_brief rival_brief = 10; 
+	optional int32 time = 11[default = 0];
+	
+	//服务器字段
+	repeated common.one_item item_list = 12;
+}
+
+message req_quit_battle
+{
+	optional int32 reason = 1[default = 0];
+}
+
+message rsp_quit_battle
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_take_season_award
+{
+	
+}
+
+message rsp_take_season_award
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 2; //奖励
+	//服务器字段
+	repeated common.one_item item_list = 3;
+}
+

@@ -1,0 +1,35 @@
+package buzhen;
+
+import "common.proto";
+
+message req_arrange_buzhen
+{
+	optional int32 buzhen_id = 1[default = 1];
+	optional common.one_buzhen buzhen_info = 2;
+}
+
+message rsp_arrange_buzhen
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_all_buzhen_list
+{
+
+}
+
+message rsp_all_buzhen_list
+{
+	optional int32 result = 1[default = 0];
+	repeated common.one_buzhen buzhen_list = 2;
+}
+
+message ntf_all_buzhen_list
+{
+	repeated common.one_buzhen buzhen_list = 1;
+}
+
+message ntf_update_one_buzhen_info
+{
+	optional common.one_buzhen buzhen_info = 1;
+}

@@ -1,0 +1,24 @@
+package db;
+
+message one_goods_info
+{
+	optional int32 goods_id = 1[default = 0];//配置id
+	optional int32 discount = 2[default = 10];//1-9一到九折 10无折扣
+	optional int32 buy_times = 3[default = 0];//
+}
+
+message common_shop_info
+{
+	repeated one_goods_info goods_list = 1;
+	optional int32 last_refresh_time = 2[default = 0];//上次自动刷新时间
+	optional int32 force_refresh_times = 3[default = 0];//手动刷新次数
+}
+
+message Shop
+{	
+	optional common_shop_info secret_shop = 1;
+	optional common_shop_info special_shop = 2;
+	optional common_shop_info arena_shop = 3;
+	optional common_shop_info guild_shop = 4;
+	optional common_shop_info friend_shop = 5;
+}

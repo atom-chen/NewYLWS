@@ -1,0 +1,155 @@
+package hunt;
+
+import 'common.proto';
+
+message one_ground //一个苑
+{
+	optional int32 id = 1[default = 0];
+	optional int32 level = 2[default = 0];
+	optional int32 status = 3[default = 0];//0已维护 1未解锁  2需维护 3.在升级；10已维护且可升级; 12需维护且可升级（10以下不可升级，10及以上可升级）
+	optional int32 finish_levelup_time = 4[default = 0];//在升级时 升级完成时间
+}
+
+message one_ground_show //选秀信息
+{
+	optional int32 id = 1[default = 0];
+	optional int32 level = 2[default = 0];
+	optional int32 total_times = 3[default = 0];
+	optional int32 left_times = 4[default = 0];
+	optional int32 cd_end_time = 5[default = 0];
+	optional int32 status = 6[default = 0];//1未解锁  2需维护 3.在升级
+	optional int32 clear_cd_times = 7[default = 0];
+}
+
+message one_level_attrs //等级资质
+{
+	message one_attr
+	{
+		optional int32 attr_id = 1[default = 0];
+		optional int32 status = 2[default = 0]; //1激活
+	}
+	optional int32 level = 1[default = 0];
+	repeated one_attr attr_list = 2;//1统帅 2武力 3治理 4防御
+}
+
+message req_hunt_panel
+{
+
+}
+
+message rsp_hunt_panel
+{
+	optional int32 result = 1[default = 0];
+	repeated one_ground ground_list = 2;
+}
+
+message req_maintain //维护
+{
+	optional int32 id = 1[default = 0];
+}
+
+message rsp_maintain
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_levelup //升级
+{
+	optional int32 id = 1[default = 0];
+}
+
+message rsp_levelup
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_clear_levelup_cd //秒cd
+{
+	optional int32 id = 1[default = 0];
+}
+
+message rsp_clear_levelup_cd
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_horse_show_panel //选秀
+{
+
+}
+
+message rsp_horse_show_panel
+{
+	optional int32 result = 1[default = 0];
+	repeated one_ground_show ground_show_list = 2;
+}
+
+message req_clear_show_cd
+{
+	optional int32 id = 1[default = 0];
+}
+
+message rsp_clear_show_cd
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_ground_first_attr //苑 资质
+{
+	optional int32 id = 1[default = 0];
+}
+
+message rsp_ground_first_attr
+{
+	optional int32 result = 1[default = 0];
+	repeated one_level_attrs level_attrs_list = 2;
+}
+
+message req_active_attr
+{
+	optional int32 id = 1[default = 0];
+	optional int32 level = 2[default = 0];
+	optional int32 attr_id = 3[default = 0];
+}
+
+message rsp_active_attr
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_first_attr_detail //资质详情
+{
+	optional int32 id = 1[default = 0];
+}
+
+message rsp_first_attr_detail
+{
+	optional int32 result = 1[default = 0];
+	optional common.first_attr base_first_attr_min = 2;
+	optional common.first_attr extra_first_attr_min = 3;
+	optional common.first_attr base_first_attr_max = 4;
+	optional common.first_attr extra_first_attr_max = 5;
+}
+
+message req_horse_show
+{
+	optional int32 id = 1[default = 0];
+}
+
+message rsp_horse_show
+{
+	optional int32 result = 1[default = 0];
+	repeated common.one_horse horse_list = 2;
+}
+
+message req_select_horse
+{
+	optional int32 id = 1[default = 0];
+	optional int32 horse_index = 2[default = 0];
+}
+
+message rsp_select_horse
+{
+	optional int32 result = 1[default = 0];
+	optional int32 horse_index = 2[default = 0];
+}

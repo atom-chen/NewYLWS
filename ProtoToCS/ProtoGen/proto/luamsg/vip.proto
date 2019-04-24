@@ -1,0 +1,148 @@
+package vip;
+import "common.proto";
+
+message req_buy_goods
+{
+	optional int32 goods_id = 1[default = 0];
+}
+
+message rsp_buy_goods
+{
+	optional int32 result = 1[default = 0];
+	optional int32 goods_id = 2[default = 0];
+}
+
+message req_vip_shop_info
+{
+	optional int32 phone_type = 1[default = 0];		// 机器类型 0,未知; 1,苹果; 2,安卓(只有确认识别出苹果机型的，才会屏蔽掉高充值项)
+	optional string terrace = 2;					// 渠道
+	optional int32 shop_type = 3[default = 0]; //2vips商店，3礼包商店
+}
+
+message rsp_vip_shop_info
+{
+	optional int32 result = 1[default = 0];						//可购买商品
+
+	message one_goods_cfg
+	{
+		
+		optional int32 goods_id = 1[default = 0];
+		optional double price = 2[default = 0.0];
+		optional int32 charged_yuanbao = 3[default = 0];
+		optional int32 normal_charged_yuanbao = 4[default = 0];
+		optional int32 first_charged_yuanbao = 5[default = 0];
+		optional int32 recommend = 6[default = 0];
+		optional string sicon = 7[default = ''];
+		optional string desc = 8[default = ''];
+		optional string appStoreProductID = 9[default = ''];
+		optional string name = 10[default = ''];
+		optional int32 buy_times = 11[default = 0]; //0没有购买过，大于0=买过次数
+		optional int32 goods_type = 12[default = 0];//1月卡 2元宝 3武将信物 4道具礼包
+		optional int32 buy_times_limit = 13[default = 0];//0不限制
+		optional int32 buy_times_type = 14[default = 0];//0无，1每天，2每周
+		optional int32 sortID = 15[default = 0];
+		repeated common.one_item goods_info_list = 16;
+	}
+
+	repeated one_goods_cfg goods_cfg_list = 2;
+
+}
+
+
+message req_take_viplevelgift_award
+{
+	optional int32 vip_level = 1[default = 0];
+}
+
+message rsp_take_viplevelgift_award
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 2;
+	optional int32 viplevelgift_taken_flag = 55 [default = 0];	//vip等级特权礼包标志
+}
+
+message ntf_buy_goods
+{
+	repeated common.award_info award_list = 3;
+}
+
+message req_recharge_award_info
+{
+	
+}
+
+message one_recharge_award_info
+{
+	optional int32 price = 1[default = 0]; //0、任意金额
+	repeated common.one_item award_list = 2;
+	optional int32 btn_status = 3[default = 0];//0、不可领取 1、可领取 2、已领取
+	optional int32 extral_charge_money = 4[default = 0];
+}
+
+message rsp_recharge_award_info
+{
+	
+	optional int32 result = 1[default = 0];
+	repeated one_recharge_award_info charge_award_list = 3;
+
+}
+
+message ntf_recharge_award_info_chg
+{
+	repeated one_recharge_award_info charge_award_list = 1;
+}
+
+message req_take_recharge_award
+{
+	optional int32 take_type = 1[default = 0];//1领取首充奖励 98、领取累充奖励
+}
+
+message rsp_take_recharge_award
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 2;
+	optional int32 btn_status = 3[default = 0];//0、不可领取 1、可领取 2、已领取
+	optional int32 take_type = 4[default = 0];
+	
+}
+
+message one_yueka
+{
+
+	optional int32 goods_id = 1[default = 0];
+	optional double price = 2[default = 0.0];
+	optional int32 left_days = 3[default = 0];
+	repeated common.one_item item_list = 4;
+	optional int32 status = 5[default = 0];		//1:可购买 2:可领取 3:已领取
+
+}
+
+message req_yueka_info
+{
+	
+}
+
+message rsp_yueka_info
+{
+	optional one_yueka small_yueka = 1;
+	optional one_yueka big_yueka = 2;
+	optional int32 result = 3[default = 0];
+}
+
+message ntf_yueka_info
+{
+	optional one_yueka small_yueka = 1;
+	optional one_yueka big_yueka = 2;
+}
+
+message req_take_yueka_award
+{
+	optional int32 yueka_type = 1[default = 0]; //1小月卡 2大月卡
+
+}
+
+message rsp_take_yueka_award
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 2;
+}

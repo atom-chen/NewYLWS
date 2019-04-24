@@ -1,0 +1,98 @@
+
+package racing;
+import "common.proto";
+import "battle.proto";
+
+
+message one_race_member_info
+{
+	optional int32 index = 1[default = 0];
+	optional common.one_user_brief user_brief = 10;
+}
+
+message one_race_info
+{
+	optional int32 status = 1[default = 0];  // 1 匹配中， 2， 匹配完成 , 3 战斗完成, 4 已经查看
+	optional int32 race_id = 2[default = 0];
+	repeated one_race_member_info member_list = 10;
+}
+
+message one_race_report
+{
+	optional uint32 time = 1[default = 0];
+	optional int32  horse_id = 2[default = 0];
+	optional int32  horse_stage = 3[default = 0];
+	optional int32  rank = 4[default = 0];
+	optional string video_id = 10[default = ''];
+}
+
+message req_racing_pannel
+{
+	optional bool is_close = 4 [default = false];  // true 为关闭
+}
+
+message rsp_racing_pannel
+{
+	optional int32 result = 1[default = 0];
+
+	repeated int32 tired_horse_index_list = 2;  // 今日已经参赛的坐骑
+	optional int32 today_race_count = 3[default = 0];
+
+	optional int32 cfg_daily_free_count = 10[default = 0]; /// 每日免费次数
+
+	optional one_race_info curr_matching_race_info = 11;
+	optional one_race_info joining_race_info = 12;  /// 正在参加的
+}
+
+message req_apply_racing
+{
+	optional int32 horse_index = 1[default = 0];
+}
+
+message rsp_apply_racing
+{
+	optional int32 result = 1[default = 0];
+	optional int32 horse_index = 2[default = 0];
+}
+
+message ntf_race_info
+{
+	optional one_race_info race_info = 11;
+}
+
+message ntf_racing_battle_result
+{
+	optional int32 finish_result = 4[default = 0];
+	repeated common.award_info drop_list = 3;
+
+	optional battle.battle_info battle_info = 10;
+    optional battle.result_info battle_result_info = 11;	//
+}
+
+message req_start_race  /// 其实只是观看比赛结果
+{
+	optional int32 race_id = 1[default = 0];
+}
+
+message rsp_start_race
+{
+	optional int32 result = 1[default = 0];
+	optional int32 finish_result = 4[default = 0];
+	repeated common.award_info drop_list = 3;
+	optional uint32 uid = 5[default = 0];
+
+	optional battle.battle_info battle_info = 10;
+    optional battle.result_info battle_result_info = 11;	//
+}
+
+message req_recently_report
+{
+
+}
+
+message rsp_recently_report
+{
+	optional int32 result = 1[default = 0];
+
+	repeated one_race_report report_list = 2;
+}

@@ -1,0 +1,10 @@
+package db;
+
+import 'db_common.proto';
+
+message Wujiang
+{
+	repeated one_wujiang_info wujiang_list = 1;//武将列表 
+	optional int32 next_wujiang_index = 2[default = 1];
+	repeated one_dragon dragon_list = 3;	//召唤兽列表
+}

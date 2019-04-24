@@ -1,0 +1,116 @@
+package lottery;
+
+import 'common.proto';
+
+message activity_bar_info
+{
+	optional int32 fuli_type = 1[default = 0];  // 1:特定稀有度出现概率上升
+												// 2:特定武将出现率上升，可以在卡池中调整指定武将的权重
+												// 3:新武将发放
+												// 4:抽卡返利，招募可以获得额外的物品
+												// 5:抽卡累点，招募可以累积点数换取物品，可能需要领取按钮或跳转至商店按钮
+												// 6:武将招募金符，游戏中以及活动会赠送招募金符，使用即可招募武将，卡池、概率与元宝招募一致
+	optional int32 icon = 2[default = 0];
+	optional string title = 3[default = ""];
+}
+
+message one_recruit_type_cfg
+{
+	optional int32 recruit_type = 1[default = 0];
+	optional int32 price = 2[default = 0];
+	optional int32 price_item_id = 3[default = 0];
+}
+
+message req_lottery_info
+{
+	
+}
+
+message rsp_lottery_info
+{
+	optional int32 result = 1[default = 0];
+
+	optional int32 take_daily_fuli_count = 2[default = 0]; // 经获取每日福利 次数
+	optional int32 take_daily_fuli_count_limit = 3[default = 0]; // 是否已经获取每日福利 次数
+
+	repeated one_recruit_type_cfg recruit_type_cfg_list = 4;
+
+
+	optional activity_bar_info curr_activity_bar_info  = 11;  /// 活动栏信息
+	optional int32  curr_activity_wujiang_id = 12;   ///本期武将 活动 当前神将招募中有概率获得的信物
+	optional int32  curr_got_activity_xinwu_num = 13;   ///活动 已获得的信物数量
+	optional int32  activity_xinwu_num_limit = 14;   ///活动 已获得的信物数量	
+}
+
+/// 招募
+message req_recruit
+{
+	optional int32 recruit_type = 1[default=0];   //1:普通招募 2:普通十连
+												  //3:神将招募 4:神将十连 5:点将令
+}
+
+message rsp_recruit
+{
+	optional int32 result = 1[default =0];
+	optional int32 recruit_type = 2[default = 0];
+
+	repeated common.award_info	normal_award_list = 10;
+
+	repeated common.award_info	addition_award_list = 11;
+}
+
+
+message req_get_daily_fuli
+{
+
+}
+
+message rsp_get_daily_fuli
+{
+	optional int32 result = 1[default = 0];
+	optional int32 take_daily_fuli_count = 2[default = 0];
+	repeated common.award_info	award_list = 10;
+}
+
+message req_xiejia
+{
+	repeated int32 wujiang_seq_list = 1;
+}
+
+message rsp_xiejia
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info	award_list = 10;
+}
+
+message one_exchange_item
+{
+	optional int32 seq = 1[default = 0];
+	optional int32 item_id = 2[default = 0];  /// 兑换商品的物品id
+	optional int32 per_count = 7[default = 0]; /// 每次兑换获得物品的数量
+	optional int32 buy_count = 3[default = 0]; /// 以购买次数 
+	optional int32 buy_count_limit = 4[default = 0]; /// 购买次数上限
+	optional int32 price_item_id = 5[default = 0]; /// 需要的物品id
+	optional int32 price_item_count = 6[default = 0]; 
+}
+
+message req_exchange_info
+{
+}
+message rsp_exchange_info
+{
+	optional int32 result = 1[default =0];
+	repeated one_exchange_item exchange_item_list = 2;
+}
+
+message req_exchange
+{
+	optional int32 seq = 1[default = 0];
+	optional int32 count = 2[default = 0];
+}
+
+message rsp_exchange
+{
+	optional int32 result = 1[default =0];
+	repeated common.award_info	award_list = 10;
+}

@@ -1,0 +1,185 @@
+package db;
+
+message one_item //道具
+{
+	optional int32 item_id = 1[default = 0];
+	optional int32 count = 2[default = 0];
+	optional int32 locked = 3[default = 0];
+}
+
+message first_attr_info
+{
+	optional int32 tongshuai = 1[default = 0];
+	optional int32 wuli = 2[default = 0];
+	optional int32 zhili = 3[default = 0];
+	optional int32 fangyu = 4[default = 0];
+}
+
+message one_inscription_case_info //命签方案
+{
+	optional int32 inscription_case_index = 1[default = 0];
+	optional string case_name = 2[default = ""];
+	repeated int32 inscription_id_list = 3;
+}
+
+message one_horse_info //坐骑
+{
+	optional int32 index = 1[default = 0];
+	optional int32 id = 2[default = 0];
+	optional int32 stage = 3[default = 1];
+	optional int32 max_stage = 4[default = 0];
+	optional first_attr_info init_first_attr = 5;
+	optional int32 equiped_wujiang_index = 6;
+	optional int32 locked = 7[default = 0];
+}
+
+message one_shenshou_info //神兽
+{
+	optional int32 index = 1[default = 0];
+	optional int32 id = 2[default = 0];
+	optional int32 level = 3[default = 0];
+	optional int32 exp = 4[default = 0];
+	optional int32 stage = 5[default = 0];
+	optional int32 equiped_wujiang_index = 6;
+}
+
+message one_shenbing_info //神兵
+{
+	message one_mingwen
+	{
+		optional int32 mingwen_id = 2[default = 0];
+		optional int32 wash_times = 3[default = 0];
+	}
+	optional int32 index = 1[default = 0];
+	optional int32 id = 2[default = 0];
+	optional int32 stage = 3[default = 0];
+	repeated int32 attr_list = 4;
+	optional int32 equiped_wujiang_index = 5;
+	repeated one_mingwen mingwen_list = 6;
+	repeated one_mingwen tmp_new_mingwen = 7;//如果confirm==0，則存儲；1\0都要在結束時清空
+	optional int32 locked = 8[default = 0];
+}
+
+message one_wujiang_skill_info //武将技能
+{
+	optional int32 skill_id = 1[default = 0];
+	optional int32 skill_level = 2[default = 0];
+}
+
+message one_intimacy_info //亲密度
+{
+	optional int32 src_wujiang_id = 1[default = 0];
+	optional int32 dst_wujiang_id = 2[default = 0];
+	optional int32 intimacy = 3[default = 0]; //亲密度
+	optional int32 intimacy_level = 4[default = 0];
+}
+
+message one_wujiang_brief_info
+{		
+	optional int32 id = 1[default = 0];		//武将id
+	optional int32 level = 2[default = 0];
+	optional int32 star = 4[default = 0];
+	optional int32 pos = 5[default = 0];
+	optional int32 index = 6[default = 0];//-1表示雇佣武将
+	optional int32 power = 7[default = 0];
+	optional int32 tupo_times = 8[default = 0];
+	optional int32 wuqiLevel = 9[default = 0];		// 武器等级
+}
+
+message one_wujiang_info 
+{
+	optional int32 wujiang_index = 1[default = 0]; //序号(获得顺序)
+	optional int32 wujiang_id = 2[default = 0];
+	optional int32 wujiang_level = 3[default = 0];	//当前等级
+	optional int32 wujiang_exp = 4[default = 0]; //当前等级经验
+	optional int32 wujiang_star = 5[default = 0];	
+	optional int32 shenbing_index = 6[default = 0];
+	optional int32 horse_index = 7[default = 0];
+	repeated one_wujiang_skill_info skill_list = 9;
+	optional int32 wujiang_power = 10[default = 0];
+	repeated int32 inscription_id_list = 11; //命签
+}
+
+message user_list
+{
+	repeated uint32 uid_list = 1;
+}
+
+message one_hire_wujiang_info
+{
+	optional uint32 hire_owner_id = 1[default = 0];
+	optional one_wujiang_brief_info wujiang_brief = 2;
+}
+
+message one_buzhen_info
+{
+// -1 的武将索引表示雇佣
+	optional int32 buzhen_id = 1[default = 0];
+	optional int32 wujiang_seq1 = 2[default = 0];
+	optional int32 wujiang_seq2 = 3[default = 0];
+	optional int32 wujiang_seq3 = 4[default = 0];
+	optional int32 wujiang_seq4 = 5[default = 0];
+	optional int32 wujiang_seq5 = 6[default = 0];
+	optional int32 summon = 7[default = 0]; /// 召唤兽
+	optional int32 backup_wujiang_seq1 = 8[default = 0];
+	optional int32 backup_wujiang_seq2 = 9[default = 0];
+	optional int32 backup_wujiang_seq3 = 10[default = 0];
+	optional one_hire_wujiang_info hired_wujiang = 11;
+}
+
+message one_battle_wujiang_info
+{
+	optional int32 seq = 1[default = 0];		// 玩家可以有重复武将，此乃武将主键
+	optional int32 wujiang_id = 2[default = 0];
+	optional uint32 uid = 3[default = 0];
+	optional int32 level = 4[default = 0];	//当前等级
+	optional int32 star = 5[default = 0];
+
+	optional int32 hp = 6[default = 0];	//当前血量
+	optional int32 max_hp = 10[default = 0];	//血量上限
+	optional int32 phy_atk = 11[default = 0];	//物攻
+	optional int32 phy_def = 12[default = 0];	//物防
+	optional int32 magic_atk = 13[default = 0];	//法攻
+	optional int32 magic_def = 14[default = 0];	//法防
+	optional int32 phy_baoji = 15[default = 0];	//物理爆击
+	optional int32 magic_baoji = 16[default = 0];//法术爆击
+	optional int32 shanbi = 17[default = 0];	//闪避
+	optional int32 mingzhong = 18[default = 0];	//命中
+	optional int32 move_speed = 19[default = 0];//移动速度
+	optional int32 atk_speed = 20[default = 0];	//攻击速度
+	optional int32 hp_recover = 21[default = 0];//生命回复
+	optional int32 nuqi_recover = 22[default = 0];	//怒气回复
+	optional int32 init_nuqi = 23[default = 0];	//初始怒气
+	optional float baoji_hurt = 24[default = 0];	//暴击伤害
+	optional int32 phy_suckblood = 25[default = 0];	//物理吸血
+	optional int32 magic_suckblood = 26[default = 0];	//法术吸血
+	optional int32 reduce_cd = 27[default = 0];	//减免CD
+
+	optional int32 lineUpPos = 28[default = 0];	//站位
+	optional int32 mountID = 29[default = 0];	//坐骑等级
+	optional int32 wuqiLevel = 31[default = 0];	//武器等级
+
+	repeated one_wujiang_skill_info skill_list = 30;
+	repeated one_wujiang_skill_info inscriptions_skill_list = 33;
+
+	optional int32 power = 32[default = 0];
+
+}
+
+//龙子神兽
+message one_dragon
+{
+	optional int32 dragon_id = 1[default = 0];
+	optional int32 level = 2[default = 0];
+	optional int32 dragon_exp = 3[default = 0];
+	repeated int32 dragon_talent_list = 4;
+	optional int32 buff_time = 5[default = 0];
+}
+
+message one_guild_invitation_info ///家族 邀请
+{
+	optional uint32 gid = 1[default = 0];
+	optional uint32 inviter_uid = 2[default = 0];  /// 邀请者
+	optional uint32 target_uid = 3[default = 0];   /// 邀请对象
+	optional uint32 time = 4[default = 0];
+}

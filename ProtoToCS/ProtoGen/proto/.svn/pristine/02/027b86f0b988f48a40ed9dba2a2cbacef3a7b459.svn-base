@@ -1,0 +1,144 @@
+package db;
+
+import 'db_common.proto';
+
+
+message one_world_important_event
+{
+	optional int32 event_type = 1[default = 0];
+	optional int32 event_time = 2[default = 0];
+	optional string name1 = 3[default = ""]; 	// 行为人1名字
+	optional string name2 = 4[default = ""];	// 行为人2名字
+	optional string name3 = 5[default = ""];	// 行为人3名字
+	optional string strparam1 = 6[default = ""];	// 附加参数1
+	optional int32 intparam1= 7[default = 0];		// 附加int参数1
+}
+
+message duobaoqibin
+{
+	message joiner_info
+	{
+		optional uint32 uid = 1[default = 0];
+		optional int32 value = 2[default = 0];
+		optional int32 award_status = 3[default = 0];	//0:未获奖，1已获奖
+	}
+	
+	message record_info
+	{
+		optional int32 start_time = 1[default = 0];
+		optional int32 end_time = 2[default = 0];
+		repeated joiner_info joiner_list = 3;		//购买者名单
+		optional int32 last_value = 4;			//结算时的金额
+		optional int32 rand = 5[default = 0];	//第几轮
+	}
+	
+	optional int32 box_type = 1[default = 0];
+	optional int32 curr_rand = 2[default = 0];	//当前是第几轮
+	optional int32 start_time = 3[default = 0];	//开始时间
+	repeated record_info record_list = 4;
+	repeated joiner_info joiner_list = 5;		//参与玩家
+	optional int32 curr_value = 6[default = 0];	//金额
+}
+
+//闯连营阵容
+message one_camps_passed_info
+{
+	optional int32 copy_id = 1 [default = 0];
+	optional uint32 uid = 2[default = 0];
+	optional int32 passed_time = 3[default = 0];
+	repeated one_wujiang_brief_info main_wujiang_list = 4;
+	repeated one_wujiang_brief_info alternates_wujiang_list = 5;
+	optional int32 def_power = 6[default = 0];	//战力 
+}
+
+message lottery_info
+{
+	message lottery_wujiang_act_info
+	{
+		optional int32 act_index = 6[default = 0];
+		optional int32 act_type = 1[default = 0];
+		optional int32 sub_type = 2[default = 0];
+		optional float prob_multi = 3[default = 0.0];
+		optional uint32 start_time = 4[default = 0];
+		optional uint32 end_time = 5[default = 0];
+		optional uint32 effect_count_limit = 7[default = 0];
+		optional string title = 8[default = ''];
+	}
+	message lottery_xinwu_act_info
+	{
+		optional int32 act_index = 7[default = 0];
+		optional int32 item_id = 1[default = 0];
+		optional int32 wujiang_id = 8[default = 0];
+		optional int32 per_num = 2[default = 0];
+		optional int32 prob = 3[default = 0];
+		optional int32 max_num = 4[default = 0];
+		optional uint32 start_time = 5[default = 0];
+		optional uint32 end_time = 6[default = 0];
+		optional string comment = 9[default = ''];
+	}
+	optional lottery_wujiang_act_info wujiang_act_info = 1;
+	optional lottery_xinwu_act_info xinwu_act_info = 2;
+}
+
+message vip_shop_good_info
+{
+	
+	optional int32 goods_id = 1[default = 0];
+	// optional double price = 2[default = 0.0];
+	// optional int32 charged_yuanbao = 3[default = 0];
+	// optional int32 normal_charged_yuanbao = 4[default = 0];
+	// optional int32 first_charged_yuanbao = 5[default = 0];
+	// optional int32 recommend = 6[default = 0];
+	optional int32 is_show = 6[default = 0];
+	optional string sicon = 7[default = ''];
+	// optional string desc = 8[default = ''];
+	// optional string appStoreProductID = 9[default = ''];
+	optional string name = 10[default = ''];
+	// optional int32 goods_type = 12[default = 0];//1月卡 2元宝 3武将信物 4道具礼包
+	// optional int32 shop_type = 17[default = 0];
+	optional int32 buy_times_limit = 13[default = 0];//0不限制
+	optional int32 buy_times_type = 14[default = 0];//0无，1每天，2每周
+	// optional int32 sortID = 15[default = 0];
+	repeated one_item goods_info_list = 16;
+}
+
+message cross_qunxiongzhulu_info
+{
+	optional int32 season = 1[default = 0];
+    optional int32 season_start_time = 2[default = 0];
+    optional int32 season_end_time = 3[default = 0];
+}
+
+message gamesvr_qunxiongzhulu_info
+{
+	optional int32 season = 1[default = 0];
+}
+
+message ext_param_msg
+{
+	optional string var_str = 1[default = ''];
+	repeated one_camps_passed_info camps_passed_info_list = 2;
+	repeated one_world_important_event world_important_event_list = 5;
+	repeated duobaoqibin duobaoqibin_list = 8;
+	optional lottery_info lottery_info = 9;
+	repeated vip_shop_good_info vip_shop_good_list = 10;
+	optional cross_qunxiongzhulu_info cross_qunxiongzhulu_data = 11;
+	optional gamesvr_qunxiongzhulu_info gamesvr_qunxiongzhulu_data = 12;
+	
+}
+
+message Svrdata
+{
+	optional uint32 uid = 1[default = 0];
+	optional int32 int1 = 2[default = 0];
+	optional int32 int2 = 3[default = 0];
+	optional int32 int3 = 4[default = 0];
+	optional int32 int4 = 5[default = 0];
+	optional int32 int5 = 6[default = 0];
+	optional int32 int6 = 7[default = 0];
+	optional int32 int7 = 8[default = 0];
+	optional int32 int8 = 9[default = 0];
+	optional int32 int9 = 10[default = 0];
+	optional int32 int10 = 11[default = 0];
+	optional ext_param_msg param_msg = 20;
+}

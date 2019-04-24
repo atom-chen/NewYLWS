@@ -1,0 +1,347 @@
+package battle;
+import "common.proto";
+
+message vec3
+{
+    optional float x = 1[default = 0];
+    optional float y = 2[default = 0];
+    optional float z = 3[default = 0];
+}
+
+message cmddata_skillinput_start
+{
+    optional int32 performer_id = 1[default = 0];
+}
+
+message cmddata_skillinput_end
+{
+    optional int32 performer_id = 1[default = 0];
+    optional int32 target_id = 2[default = 0];
+    optional vec3 perform_pos = 3;
+    optional vec3 v3_pos = 4;
+}
+
+message cmddata_summon_perform
+{
+	optional int32 camp = 1[default = 0];
+}
+
+message cmddata_create_bench_role
+{
+	optional int32 wujiang_id = 1[default = 0];
+}
+
+message cmddata_shenbing_select
+{
+	optional int32 award_index = 1[default = 0];
+	optional int32 award_actor_id = 2[default = 0];
+}
+
+message cmddata_guildboss_sync_hp
+{
+	optional int32 harm = 1[default = 0];
+}
+
+message frame_command
+{
+    optional int32 cmd_type = 1[default = 0];
+	optional int32 frame_num = 2[default = 0];
+    optional cmddata_skillinput_start cmd_input_start = 3;
+    optional cmddata_skillinput_end cmd_input_end = 4;
+	optional cmddata_summon_perform cmd_summon_perform = 5;
+	optional cmddata_create_bench_role cmd_create_bench = 6;
+	optional cmddata_shenbing_select cmd_select_shenbing = 7;
+	optional cmddata_guildboss_sync_hp cmd_guildboss_sync_hp = 8;
+}
+
+message formation_result
+{
+	message one_wujiang_result
+	{
+		optional int32 seq = 1[default = 0];		// 玩家可以有重复武将，此乃武将主键
+		optional int32 wujiang_id = 2[default = 0];
+		optional int32 actor_id = 3[default = 0];
+		optional int32 monster_id = 4[default = 0];  /// 如果是怪物的话这个有用
+		optional int32 wujiang_level = 5[default = 0];
+
+		optional int32 hp = 10[default = 0];	//剩余血量
+		optional int32 nuqi = 11[default = 0];	//剩余怒气
+		optional vec3  pos = 12;
+
+		optional int32 init_hp = 13[default = 0];	//初始血量
+		optional int32 init_nuqi = 14[default = 0];	//初始怒气
+		optional int32 max_hp = 15[default = 0];	//最大血量
+
+		optional int32 hurt_hp = 16[default= 0];  //造成伤害
+		optional int32 drop_hp = 17[default= 0];  //自己掉血
+		optional int32 add_hp = 18[default= 0];  //加血
+		optional int32 kill_count = 19[default = 0];
+	}
+	optional uint32 uid = 1[default = 0];
+	repeated one_wujiang_result wujiang_result_list = 2;
+}
+
+message result_info
+{
+	message worldboss_result_info
+	{
+		optional int32 is_kill = 1[default = 0];
+		optional int32 max_hp = 2[default = 0];
+		optional int32 harm_num = 3[default = 0];
+		optional float harm_percent = 4[default = 0];
+		optional int32 consumed_time = 5[default = 0];
+	}
+	
+	message inscriptioncopy_result_info
+	{
+		optional int32 score = 1[default = 0]; //分数
+		optional int32 consumed_time = 2[default = 0]; //持续时间
+	}
+	
+	message gravecopy_result_info
+	{
+		optional int32 consumed_time = 1[default = 0]; //持续时间
+		optional int32 tongqian_count = 2[default = 0];
+		repeated common.one_item item_list = 3;
+	}
+
+	message shenbingcopy_result_info
+	{
+		repeated int32 award_index_list = 1;
+	}
+
+	message guildboss_result_info
+	{
+		optional int32 is_kill = 1[default = 0];
+		optional int32 harm_num = 3[default = 0];
+		optional int32 consumed_time = 5[default = 0];
+	}
+
+	message yuanmen_result_info
+	{
+		optional int32 score = 1[default = 0]; //分数
+		optional int32 consumed_time = 2[default = 0]; //持续时间
+		optional int32 deduct_time_score = 3[default = 0];
+		optional int32 dead_wujiang = 4[default = 0];//挂了几个武将
+		optional int32 deduct_dead_wujiang = 5[default = 0];
+	}
+
+	message racing_result_info
+	{
+		message one_racing_rank
+		{
+			optional uint32 uid = 1[default = 0];
+			optional int32 horse_id = 2[default = 0];
+			optional int32 horse_stage = 3[default = 0];
+			optional float cost_time = 4[default = 0];
+			optional int32 rank = 5[default = 0];
+			optional string name = 6[default = ''];
+		}
+		repeated one_racing_rank rank_list = 1;
+	}
+
+
+	optional int32 result = 1[default = 0];  //1:左边赢， 2：右边赢
+	optional uint32 winneruid = 2[default = 0];
+	optional string battle_id = 5[default = ''];
+
+	optional formation_result left_result = 3;
+	optional formation_result right_result = 4;
+	optional worldboss_result_info worldboss_result = 6;
+	optional inscriptioncopy_result_info inscriptioncopy_result = 7;
+	optional gravecopy_result_info gravecopy_result = 8;
+	optional shenbingcopy_result_info shenbingcopy_result = 9;
+	optional guildboss_result_info guildboss_result = 10;
+	optional yuanmen_result_info yuanmen_result = 11;
+	optional racing_result_info racing_result = 12;
+
+	optional int32 consumed_time = 13[default = 0];
+}
+
+message damage_recode_info
+{
+
+}
+
+message battle_info
+{
+	message yuanmen_battle_info
+	{
+		message one_monster_base_info
+		{
+			optional int32 monster_id = 1[default = 0];
+			optional int32 hp = 2[default = 0];	//剩余血量
+			optional int32 nuqi = 3[default = 0];	//剩余怒气
+			// optional int32 wujiang_star = 5[default = 0];
+			// optional int32 wujiang_level = 6[default = 0];
+		}
+		repeated int32 left_buff_list = 1;
+		repeated int32 right_buff_list = 2;
+		repeated one_monster_base_info monster_base_info = 3;
+		// optional int32 star_level = 4[default = 0];
+
+	}
+
+	message racing_battle_info
+	{
+		repeated int32 racing_track_list = 1;  
+	}
+
+	optional string battle_id = 1[default = ''];
+	optional int32 battle_ver = 2[default = 0];
+    optional int32  battle_type = 3[default = 0];
+    repeated int32 battle_random_seeds = 4; 
+
+    optional common.one_battle_formation left_formation = 10;
+    repeated common.one_battle_formation right_formation_list = 11;
+    repeated frame_command cmd_list = 12;
+	repeated common.one_shenbing_award shenbingcopy_random_award_list = 13;
+	optional yuanmen_battle_info yuanmen_battle = 14;
+	optional racing_battle_info racing_battle = 15;
+
+	optional int32 copy_id = 30[default = 0];  // 当type 为copy时 使用
+	optional int64 param1 = 31[default = 0];  //辕门挑战:param1 = 世界等级;召唤兽副本:param1 = 第N次挑战; 神兵副本：param1 = 世界等级
+	optional int64 param2 = 32[default = 0];  //辕门挑战:param2 = 同场副本上场积分;召唤兽副本:param2 = 怪物等级;
+	optional int64 param3 = 33[default = 0];  // 
+	optional int64 param4 = 34[default = 0];  // 
+	optional int64 param5 = 35[default = 0];  // 
+
+	optional damage_recode_info damage_recode_info = 40;
+
+
+	optional result_info result_info = 100;  
+
+}
+
+message SummonRecordData
+{
+	optional int32 camp = 1[default = 0];
+	optional int32 reason = 2[default = 0];
+	optional int32 summonID = 3[default = 0];
+	optional int32 summonLevel = 4[default = 0];
+}
+
+message SkillRecordData
+{
+	optional int32 camp = 1[default = 0];
+	optional int32 skillID = 2[default = 0];
+	optional int32 actorID = 3[default = 0];
+	optional int32 targetID = 4[default = 0];
+	optional int32 keyframe = 5[default = 0];
+}
+
+message PositionRecordData
+{
+	optional int32 reason = 1[default = 0];
+	optional float pos_x = 2[default = 0];
+	optional float pos_y = 3[default = 0];
+	optional float pos_z = 4[default = 0];
+	optional int32 actorID = 5[default = 0];
+	optional int32 exParam = 6[default = 0];
+}
+
+message RotationRecordData
+{
+	optional int32 actorID = 1[default = 0];
+	optional float rot_x = 2[default = 0];
+	optional float rot_y = 3[default = 0];
+	optional float rot_z = 4[default = 0];
+}
+
+message WujiangAttrRecordData
+{
+	optional int32 actorID = 1[default = 0];
+	optional int32 attrType = 2[default = 0];
+	optional int32 oldVal = 3[default = 0];
+	optional int32 newVal = 4[default = 0];
+}
+
+message HPRecordData
+{
+	optional int32 actorID = 1[default = 0];
+	optional int32 hurtType = 2[default = 0];
+	optional int32 reason = 3[default = 0];
+	optional int32 deltaVal = 4[default = 0];
+	optional int32 oldHP = 5[default = 0];
+	optional int32 newHP = 6[default = 0];
+	optional int32 attackID = 7[default = 0];
+	optional int32 skillID = 8[default = 0];
+	optional int32 judge = 9[default = 0];
+}
+
+message JudgeRecordData
+{
+	optional int32 actorID = 1[default = 0];
+	optional int32 targetID = 2[default = 0];
+	optional int32 judge = 3[default = 0];
+}
+
+message NuqiRecordData
+{
+	optional int32 actorID = 1[default = 0];
+	optional int32 reason = 2[default = 0];
+	optional int32 deltaVal = 3[default = 0];
+	optional int32 skillID = 4[default = 0];
+	optional int32 oldHP = 5[default = 0];
+	optional int32 newHP = 6[default = 0];
+}
+
+message BornRecordData
+{
+	optional int32 actorID = 1[default = 0];
+	optional float pos_x = 2[default = 0];
+	optional float pos_y = 3[default = 0];
+	optional float pos_z = 4[default = 0];
+	optional float forward_x = 5[default = 0];
+	optional float forward_y = 6[default = 0];
+	optional float forward_z = 7[default = 0];
+	optional float hp = 8[default = 0];
+}
+
+message StatusRecordData
+{
+	optional int32 actorID = 1[default = 0];
+	optional float statusType = 2[default = 0];
+	optional float giverSkillID = 3[default = 0];
+	optional float giverActorID = 4[default = 0];
+}
+	
+message frame_data
+{
+    optional int32 frame_id = 1[default = 0];
+	optional int32 event_type = 2[default = 0];
+    
+	optional SkillRecordData skill_data = 3;   // event_type  = 2
+	optional PositionRecordData pos_data = 4;	// event_type  = 1
+	optional RotationRecordData rotation_data = 5; // event_type  = 7
+	optional WujiangAttrRecordData attr_data = 6; // event_type  = 9
+	optional HPRecordData hp_data = 7;	// // event_type  = 3
+	optional JudgeRecordData judge_data = 8; // event_type  = 5
+	optional NuqiRecordData nuqi_data = 9; // event_type  = 6
+	optional BornRecordData born_data = 10; // // event_type  = 8
+	optional SummonRecordData summon_data = 11; // event_type  = 4
+	optional StatusRecordData status_data = 12; // event_type  = 10
+	optional string event_name = 13[default = ''];
+}
+
+message battle_full_frame_data
+{
+	optional string battle_id = 1[default = ''];
+	optional int32 battle_version = 2[default = 0];
+	
+    repeated frame_data frame_data_list = 3;
+}
+
+message req_report_frame_data
+{
+    optional battle.battle_full_frame_data frame_data = 1;
+//	optional string battle_id = 1[default = ''];
+//	optional int32 battle_version = 2[default = 0];
+//    repeated frame_data frame_data_list = 3;
+}
+
+message rsp_report_frame_data
+{
+    optional int32 result = 1[default = 0];
+}
+

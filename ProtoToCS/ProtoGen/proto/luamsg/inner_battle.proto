@@ -1,0 +1,40 @@
+package inner_battle;
+import "common.proto";
+import "battle.proto";
+
+
+/// 请求一次完整的战斗
+message req_inner_battle
+{
+    optional int32  client_battle_ver = 2[default = 0];
+
+    optional int32  copy_id = 5[default = 0];
+
+    optional battle.battle_info battle_info = 12;		///battle.battle_info 
+
+    optional int32 is_need_verify = 30 [default = 0];       /// 是否需要校验
+    optional battle.result_info result_info = 31; /// 客户端上传的战斗统计数据
+	
+	optional int32 param1 = 32[default = 0];//1:摸金引导
+}
+
+message rsp_inner_battle
+{
+    optional int32 result = 1[default = 0];
+    optional string battle_id = 2[default = ""];
+    optional int32  battle_type = 3[default = 0];
+
+    optional battle.result_info result_info = 10;
+    optional battle.battle_info battle_info = 11;		///battle.battle_info 
+}
+
+message req_report_frame_data_inner
+{
+    optional battle.battle_full_frame_data frame_data = 1;
+}
+
+message rsp_report_frame_data_inner
+{
+    optional int32 result = 1[default = 0];
+}
+

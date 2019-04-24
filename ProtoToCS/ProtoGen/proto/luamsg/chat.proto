@@ -1,0 +1,114 @@
+package chat;
+
+import "common.proto";
+
+message one_chat_message_brief
+{
+	optional int32 chat_time = 1[default = 0];
+	optional string words = 2[default = ""];
+	optional uint32 speaker_uid = 3[default = 0];
+	optional int32 unread = 4[default = 0];//1未读，0已读
+}
+
+message one_chat_msg //聊天用
+{
+	optional int32 speak_time = 1[default = 0];
+	optional string words = 2[default = ""];
+	optional common.one_user_brief speaker_brief = 3;
+	optional int32 unread = 4[default = 0];//1未读，0已读
+}
+
+message req_private_speak
+{
+	optional string words = 1[default = ''];//发言内容
+	optional uint32 uid = 2[default = 0];//说给谁
+}
+
+message rsp_private_speak
+{
+	optional int32 result = 1[default = 0];//0代表发送成功
+}
+
+message ntf_private_speak //通知有一条私聊
+{
+	optional one_chat_msg new_msg = 1;
+}
+
+message req_world_speak
+{
+	optional string words = 1[default = ''];//发言内容
+}
+
+message rsp_world_speak
+{
+	optional int32 result = 1[default = 0];
+}
+
+message ntf_world_speak
+{
+	optional one_chat_msg new_msg = 1;
+}
+
+message req_world_speak_list
+{
+	
+}
+
+message rsp_world_speak_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_chat_msg message_list = 2;
+}
+
+message req_guild_speak
+{
+	optional string words = 1[default = ''];//发言内容
+}
+
+message rsp_guild_speak
+{
+	optional int32 result = 1[default = 0];
+}
+
+message ntf_guild_speak
+{
+	optional one_chat_msg new_msg = 1;
+}
+
+message req_guild_speak_list
+{
+	
+}
+
+message rsp_guild_speak_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_chat_msg message_list = 2;
+}
+
+message req_private_msg_list
+{
+	optional uint32 uid = 1;
+}
+
+message rsp_private_msg_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_chat_message_brief message_list = 2;
+}
+
+message req_sys_msg_list
+{
+
+}
+
+message rsp_sys_msg_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_chat_message_brief message_list = 2;
+}
+
+message ntf_sys_msg
+{
+	optional one_chat_message_brief new_msg = 1;
+}

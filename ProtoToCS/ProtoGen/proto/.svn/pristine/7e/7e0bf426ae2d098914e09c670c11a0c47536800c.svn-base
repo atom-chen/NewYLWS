@@ -1,0 +1,51 @@
+package item;
+
+import "common.proto";
+
+//message req_item_list
+//{
+//
+//}
+
+//message rsp_item_list
+//{
+//	optional int32 result = 1[default = 0];
+//	repeated common.one_item item_list = 2;
+//}
+
+message notify_item_chg
+{
+	repeated common.one_item chg_item_list = 1;	//改变的道具列表
+	optional int32 reason = 2[default = 0];		//1:生产，。。。
+}
+
+message req_use
+{
+	optional int32 item_id = 1[default = 0];
+	optional int32 count = 2[default = 1];
+	optional int32 use_type = 3[default = 0];//1:开礼包 2:出售
+}
+
+message rsp_use
+{
+	optional int32 result = 1[default = 0];
+	optional int32 count = 2[default = 1];
+	repeated common.award_info award_list = 3;
+	optional int32 item_id = 4[default = 0];
+}
+
+message req_lock
+{
+	optional int32 item_id = 1[default = 0];
+	optional int32 lock = 2[default = 0];//1:lock, 0:unlock 
+	optional int32 item_type = 3[default = 0];
+	optional int32 index = 4[default = 0];
+}
+
+message rsp_lock
+{
+	optional int32 result = 1[default = 0];
+}
+
+//神兽
+//待定

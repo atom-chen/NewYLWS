@@ -1,0 +1,369 @@
+package db;
+
+import 'db_common.proto';
+
+message one_task_info
+{
+	optional int32 id = 1[default = 0];	//活动ID
+	optional int32 progress = 2[default = 0];	//今天的进度
+	optional int32 taken_flag = 3[default = 0];	//1是已经领取过了
+}
+
+message task_main_info
+{
+	repeated one_task_info task_list = 1;
+	repeated int32 finish_id_list = 2;
+}
+
+message daily_info
+{
+	repeated one_task_info daily_list = 1;
+	repeated int32 taken_box_list = 2;
+}
+
+message weekly_info
+{
+	repeated one_task_info weekly_list = 1;
+	repeated int32 taken_box_list = 2;
+}
+
+message achievement_info
+{
+	repeated one_task_info achievement_list = 1;	
+}
+
+message one_act
+{
+	message one_common_record
+	{
+		message one_single_charge_entry
+		{
+			optional int32 money = 1[default = 0];
+			optional int32 charge_times = 2[default = 0];
+			optional int32 award_taken_times = 3[default = 0];
+		}
+		
+		message single_charge_record
+		{
+			optional int32 day_id = 1[default = 0];
+			repeated one_single_charge_entry charge_list = 2;
+		}
+		
+		message one_day_single_charge
+		{
+			optional int32 day_id = 1[default = 0];
+			optional int32 money = 2[default = 0];
+			optional int32 taken = 3[default = 0];
+		}
+				
+		message consume_record
+		{
+			optional int32 time = 1[default = 0];
+			optional int32 consume_yuanbao = 2[default = 0];	//消费的元宝
+			optional int32 return_yuanbao = 3[default = 0];		//返还的元宝
+		}
+		
+		message time_count_limit_exchange_entry
+		{
+			optional int32 vip_level = 1[default = 0];
+			optional int32 award_taken_times = 2[default = 0];
+		}
+		
+		message time_limit_charge
+		{
+			optional int32 item_id = 1[default = 0];
+			optional int32 count = 2[default = 0];
+		}
+		
+		message drop_exchange_entry
+		{
+			optional int32 tag_index = 1[default = 0];
+			optional int32 award_taken_times = 2[default = 0];
+		}
+		
+		message shenbing_lottery_draw
+		{
+			optional int32 curr_team = 1[default = 1];//当前组 默认第一组
+			optional int32 curr_round = 2[default = 1];//当前组 轮次 默认第一轮
+			optional int32 has_lottery_times =3[default = 0];//已抽奖次数
+		}
+		
+		message hufu_baoxiang_record
+		{
+			optional int32 type = 1[default = 0];
+			optional int32 index = 2[default = 0];
+			optional int32 has_taken = 3[default = 0];
+			optional int32 can_open_time = 4[default = 0];
+		}
+		message hufu_baoxiang_award_record
+		{
+			message one_award
+			{
+				optional int32 award_id = 1[default = 0];//奖励id 道具或武将等id
+				optional int32 award_count = 2[default = 0];//总共奖励个数
+				optional int32 award_times = 3[default = 0];//奖励次数
+			}
+			optional int32 type = 1[default = 0];
+			repeated one_award taken_award_list = 2;
+		}
+				
+		optional int32 curr_value = 1[default = 0];
+		optional uint32 award_flag = 2[default = 0];
+		optional int32 last_login_time = 3[default = 0];
+		repeated int32 vip_bought_list = 4;	//vip购买列表
+		repeated single_charge_record continue_single_charge_list = 10;	//连续单笔充值记录
+		optional int32 last_charge_time = 11[default = 0];
+		repeated time_count_limit_exchange_entry time_count_exchange_list = 12;
+		repeated drop_exchange_entry drop_exchange_list = 13;
+		repeated one_day_single_charge charge_gift_7d_list = 14;	//7天 充值好礼
+		optional time_limit_charge time_limit_charge_info = 15;		//限时充值
+		repeated hufu_baoxiang_record hufu_baoxiang_list = 16; //虎符宝箱
+		optional shenbing_lottery_draw shenbing_lottery = 17;//神兵抽奖
+		repeated hufu_baoxiang_award_record hufu_baoxiang_award_list = 18; //虎符宝箱开箱奖励
+	}
+
+	optional uint32 act_id = 1[default = 0];
+	optional int32 act_type = 2[default = 0];
+	optional one_common_record act_record = 3;
+	optional int32 taken_all = 4[default = 0]; //领取了所有的奖励
+	optional int32 param1 = 5[default = 0];
+}
+
+message one_act_mgr
+{
+	repeated one_act act_list = 2;
+	repeated uint32 read_act_id_list = 3;	//客户端已经浏览过的活动id
+}
+
+message one_opensvr_act
+{
+	message one_common_record
+	{				
+		optional int32 curr_value = 1[default = 0];
+		optional uint32 award_flag = 2[default = 0];
+		optional int32 last_charge_time = 11[default = 0];
+	
+		message one_charge_gift
+		{
+			optional int32 day_id = 1[default = 0];
+			optional int32 charge_gold = 2[default = 0];
+			optional int32 award_taken = 3[default = 0];
+		}
+	}
+
+	optional uint32 act_id = 1[default = 0];
+	optional int32 act_type = 2[default = 0];
+	optional one_common_record act_record = 3;
+	optional int32 taken_all = 4[default = 0]; //领取了所有的奖励
+	optional int32 param1 = 5[default = 0];
+}
+
+message opensvr_act_mgr
+{
+	repeated one_opensvr_act act_list = 1;
+}
+
+message fuli_online
+{
+	optional int32 online_secs = 1[default = 0];
+	optional uint32 taken_flag = 2[default = 0];
+	optional uint32 last_update_time = 3[default = 0];
+}
+
+message fuli_login
+{
+	optional int32 total_login_days = 1[default = 0];
+	optional uint32 taken_flag = 2[default = 0];	//按位操作，第一位表示第一条，第二位表示第二条
+}
+
+message fuli_sign
+{
+	optional int32 taken_times = 1[default = 0];	//这个月已经领取的次数
+	optional int32 month = 2[default = 0];//月份
+	optional int32 last_taken_time = 3[default = 0];	//最后一次领取的时间
+}
+
+message fuli_levelup
+{
+	optional uint32 taken_flag = 1[default = 0];
+}
+
+message fuli_info
+{
+	optional int32 daily_flag = 1[default = 0];	//日常标记,0表示午餐，1表示晚餐，2表示夜宵
+	optional fuli_sign sign_info = 3;//签到
+	optional fuli_online online_fuli = 7;
+	optional fuli_login login_fuli = 8;	
+	optional fuli_levelup levelup_fuli = 9;
+}
+
+message one_camp
+{
+	message drop_item{
+		optional int32 item_id = 1[default = 0];
+		optional int32 count = 2[default = 0];
+	}
+	optional int32 today_times = 1[default = 0]; // 今天打过几次 挑战失败算一次
+	optional int32 sweep_floor = 2[default = 0]; // 今日从哪层开始打=今日扫荡的层数=昨日的最后通关进度 每日更新 
+	optional int32 sweep_flag = 3[default = 0]; // 1是可以扫荡
+	optional int32 floor = 4[default = 0]; // 当前通关进度  每次通过后更新
+	optional int32 passed_time = 5[default = 0]; // 最高层通关的时间 用于排行榜 每次通过后更新
+	repeated drop_item drop_list = 6;  //掉落
+	optional int32 today_reset_times = 7[default = 0]; //重置次数
+}
+
+message inscriptioncopy_data
+{
+	optional int32 pass_floor_max = 1[default = 0];
+	optional int32 enter_times = 2[default = 0];
+	optional int32 history_score_max = 3[default = 0];
+	optional int32 history_rank_best = 4[default = 0];
+	optional int32 best_consumed_time = 5[default = 0];
+	optional int32 best_score = 6[default = 0];
+}
+
+message gravecopy_data
+{
+	optional int32 pass_floor_max = 1[default = 0];
+	optional int32 enter_times = 2[default = 0];
+	optional int32 best_consumed_time = 3[default = 0];
+	optional int32 best_tongqian_count = 4[default = 0];
+}
+
+message shenbingcopy_data
+{
+	message one_shenbingcopy_award
+	{
+		message one_award_shenbing //神兵
+		{
+			optional int32 stage = 3[default = 0];
+			repeated int32 attr_list = 4;
+			repeated int32 mingwen_list = 6;
+		}
+		optional int32 award_type = 1[default = 0];//1、神兵 2、材料
+		optional int32 award_index = 2[default = 0];//唯一key
+		optional int32 award_id = 3[default = 0];
+		optional int32 award_count = 4[default = 0];
+		optional one_award_shenbing award_shenbing = 5;//award_type == 1时 读取award_shenbing
+		optional int32 award_owner_wj = 6[default = 0];
+	}
+
+
+	optional int32 max_pass_id = 1[default = 0];
+	optional int32 enter_times = 2[default = 0];
+	optional int32 today_chargell_time = 3[default = 0];
+	repeated one_shenbingcopy_award random_award_list = 4;//finish时必须clear
+	optional uint32 curr_copy_id = 5[default = 0];
+	optional uint32 fighting_seq = 6[default = 0];
+	optional uint32 next_award_index = 7[default = 0];//enter、finish时必须置0
+}
+
+message yuanmen_data
+{
+	message one_yuanmen
+	{
+		message one_monster_result
+		{
+			optional int32 monster_id = 1[default = 0];
+			optional int32 hp = 2[default = 0];	//剩余血量
+			optional int32 nuqi = 3[default = 0];	//剩余怒气
+			optional int32 ops = 4[default = 0]; //位置,
+			optional int32 monster_star = 5[default = 0];
+		}
+		optional int32 yuanmen_id = 1[default = 0];
+		optional int32 star_level = 2[default = 0];
+		repeated int32 left_buff_list = 3;
+		repeated int32 right_buff_list = 4;
+		repeated one_monster_result right_monster_info_list = 5;//right_monster_info_list
+		optional bool  passed = 6[default = false];
+		optional int32 score = 7[default = 6000];
+		optional int32 monster_level = 8[default = 0];
+	}
+	optional int32 last_refresh_time = 1[default = 0];
+	repeated one_yuanmen yuanmen_copy_list = 2;
+	optional int32 today_challenge_time = 3[default = 0];//今天挑战成功次数
+	optional int32 curr_yuanmen_id = 5[default = 0];
+	optional int32 fighting_seq = 6[default = 0];
+	optional bool  take_pass_six_award = 7[default = false];
+	optional int32 best_score = 8[default = 0];
+	optional int32 best_score_star = 9[default = 0];
+	
+}
+
+message dragon_copy_data
+{
+	message one_dragon_copy
+	{
+		optional int32 dragon_id = 1[default = 0];
+		optional int32 today_count = 2[default = 0];
+		
+	}
+	repeated one_dragon_copy dragon_copy_list = 2;
+	optional int32 today_challenge_time = 3[default = 0];//今天挑战成功次数
+	optional int32 curr_copy_id = 5[default = 0];
+	optional int32 fighting_seq = 6[default = 0];
+}
+
+message huarongdao_data
+{
+	message one_battlewujiang_extra_info
+	{
+		optional int32 seq = 1[default = 0];
+		optional second_attr_ratio_info base_second_attr_ratio = 2;
+		optional second_attr_info extra_second_attr = 3;
+		optional int32 extra_power = 4[default = 0]; //不包括所有武将都增加的战力，如星盘战力、家族战力等
+		optional first_attr_info real_extra_first_attr = 5;
+		optional first_attr_info show_extra_first_attr = 6;
+		repeated one_wujiang_skill_info inscriptions_skill_list = 7;
+		optional one_wujiang_skill_info horse_skill = 8;
+		optional one_horse_info horse_info = 9;
+		optional one_shenbing_info shenbing_info = 10;
+	}
+	
+	message one_buff_info
+	{
+		optional int32 buff_id = 1[default = 0];
+		optional int32 left_times = 2[default = 0];//-1表示无限次数
+	}
+	
+	message one_floor_info
+	{
+		message one_grid_info
+		{
+			optional int32 grid_type = 1[default = 0];
+			optional int32 pos = 2[default = 0];//row*10 + col
+			optional int32 status = 3[default = 0];
+		}
+		optional int32 floor = 1[default = 0]; //0未开启华容道
+		repeated one_grid_info grid_list = 2;
+	}
+	
+	optional one_floor_info curr_floor_info = 1;
+	repeated one_buff_info buff_list = 2;
+	repeated one_battle_wujiang_info wujiang_list = 3;
+	repeated one_battlewujiang_extra_info wujiang_extra_info_list = 4;
+	optional int32 last_give_ticket_time = 5[default = 0];
+	optional int32 next_wujiang_index = 6[default = 1];
+	optional int32 extra_power = 7[default = 0];//所有武将都增加的战力，如星盘战力、家族战力等
+	optional second_attr_info extra_second_attr = 8;
+	optional one_buzhen_info buzhen_info = 9;
+}
+
+message Achieve
+{
+	optional daily_info daily_data = 1;
+	optional task_main_info task_main_data = 2;
+
+	optional weekly_info weekly_data = 5;
+	optional achievement_info achievement_data = 6;	
+	optional fuli_info fuli_data = 7;
+	
+	optional one_camp camp_info = 23; //闯连营的数据
+	optional inscriptioncopy_data inscriptioncopy_info = 24;//命签副本
+	optional gravecopy_data gravecopy_info = 25;//墓穴副本
+
+	optional shenbingcopy_data shenbingcopy_info = 31;
+	optional yuanmen_data yuanmen_info = 32;
+	optional dragon_copy_data dragon_copy_info = 33;
+	optional huarongdao_data huarongdao_info = 34;
+}

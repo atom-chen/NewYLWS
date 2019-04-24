@@ -1,0 +1,97 @@
+package lottery;
+
+import 'common.proto';
+
+message activity_bar_info
+{
+	optional int32 fuli_type = 1[default = 0];  //1: 指定武将概率增加
+												//2: 指定国别的武将概率增加
+												//3: 指定稀有度的武将概率增加
+	optional int32 icon = 2[default = 0];
+	optional string title = 3[default = ""];
+	optional int32 param1 = 4[default = 0];
+}
+
+message one_recruit_type_cfg
+{
+	optional int32 recruit_type = 1[default = 0];
+	optional int32 price = 2[default = 0];
+	optional int32 price_item_id = 3[default = 0];
+}
+
+message req_lottery_info
+{
+	
+}
+
+message rsp_lottery_info
+{
+	optional int32 result = 1[default = 0];
+
+	optional int32 take_daily_fuli_count = 2[default = 0]; // 经获取每日福利 次数
+	optional int32 take_daily_fuli_count_limit = 3[default = 0]; // 是否已经获取每日福利 次数
+
+	repeated one_recruit_type_cfg recruit_type_cfg_list = 4;
+
+
+	optional activity_bar_info curr_activity_bar_info  = 11;  /// 活动栏信息
+	optional int32  curr_activity_wujiang_id = 12;   ///本期武将 活动 当前神将招募中有概率获得的信物
+	optional int32  curr_got_activity_xinwu_num = 13;   ///活动 已获得的信物数量
+	optional int32  activity_xinwu_num_limit = 14;   ///活动 已获得的信物数量	
+}
+
+message req_curr_activity_wujiang_comment
+{
+
+}
+
+message rsp_curr_activity_wujiang_comment
+{
+	optional int32 result = 1[default = 0];
+	optional string comment = 2[default = ""];
+}
+
+/// 招募
+message req_recruit
+{
+	optional int32 recruit_type = 1[default=0];   //1:普通招募 2:普通十连
+												  //3:神将招募 4:神将十连 5:点将令
+}
+
+message rsp_recruit
+{
+	optional int32 result = 1[default =0];
+	optional int32 recruit_type = 2[default = 0];
+
+	repeated common.award_info	normal_award_list = 10;
+
+	repeated common.award_info	addition_award_list = 11;
+
+	optional int32  curr_got_activity_xinwu_num = 13 [default = 0];   ///活动 已获得的信物数量
+	optional int32  activity_xinwu_num_limit = 14;   ///活动 已获得的信物数量限制
+}
+
+
+message req_get_daily_fuli
+{
+
+}
+
+message rsp_get_daily_fuli
+{
+	optional int32 result = 1[default = 0];
+	optional int32 take_daily_fuli_count = 2[default = 0];
+	repeated common.award_info	award_list = 10;
+}
+
+message req_xiejia
+{
+	repeated int32 wujiang_seq_list = 1;
+}
+
+message rsp_xiejia
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info	award_list = 10;
+}
+

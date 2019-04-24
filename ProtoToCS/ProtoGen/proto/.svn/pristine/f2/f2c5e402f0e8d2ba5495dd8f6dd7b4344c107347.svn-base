@@ -1,0 +1,56 @@
+package dragon;
+
+import 'common.proto';
+
+message req_dragon_list
+{
+
+}
+
+message rsp_dragon_list
+{
+	optional int32 result = 1[default = 0];
+	repeated common.one_dragon dragon_list = 2;
+}
+
+message req_improve_dragon
+{
+	optional int32 dragon_id = 1[default = 0];
+	optional common.one_item need_item = 2;
+}
+
+message rsp_improve_dragon
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_insert_buff_time
+{
+	optional int32 dragon_id = 1[default = 0];
+	optional common.one_item need_item = 2;
+}
+
+message rsp_insert_buff_time
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_active_talent
+{
+	optional int32 dragon_id = 1[default = 0];
+	optional common.one_item need_item = 2;
+	optional int32 talent_id = 3[default = 0];
+}
+
+message rsp_active_talent
+{
+	optional int32 dragon_id = 1[default = 0];
+	optional common.one_item need_item = 2;
+	optional int32 talent_id = 3[default = 0];
+}
+
+message ntf_dragon_chg
+{
+	optional int32 reason = 1[default = 0]; //1升级 2激活技能 3可以使用觉醒
+	optional common.one_dragon dragon_info = 2;
+}

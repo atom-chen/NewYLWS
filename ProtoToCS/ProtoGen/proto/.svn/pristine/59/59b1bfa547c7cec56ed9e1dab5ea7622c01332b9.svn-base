@@ -1,0 +1,834 @@
+package guild;
+import "common.proto";
+import "battle.proto";
+
+//军团简要信息
+message one_guild_brief
+{
+	optional uint32 gid = 1[default = 0];	//军团ID
+	optional string name = 2[default = ''];
+	optional int32 flag_icon = 4[default = 0]; //旗帜
+	optional int32 level = 5[default = 0];
+	optional int32 member_count = 6[default = 0];	//人数
+	optional int32 need_level = 7[default = 0];	//加入所需主公等级
+	optional string declaration = 8[default = ''];	//宣言
+	optional int32 join_type = 9[default = 0];	//验证类型，0需要验证，1不需要验证,2不允许加入
+	optional int32 huoyue = 10[default = 0];	//军团活跃
+	optional int32 member_limit = 11[default = 0]; //人数限制
+	optional int32 icon = 12[default = 0]; //旗帜
+	optional int32 rank = 13[default = 0]; //全服排行
+	optional int32 warcraft_score = 14[default = 0]; //争霸积分
+	optional string doyen_name = 15[default = ""];	//军团长姓名
+	optional uint32 doyen = 16[default = 0];	//军团长姓名
+}
+
+message one_member_brief
+{
+	optional uint32 uid = 1[default = 0];
+	optional string user_name = 2[default = ''];
+	optional int32 post = 3[default = 0];//职位，0普通，1军机 2副团，3团长
+	optional int32 level = 5[default = 0];	//主公等级
+	//optional int32 icon = 6[default = 0]; //头像
+	//optional int32 is_online = 9[default =0];  //0.不在线 1.在线
+	optional int32 sum_huoyue = 10[default = 0]; // 累计活跃
+	optional int32 week_huoyue = 11[default = 0]; // 本周活跃
+	optional int32 off_online_time = 12[default =0];  //0.在线 ,  > 0 下线时间
+	optional common.one_user_icon use_icon = 13; //头像
+}
+
+//职位对应的名字映射
+message one_post_name_map
+{
+	optional int32 post_type = 1[default = 1];
+	optional string post_name = 2[default = ''];
+}
+
+message one_member_detail
+{
+	optional uint32 uid = 1[default = 0];
+	optional string user_name = 2[default = ''];
+	optional int32 post = 3[default = 0];//职位，0普通，1军机 2副团，3团长
+	optional int32 arena_rank = 4[default = 0];	//竞技场排名
+	optional int32 level = 5[default = 0];	//主公等级
+	optional int32 huoyue7day = 6[default = 0];	//7日战功
+	optional int32 login_time = 7[default = 0];	//上线时间
+	optional int32 icon = 8[default = 0]; 
+	optional int32 is_online = 9[default =0];  //0.不在线 1.在线
+}
+
+message one_boss_rank_info
+{
+	optional uint32 uid = 1[default = 0];
+	optional string user_name = 2[default = ''];
+	optional int32 kill_soldier_count = 3[default = 0]; 
+	optional int32 rank = 4[default = 0];
+	optional int32 icon = 5[default = 0];
+}
+//申请列表详情
+message one_apply_detail
+{
+	optional common.one_user_brief user_brief = 6;
+	optional uint32 apply_time  = 7[default = 0];	//
+}
+
+message one_invitation /// 邀请
+{
+	optional uint32 gid = 1[default = 0];
+	optional uint32 inviter_uid = 2[default = 0];
+	optional uint32 target_uid = 3[default = 0];
+	optional uint32 time = 4[default = 0];
+	optional string guild_name = 5[default = ""];
+	optional string inviter_name = 6[default = ""];
+}
+
+//----------查看军团简要列表
+message req_guild_list
+{
+	optional int32 open_param = 1[default = 0];  /// 1 表示只请求随机列表
+}
+
+message rsp_guild_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_guild_brief guild_list = 2;
+	optional int32 open_param = 3[default = 0];
+	repeated one_guild_brief guild_rank_list = 4;
+}
+
+message req_guild_rank_list
+{
+
+}
+
+message rsp_guild_rank_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_guild_brief guild_rank_list = 4;
+}
+
+//----------查看自己军团详细信息
+message req_guild_detail
+{
+	optional int32 open_param = 1[default = 0];
+}
+
+message day_award_info
+{
+   optional  int32    gain    = 1[default = 0];   //是否领取  1.未领取  2.已领取
+   optional  int32    award_id = 2[default = 0];    
+   optional  int32    award_count = 3[default = 0];   
+}
+
+message one_donate_record  /// 捐献记录
+{
+	optional int32 donate_id = 1[default = 0];
+	//optional int32 count = 2[default = 0];
+	optional int32 left_count = 2[default = 0];
+}
+
+message one_worship_record  /// 膜拜记录
+{
+	optional uint32 target_uid = 1[default = 0];
+	optional int32 type = 2[default = 0];
+}
+
+message rsp_guild_detail
+{
+	optional int32 result = 1[default = 0];
+	optional string name = 2[default = ''];
+	optional int32 flag_icon = 4[default = 0]; //flag_icon
+	optional int32 icon = 12[default = 0]; //icon
+	optional int32 level = 5[default = 0];
+	optional int32 member_limit = 6[default = 0];	//人数上限
+	optional int32 huoyue = 7[default = 0];	//军团活跃
+	optional string recruit_declaration = 8[default = ''];	//宣言标题
+	optional string declaration = 9[default = ''];	//宣言
+	optional int32 resource = 10[default = 0];	//军团资源 --- TODO to be removed
+	repeated one_member_brief member_list = 11;	//成员简介列表
+
+	optional int32 join_type = 14[default = 0];	//验证类型，0需要验证，1不需要验证,2不允许加入
+	optional int32 need_level = 15[default = 1];	//需要的主公等级
+	repeated one_post_name_map post_name_map = 16;	//职位对应名字的映射
+	optional int32 vice_doyen_count_limit = 17[default = 2];	//副团长人数上限
+	optional uint32 gid = 19[default = 0];	//军团ID
+	optional int32 open_param = 20[default = 0];
+	repeated day_award_info day_award_list = 21;
+	optional int32 today_day_gain = 22[default = 0]; //今天是否领取军团签到奖励 1.未领取  2.已领取
+	optional int32 self_post = 23[default = 0]; //自己的职位
+	optional int32 need_huoyue = 24[default = 0]; //需要多少活跃升级  -1表示已满
+	repeated int32 red_point_list = 25;       //家族红点: 1 加入申请
+	repeated one_donate_record donate_record_list = 26;
+	repeated one_worship_record worship_record_list = 27;
+
+	optional int32 guild_yuanbao = 28[default = 0];	//军团资源元宝
+	optional int32 guild_coin = 29[default = 0];	//军团资源铜钱
+
+	optional int32 warcraft_score = 40[default = 0];
+	optional int32 rank = 41[default = 0];
+}
+
+
+//-----------查看自己军团的成员列表
+message req_guild_member_list
+{
+
+}
+
+message rsp_guild_member_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_member_detail member_list = 2;
+}
+
+//----------查找军团
+message req_find_guild
+{
+	optional string guild_key = 1[default = ''];	//查找军团的索引
+}
+
+message rsp_find_guild
+{
+	optional int32 result = 1[default = 0];
+	repeated one_guild_brief guild_info_list = 2;
+}
+
+//----------创建军团
+message req_create_guild
+{
+	optional string name = 1[default = ''];
+	optional int32 icon = 2[default = 0]; //军团旗帜
+	optional int32 flag_icon = 3[default = 0]; //军团旗帜
+	optional string declaration = 4[default = ''];
+}
+
+message rsp_create_guild
+{
+	optional int32 result = 1[default = 0];
+	optional uint32 gid = 2[default = 0];	//成功建立的军团id
+}
+
+//----------申请入团
+message req_apply
+{
+	optional uint32 gid = 1[default = 0];
+	optional uint32 inviter_uid = 2[default = 0];  /// 如果是受邀，则填写邀请者的uid
+}
+
+message rsp_apply
+{
+	optional int32 result = 1[default = 0];	
+	optional uint32 gid = 2[default = 0];
+	optional int32 apply_result = 3[default = 0];//0成功申请，1正式加入
+}
+
+//-----------查询申请列表
+message req_apply_list
+{
+}
+
+message rsp_apply_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_apply_detail apply_list = 2;
+}
+
+//-----------审批入团
+message req_examine
+{
+	optional uint32 uid = 1[default = 0];//玩家UID
+	optional int32 examine_result = 2[default = 0];//0表示不同意，1表示同意
+}
+
+message rsp_examine
+{
+	optional int32 result = 1[default = 0];
+	optional uint32 uid = 2[default = 0];//玩家UID
+	optional int32 examine_result = 3[default = 0];	//0表示正常，-1表示玩家已经加入军团了,-2表示军团已经满了
+	repeated one_member_brief member_list = 4;	//成员简介列表
+}
+
+//----------通知玩家入团
+message ntf_join_guild
+{
+	optional uint32 gid = 1[default = 0];	//军团ID
+	optional string name = 2[default = ''];
+}
+
+message req_invite  /// 邀请
+{
+	optional uint32 uid = 1[default = 0];
+}
+
+message rsp_invite
+{
+	optional int32 result = 1[default = 0];
+	optional uint32 uid = 2[default = 0];//玩家UID
+}
+
+message ntf_new_guild_invitation
+{
+
+}
+
+message req_invitation_list
+{
+}
+
+message rsp_invitation_list
+{
+	optional int32 result = 1[default = 0];
+	optional one_invitation invitation_list = 2;
+}
+
+//-----------退出军团
+message req_exit
+{
+}
+message rsp_exit
+{
+	optional int32 result = 1[default = 0];
+}
+
+//----------军团设置
+message req_setting
+{
+	optional int32 chg_type = 1[default = 0];//0修改宣言，1修改军团标记和名称 2修改验证类型以及主公等级限制
+	optional string name = 2[default = ''];
+	optional string recruit_declaration = 3[default = ''];
+	optional string declaration = 4[default = ''];
+	optional int32 flag_icon = 6[default = 0];
+	optional int32 icon = 9[default = 0];
+	optional int32 join_type = 7[default = 0];	//验证类型，0需要验证，1不需要验证,2不允许加入
+	optional int32 need_level = 8[default = 1];	//需要的主公等级
+}
+
+message rsp_setting
+{
+	optional int32 result = 1[default = 0];
+	optional int32 chg_type = 2[default = 0];
+}
+
+//----------职务改名
+message req_post_rename
+{
+	optional int32 chg_type = 1[default = 0];	//修改的职位，1军机 2副团，3长老
+	optional string doyen_name = 2[default = ''];	//团长
+	optional string vice_doyen_name = 3[default = ''];	//副团长
+	optional string elder_name = 4[default = ''];	//长老
+}
+
+message rsp_post_rename
+{
+	optional int32 result = 1[default = 0];
+	optional int32 chg_type = 2[default = 0];	//修改的职位，1军机 2副团，3团长
+}
+
+//----------职务安排
+message req_post_deploy
+{
+	optional uint32 uid = 1[default = 0];
+	optional int32 post = 2[default = 0];
+}
+
+message rsp_post_deploy
+{
+	optional int32 result = 1[default = 0];
+}
+
+//---------------踢人
+message req_member_kick
+{
+	optional uint32 uid = 1[default = 0];
+}
+message rsp_member_kick
+{
+	optional int32 result = 1[default = 0];
+	optional uint32 uid = 2[default = 0];
+	optional string name = 3[default = ''];
+}
+
+//---------------让位
+message req_abdicate
+{
+	optional uint32 uid = 1[default = 0];
+}
+
+message rsp_abdicate
+{
+	optional int32 result = 1[default = 0];
+}
+
+
+//--------------解散团
+message req_dismiss
+{
+}
+
+message rsp_dismiss
+{
+	optional int32 result = 1[default = 0];
+}
+
+message ntf_leave_guild
+{
+	optional uint32 gid = 1[default = 0];	//军团ID
+}
+
+message req_levelup  /// 升级军团
+{
+}
+
+message rsp_levelup  /// 升级军团
+{
+	optional int32 result = 1[default = 0];
+	optional int32 guild_level = 2[default = 0];
+}
+
+message req_sure_getaward
+{
+	optional int32 qiyuaward_trench=1[default = 0];//打开的邮件对应的槽位
+	optional int32 qiyu_id=3[default = 0];
+}
+message rsp_sure_getaward
+{
+	 optional int32 result=1[default = 0];
+}
+message ntf_send_mak_time_info
+{
+	optional int32 show_mak_time=1[default = 0];//为0时不用记时，大于0时进行记时
+	optional int32 show_mak=2[default = 0];//为0时不显示小红点，为1时显示小红点
+}
+
+
+
+message one_guild_daily
+{
+	message member_info
+	{
+		optional string name = 1[default = ''];
+		optional int32 post = 2[default = 0];
+	}
+
+	optional int32 curr_time = 1[default = 0];//日志的发生时间
+	optional int32 daily_type = 4[default = 0];//日志类型
+
+	optional member_info member1 = 5;
+	optional member_info member2 = 6;
+	optional member_info member3 = 7;
+	optional string guild_name1 = 8[default = ''];
+	optional string guild_name2 = 9[default = ''];
+
+	optional uint32 param1 = 16 [default = 0];
+	optional uint32 param2 = 17 [default = 0];
+	optional uint32 param3 = 18 [default = 0];
+	optional uint32 param4 = 19 [default = 0];
+
+	optional string str1 = 20 [default = ''];
+	optional string str2 = 21 [default = ''];
+	optional string str3 = 22 [default = ''];
+	optional string str4 = 23 [default = ''];
+}
+
+message req_guild_daily
+{
+	
+}
+message rsp_guild_daily
+{
+	optional int32 result = 1[default = 0];
+	repeated one_guild_daily guild_daily_list = 2;
+}
+
+message req_open_guild//点击军团按钮进入军团
+{
+	optional int32 open_param = 1[default = 0];
+}
+message rsp_open_guild//点击军团按钮进入军团
+{
+	optional int32 result = 1[default = 0];
+}
+
+message ntf_guild_chg
+{
+	optional uint32 gid = 1[default = 0];	//军团ID
+}
+
+message ntf_guild_resouce
+{
+	optional uint32 gid = 1[default = 0];	//军团ID
+	optional int32 guild_yuanbao = 2[default = 0];
+	optional int32 guild_coin = 3[default = 0];
+}
+
+message req_donate_guild
+{
+	optional uint32 donate_id = 1[default = 0];
+}
+message rsp_donate_guild
+{
+	optional int32 result = 1[default = 0];
+	optional int32 guild_level = 2[default = 0];
+	optional int32 guild_add_huoyue = 3[default = 0];
+	optional int32 left_count = 4[default = 0];
+
+	optional int32 guild_huoyue = 5[default = 0];
+	optional int32 guild_yuanbao = 6[default = 0];
+	optional int32 guild_coin = 7[default = 0];
+}
+
+message ntf_guild_apply_list_change
+{
+	optional int32 if_show_apply_mak = 1[default = 0];	//0为不显示红点，1为显示红点
+}
+
+message req_rename
+{
+	optional string name = 1[default = ''];
+}
+
+message rsp_rename
+{
+	optional int32 result = 1[default = 0];
+	optional string name = 2[default = ''];
+}
+
+message one_guild_boss
+{
+	optional int32 index = 1[default =0];  /// 第几个
+	optional int32 cfg_id = 2[default =0]; /// lua_guild_boss 表 id
+	optional int32 boss_id = 3[default =0]; /// boss怪物id
+	optional float hp_percent = 6[default =0];  // 表示还剩血量百分比
+	optional int32 status = 7; //boss状态  0:未激活  1: 激活状态 2: 激活并且被攻击状态  3: 已经被击杀 
+	optional int32 max_hp = 8; 
+	optional int32 curr_hp = 9; 
+	optional int32 boss_level = 10; 
+}
+
+message one_player_hurt_info
+{
+	optional common.one_user_brief user_brief = 1;
+	optional uint64 sum_hurt = 2[default = 0]; 
+	optional int32 rank = 3[default = 0];
+}
+
+message one_guild_hurt_info
+{
+	optional one_guild_brief guild_brief = 1;
+	optional uint64 sum_hurt = 2[default = 0]; 
+	optional int32 rank = 3[default = 0];
+}
+
+message req_all_guild_boss_info
+{
+
+}
+
+message rsp_all_guild_boss_info
+{
+	optional int32 result = 1[default = 0];
+	repeated one_guild_boss boss_list =2;
+	optional int32 remain_times =4[default =0];         //剩余挑战次数
+	optional int32 can_atk_boss = 5[default =0];   // 1表示能
+	optional int32 reset_count = 6[default = 0];  //已重置次数
+	optional int32 reset_limit = 7[default = 0];  //重置次数限制
+	optional int32 buy_buff_count = 8[default = 0];  //购买buff次数
+	optional int32 buy_buff_limit = 9[default = 0];  //购买buff次数限制
+	optional int32 atk_buff_valid = 10[default = 0];  //buff 是否生效中
+
+	repeated one_player_hurt_info player_hurt_rank_list = 20;
+	repeated one_guild_hurt_info  guild_hurt_rank_list = 21;
+
+	optional one_player_hurt_info own_hurt_info = 22;
+	optional one_guild_hurt_info  own_guild_hurt_info = 23;
+}
+
+message req_guild_boss_rank_list
+{
+
+}
+
+message rsp_guild_boss_rank_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_player_hurt_info player_hurt_rank_list = 20;
+	repeated one_guild_hurt_info  guild_hurt_rank_list = 21;
+
+	optional one_player_hurt_info own_hurt_info = 22;
+	optional one_guild_hurt_info  own_guild_hurt_info = 23;
+}
+
+message req_atk_boss
+{
+	optional int32 index = 1[default = 0];
+	optional common.one_buzhen buzhen_info = 3;
+	optional int32 copy_id = 4[default = 0]; ///
+}
+
+message rsp_atk_boss
+{
+	optional int32 result = 1 [default = 0];
+	optional battle.battle_info battle_info = 2;		///battle.battle_info 
+}
+
+message req_finish_atk_boss
+{
+	optional battle.battle_info battle_info = 1;		///battle.battle_info 
+    optional battle.result_info battle_result = 2;
+}
+
+message rsp_finish_atk_boss
+{
+	optional int32 result = 1[default = 0];//1战斗结果异常，2超时了，
+	repeated common.award_info award_list = 7;
+	optional float harm_percent = 8[default = 0];//乘以100的 
+	optional int32 consumed_time = 9[default = 0];//乘以10的
+	optional int32 my_rank = 10[default = 0];	//我的排名，0代表未上榜
+	optional int32 guild_rank = 11[default = 0];	//我的排名，0代表未上榜
+    optional battle.result_info battle_result = 13;
+}
+
+message req_buy_buff
+{
+
+}
+
+message rsp_buy_buff
+{
+	optional int32 result = 1[default = 0];
+	optional int32 buy_buff_count = 2[default = 0];
+	optional int32 atk_buff_valid = 3[default = 0];
+}
+
+/// boss战斗实时扣血
+message req_boss_rt_deduct_hp
+{
+	optional int32 seq = 1[default = 0];
+	optional int32 harm = 2[default = 0];  // 正数
+}
+
+message rsp_boss_rt_deduct_hp
+{
+	optional int32 result = 1[default = 0];
+	optional int32 seq = 2[default = 0];
+}
+
+message ntf_boss_rt_deduct_hp
+{
+	optional int32 seq = 1[default = 0];
+	optional int32 harm  = 2[default = 0];
+	optional int32 left_hp = 3[default = 0];
+	optional uint32 atker_uid = 4[default = 0];
+	optional string atker_name = 5[default = ""];
+	optional common.one_user_icon use_icon = 6; 
+}
+
+message req_reset_boss
+{
+}
+
+message rsp_reset_boss
+{
+	optional int32 result = 1[default = 0];
+	optional int32 guild_yuanbao = 2[default = 0];
+	optional int32 guild_coin = 3[default = 0];
+	optional int32 reset_count = 4[default = 0];
+}
+
+message req_guild_send_mail
+{
+	optional string title = 1[default = ''];
+	optional string content = 2[default = ''];
+}
+
+message rsp_guild_send_mail
+{
+	optional int32 result =1[default = 0];
+}
+
+
+//家族中的援助战报
+message one_guild_report
+{
+	optional int32 report_id = 1[default = 0];
+	optional uint32 from_uid = 2[default = 0];
+	optional uint32 report_time = 3[default = 0];
+	optional int32 is_read = 4[default = 0];
+	optional string from_name = 7[default = ''];
+	optional int32	guild_job = 8[default = 0];
+}
+
+message req_guild_report_list
+{
+}
+
+message rsp_guild_report_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_guild_report guild_report_list = 2;	
+}
+
+message req_read_guild_report
+{
+	optional int32 report_id = 1[default = 0];
+}
+
+message rsp_read_guild_report
+{
+	optional int32 result = 1[default = 0];
+	optional int32 report_id = 2[default = 0];
+	optional int32 is_read = 3[default = 0];
+}
+
+message req_guild_boss_rank
+{
+
+}
+
+message rsp_guild_boss_rank
+{
+	optional int32 result = 1[default = 0];
+	repeated one_boss_rank_info rank_list = 2;
+}
+
+message req_worship
+{
+	optional uint32 uid = 1[default = 0];	//膜拜uid
+	optional int32 worship_type = 2[default = 0];	//1是免费，2是花铜钱，3是花元宝
+}
+
+message rsp_worship
+{
+	optional int32 result = 1[default = 0];
+	optional uint32 uid = 2[default = 0];	//膜拜uid
+	optional int32 get_stamina = 3[default = 0];	//得到的体力
+}
+
+message req_worship_reward
+{
+
+}
+
+message rsp_worship_reward
+{
+	optional int32 result = 1[default = 0];
+	optional int32 reward_yuanbao = 2[default = 0];
+	optional int32 today_worship_count = 3[default = 0];
+	optional int32 be_worshiped_count = 4[default = 0];
+	optional int32 worship_limit = 5[default = 0];
+	optional int32 reward_money = 6[default = 0];
+}
+
+message req_take_worship_reward
+{
+
+}
+
+message rsp_take_worship_reward
+{
+	optional int32 result = 1[default = 0];
+	optional int32 reward_money = 2[default = 0];
+	optional int32 reward_yuanbao = 3[default = 0];
+}
+
+message one_award_info
+{
+	optional int32 type = 1[default = 0];  
+	optional int32 award_yuanbao = 2[default = 0];
+	repeated common.one_item item_list = 3;
+	optional string from_user_name = 4[default = ""];
+}
+
+message ntf_new_award
+{
+}
+
+message req_award_info
+{
+}
+
+message rsp_award_info
+{
+	optional int32 result = 1[default = 0];
+	repeated one_award_info award_list = 2;
+	optional int32 be_worshiped_count = 3[default = 0];
+}
+
+message req_take_all_award
+{
+}
+
+message rsp_take_all_award
+{
+	optional int32 result = 1[default = 0];
+}
+
+message one_guild_task
+{
+	optional int32 task_id = 1[default = 0];
+	optional int32 process = 2[default = 0];
+	optional int32 take_flag = 3[default = 0]; // 奖励领取状态 0 未领取 1 已领取
+}
+message req_guild_task_list
+{
+}
+
+message rsp_guild_task_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_guild_task task_list = 2;
+}
+
+message req_complete_guild_task
+{
+	optional int32 task_id = 1[default = 0];
+}
+
+message rsp_complete_guild_task
+{
+	optional int32 result = 1[default = 0];
+	optional int32 task_id = 2[default = 0];
+}
+
+message one_guild_skill
+{
+	optional int32 skill_id = 1[default = 0];
+	optional int32 is_unlocked = 2[default = 0]; // 0未解锁 1已解锁
+	optional int32 is_new = 3[default = 0];
+	optional int32 is_learned = 4[default = 0];
+}
+
+message req_guild_skill_list
+{
+
+}
+
+message rsp_guild_skill_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_guild_skill guild_skill_list = 2;
+	repeated int32 learned_skill_id_list = 3;
+}
+
+message req_unlock_skill  //激活(解锁)技能
+{
+	optional int32 skill_id = 1[default = 0];
+}
+
+message rsp_unlock_skill
+{
+	optional int32 result = 1[default = 0];
+	optional one_guild_skill skill_info = 2;
+}
+
+message req_learn_skill
+{
+	optional int32 skill_id = 1[default = 0];
+}
+
+message rsp_learn_skill
+{
+	optional int32 result = 1[default = 0];
+	optional int32 skill_id = 2[default = 0];
+	repeated int32 learned_skill_id_list = 3;
+}
+

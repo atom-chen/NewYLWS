@@ -1,0 +1,20 @@
+package setting;
+
+//活动的信息
+message ntf_activity_setting
+{
+	optional int32 create_guild_need_yuanbao = 10[default = 0];
+	optional int32 arena_lingpai_limit = 11[default = 0]; /// 竞技场挑战令牌上限
+	optional int32 elite_copy_limit = 31[default = 3];	//精英副本可以进入的总次数
+	optional int32 gmt_zone = 32[default = 8];
+	optional int32 player_rename_cost = 33[default = 100];//玩家改名花钱
+	optional int32 max_user_level = 42[default = 80];	//玩家最高等级
+	optional uint32 module_switch = 43[default = 0];	//模块开关	
+	optional int32 rebuild_shenbing_cost_1 = 44[default = 0]; //重铸神兵铭文1价格
+	optional int32 rebuild_shenbing_cost_2 = 45[default = 0]; //重铸神兵铭文1价格
+	optional int32 rebuild_shenbing_cost_3 = 46[default = 0]; //重铸神兵铭文1价格
+	
+	optional int32 max_copy_section = 76[default = 0];	//开放的最大章节id	
+
+	
+}

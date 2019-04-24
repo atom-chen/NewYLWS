@@ -1,0 +1,118 @@
+package db;
+import 'db_common.proto';
+
+message one_guild_apply_info
+{
+	optional uint32 gid = 1[default = 0];
+	optional int32 time = 2[default = 0];
+}
+
+message one_guild_exit_info
+{
+	optional uint32 gid = 1[default = 0];
+	optional int32 time = 2[default = 0];
+}
+
+message one_guild_join_info
+{
+	optional uint32 gid = 1[default = 0];
+	optional int32 time = 2[default = 0];
+}
+
+message one_guild_donate_info
+{
+	optional int32 donate_id = 1[default = 0];
+	optional int32 count = 2[default = 0];
+}
+
+message one_charge_act_red_spot
+{
+	optional int32 red_spot_time = 1[default = 0];
+	repeated int32 act_type_list = 2;
+}
+
+//有关世界BOSS的战斗信息
+message one_world_boss_info
+{
+	optional uint32 fought_flag = 1[default = 0];	//打过BOSS的记录,与上0x1表示上午，0x2表示下午
+
+	optional int32 noon_boss_hp = 2[default = 0];
+	optional int32 noon_harm_num = 3[default = 0];	//上午的伤害数
+	optional int32 noon_kill_time = 4[default = 0];	//上午的击杀时间
+
+	optional int32 night_boss_hp = 7[default = 0];
+	optional int32 night_harm_num = 8[default = 0];
+	optional int32 night_kill_time = 9[default = 0];
+
+	optional int32 fighting_boss_id = 11[default = 0];	//正在与哪个BOSS决斗
+	optional int32 fighting_boss_level = 12[default = 0];
+	optional uint32 fighting_flag = 13[default = 0];	//正在打的标志，主要是防止打的时候超过时间了
+	optional int32 enter_time = 14[default = 0];	//进入副本的时间
+	optional int32 enhanced_atk = 15[default = 0];	//增强的攻击,1代表100，2表示200 
+	optional uint32 enhanced_fought_flag = 16[default = 0];	//此次增加的类型，早上还是晚上
+	optional int32 fighting_seq = 17[default = 0];
+	
+	optional int32 fight_noon_boss_times = 18[default = 0];	//挑战过中午boss的次数
+	optional int32 already_buy_noon_boss_times = 19[default = 0]; //已经购买过中午boss的次数
+	
+	optional int32 fight_night_boss_times = 20[default = 0];	// 挑战过晚上boss的次数
+	optional int32 already_buy_night_boss_times = 21[default = 0];	// 已经购买过晚上boss的次数
+}
+
+message one_guild_worship_info
+{
+	optional uint32 target_uid = 1[default = 0];
+	optional int32 type = 2[default = 0];
+}
+
+message guild_task_info
+{
+	message one_guild_task
+	{
+		optional int32 task_id = 1[default = 0];
+		optional int32 process = 2[default = 0];
+		optional int32 take_flag = 3[default = 0]; // 奖励领取状态 0 未领取 1 已领取
+	}
+	repeated one_guild_task task_list = 1;
+	optional uint32 time = 2[default = 0];
+}
+
+message user_guild_stuff
+{
+	optional int32 atk_boss_count = 1[default = 0];
+	optional int32 buy_boss_buff_count = 2[default = 0];
+	optional int32 is_atk_buff_valid = 3[default = 0];
+
+}
+
+message star_map_info 
+{
+	optional int32 star_make_id = 1[default = 0];
+	optional int32 taken_award_flag = 2[default = 0];
+}
+
+//所有杂事就丢在这里吧
+message Trivial
+{
+	repeated one_guild_apply_info apply_list = 1;
+	repeated one_guild_exit_info guild_exit_list = 2;	//退团记录
+	repeated one_guild_join_info guild_join_list = 3;	//主要用于记录7天内的入团数
+	optional one_world_boss_info world_boss_info = 4;	//世界BOSS相关的数据信息
+
+	optional int32 shop_half_price_count = 5[default = 0];
+	repeated star_map_info star_map_list = 7; //星图
+	optional int32 guild_award_flag      = 8[default = 0];  //军团奖励领取情况 [1-7 每日签到奖励]
+	optional int32 world_speak_times = 9[default = 0];
+	repeated uint32 blacklist = 12;	//黑名单
+	optional one_charge_act_red_spot act_charge_red_spot_info = 13;	//充值活动红点记录
+	optional int32 today_buy_stamina_count = 14[default = 0];
+
+	repeated one_guild_donate_info today_donate_guild_list = 15; // 今日捐献家族记录
+	repeated one_guild_worship_info today_guild_worship_list = 16; /// 今日膜拜记录
+	optional guild_task_info guild_task_info = 17;
+	optional user_guild_stuff guild_stuff = 18;
+		
+	optional uint32 last_check_guild_achieve_time = 53; /// 最后一次检测家族成就的时间
+
+	repeated one_buzhen_info buzhen_list = 54;
+} 

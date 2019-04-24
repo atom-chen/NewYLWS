@@ -1,0 +1,818 @@
+package guildwarcraft;
+// 争霸
+import "common.proto";
+import "battle.proto";
+
+message one_guild_info
+{
+	message one_post_name_map
+	{
+		optional int32 post_type = 1[default = 1];
+		optional string post_name = 2[default = ''];
+	}
+	optional uint32 guild_id = 1[default = 0];
+	optional int32 icon = 2[default = 0];
+	optional string name = 4[default = ''];
+	optional int32 level = 5[default = 0];
+	optional string doyen_name = 6[default = ''];
+	optional uint32 doyen = 8[default = 0];
+    optional int32 dist_id = 7[default = 0];
+
+    optional int32 warcraftscore = 9[default = 0];
+	repeated uint32 vice_doyen_list = 10;
+	repeated uint32 elder_list = 11;
+	repeated uint32 member_uid_list = 12;
+    optional string str_dist_id = 13[default = ''];
+    optional string dist_name = 14[default = ''];
+	repeated one_post_name_map post_name_map = 16;	//职位对应名字的映射
+}
+
+message one_guild_brief
+{
+	optional uint32 gid = 1[default = 0];
+	optional int32 icon = 2[default = 0];
+	optional string name = 4[default = ''];
+	optional int32 level = 5[default = 0];
+	optional string doyen_name = 6[default = ''];
+	optional uint32 doyen = 8[default = 0];
+    optional string str_dist_id = 13[default = ''];
+    optional string dist_name = 14[default = ''];
+    optional int32 warcraftscore = 9[default = 0];
+}
+
+message one_user_brief_ex
+{
+	optional uint32 uid = 1[default = 0];
+	optional common.one_user_icon use_icon = 2;	//主公头像
+	optional int32 level = 3[default = 0];
+	optional string name = 4[default = ''];
+	optional string guild_name = 5[default = ''];	//军团名称
+	optional int32 vip_level = 6[default = 0];
+	optional int32 guild_job = 7[default = 0];	//军团职务
+	optional uint32 guild_id = 8[default = 0];	//军团id
+	optional int32 dist_id = 9[default = 0];	//
+	optional string guild_job_name = 15[default = ""];	//军团职务名称
+	optional int32 guild_icon = 16[default = 0];	//
+
+	optional int32 jungong = 17[default = 0];
+
+	optional uint32 login_time = 10[default = 0];
+	optional uint32 logout_time = 11[default = 0];
+
+    optional string str_dist_id = 13[default = ''];
+    optional string dist_name = 14[default = ''];
+
+	optional common.one_buzhen default_def_buzhen = 20;	
+}
+
+
+message one_city_brief
+{
+	optional int32 city_id = 1[default = 0];
+	optional uint32 own_guild_id = 2[default = 0];
+	optional uint32 atker_guild_id = 3[default = 0];
+
+	optional one_guild_brief own_guild_brief = 4;
+	optional one_guild_brief atker_guild_brief = 5;
+}
+
+message one_room_info
+{
+	optional int32 room_id = 2[default = 0];
+	repeated one_city_brief city_list = 1; 
+}
+
+message one_wujiang_status
+{
+	optional int32 wujiang_seq = 1[default = 0];
+	optional int32 remain_hp = 2[default = 0];
+	optional int32 remain_nuqi = 3[default = 0];
+
+	optional common.one_wujiang_brief wujiang_brief = 10;
+	optional bool is_dead = 11[default = false];
+
+}
+
+message one_rival_info
+{
+	optional uint32 uid = 1[default = 0];
+	optional string user_name = 6[default = ''];	//玩家名字
+	optional int32 level = 7[default = 0];	//主公等级
+	optional int32 dist_id = 8[default = 0];	//主公等级
+	optional string guild_name = 5[default = ''];	//军团名称
+	optional int32 user_title = 9[default = 0];	//称号
+    optional string str_dist_id = 13[default = ''];
+    optional string dist_name = 14[default = ''];
+
+	repeated one_wujiang_status def_wujiang_list = 4;	//防守武将列表 包含剩余状态
+}
+
+message one_user_info
+{
+	optional uint32 uid = 1[default = 0];
+	optional common.one_user_icon use_icon = 2;	//主公头像
+	optional string user_name = 6[default = ''];	//玩家名字
+	optional int32 level = 7[default = 0];	//主公等级
+	optional int32 dist_id = 8[default = 0];	//主公等级
+	optional string guild_name = 5[default = ''];	//军团名称
+	optional int32 user_title = 9[default = 0];	//称号
+	optional int32 post = 10[default = 0];
+	optional string post_name = 11[default = ""];
+	optional int32 win_rate = 12[default = 0];
+	optional int32 jungong = 13[default = 0];
+	optional int32 guild_icon = 14[default = 0];
+
+    optional string str_dist_id = 15[default = ''];
+    optional string dist_name = 16[default = ''];
+}
+
+message one_def_buzhen
+{
+	optional common.one_buzhen buzhen_info = 1;
+	optional int32 def_city_id = 2[default = 0];  // 防守的城
+}
+
+message one_break_info
+{
+	optional int32 user_title = 1[default = 0];  /// 击破对方的称号
+	optional int32 break_count = 2[default = 0]; /// 击破该称号玩家的次数
+}
+
+
+message one_husong_mission
+{
+    optional int32 husong_id = 1[default = 0];
+	optional int32 status = 2[default = 0];  // 0 没有接受， 1进行中， 2已完成没有领取，3完成并且已领取
+	optional uint32  left_time = 3[default = 0];
+
+    optional uint32  hufa_uid = 4[default = 0];
+	optional common.one_user_brief hufa_brief = 5;
+	optional common.one_user_brief owner_brief = 6;
+
+    optional int32 	be_rob_count = 7[default = 0];// 被抢次数
+}
+
+message ntf_guildwarcraft_base_info  //-- cross to gamesvr
+{
+    optional int32 war_day = 1[default = 0];
+    optional int32 curr_stat = 2[default = 0];     /// 处于当天的哪个状态
+
+    optional int32 war_week = 4[default = 0];      
+    optional int32 war_season = 5[default = 0];      
+}
+
+// 面板
+
+message req_guildwarcraft_pannel
+{
+
+	/// 以下由服务器填
+
+	optional common.one_user_brief user_brief = 30;
+}
+
+message rsp_guildwarcraft_pannel
+{
+	optional int32 result = 1[default = 0];
+	optional int32 curr_stat = 2[default = 0];
+    optional int32 war_day = 3[default = 0];
+    optional int32 war_week = 4[default = 0];      
+    optional int32 war_season = 5[default = 0];      
+	optional one_room_info battle_room_info = 6;
+
+	optional int32 battle_start_time = 7[default = 0]; /// 战斗开始的时间
+	optional int32 curr_time = 10[default = 0]; /// 战斗开始的时间
+	optional bool  is_battle_end = 8[default = false];	   /// 战斗是否打完了
+	optional int32 offence_city_id = 9[default = 0];   /// 如果是战斗阶段，家族进攻的 city
+
+	optional one_husong_mission curr_husong_misson = 15;
+	optional int32 today_rob_count = 16[default = 0];
+	optional int32 today_rob_count_limit = 17[default = 0];
+
+	optional int32 today_atk_count = 20[default = 0];
+	optional int32 atk_count_limit = 21[default = 0];
+	optional int32 jungong = 22[default = 0];  /// 军功
+	optional int32 user_title = 23[default = 0];  /// 称号
+	repeated int32 buff_list = 24;
+	optional int32 buzhen_num_limit = 25[default = 0]; /// 个人的 布阵上限
+
+	optional int32 cfg_offence_duration_time = 30[default = 0];
+
+}
+
+/// 开启进攻
+message req_guild_start_offence
+{
+
+	/// 以下由服务器填
+	optional one_guild_info guild_info = 20;
+}
+
+message rsp_guild_start_offence
+{
+	optional int32 result = 1[default = 0];
+	optional int32 battle_start_time = 2[default = 0];
+	optional int32 offence_city_id = 3[default = 0];
+}
+
+message ntf_guild_start_offence
+{
+	optional uint32 guild_id = 1[default = 0];	
+	optional int32 battle_start_time = 2[default = 0];
+	optional int32 offence_city_id = 3[default = 0];
+}
+
+//点击出战
+message req_start_atk
+{
+}
+
+message rsp_start_atk
+{
+	optional int32 result = 1[default = 0];
+	optional int32 today_atk_count = 20[default = 0];
+	optional int32 atk_count_limit = 21[default = 0];
+}
+
+message req_warcraft_user_detail
+{
+	optional uint32 uid = 1[default = 0];
+}
+
+message user_offence_record
+{
+	message one_def_fight
+	{
+		optional common.one_user_brief  rival_brief = 1; 	
+		optional bool is_win = 2[default = false];
+		optional string battle_id = 3[default = ''];
+	}
+
+	message one_user_offence_city_record
+	{
+		optional int32 city_id = 1[default = 0];
+		optional one_guild_brief rival_guild_brief = 2;
+		repeated one_break_info  break_info_list = 3;
+	}
+
+	repeated one_def_fight def_fight_list = 1;
+	repeated one_user_offence_city_record offence_city_record_list = 2;
+}
+
+message rsp_warcraft_user_detail
+{
+	optional int32 result = 1[default = 0];
+	optional one_user_info user_info = 2;
+	optional int32 curr_break_count = 3[default = 0];  //本期攻城胜场
+	optional user_offence_record offence_record = 4;
+}
+
+message req_warcraft_guild_detail
+{
+	optional uint32 guild_id = 1[default = 0];
+}
+
+message rsp_warcraft_guild_detail
+{
+	message one_guild_city_battle_record
+	{
+		optional int32 city_id = 1[default = 0];
+		optional one_guild_brief rival_guild_brief = 2;
+		optional bool is_offence = 3[default = false];  /// true 攻城， 
+		optional bool is_win  = 4[default = false];
+		optional uint32 time = 5[default = 0];
+	}
+	optional int32 result = 1[default = 0];
+	optional one_guild_brief guild_brief = 2;
+	repeated int32 occ_city_list = 3;
+	optional int32 out_put_coin_num = 4;  // 产出金币数
+	optional int32 rank = 5;  //
+
+	repeated one_user_info user_info_list = 10;
+	repeated one_guild_city_battle_record city_battle_record = 11;
+}
+
+message req_user_def_buzhen_info  // 请求列表玩家(自己或者别人)阵容信息
+{
+	optional uint32 uid = 1[default = 0];	
+	optional int32 city_id = 2[default = 0];	
+}
+
+message rsp_user_def_buzhen_info
+{
+	message one_buzhen_wujiang_brief_list
+	{
+		optional int32 buzhen_id = 1[default = 0];
+		repeated common.one_wujiang_brief wujiang_list = 2;
+	}
+	optional int32 result = 1[default = 0];
+	optional uint32 uid = 2[default = 0];	
+	optional int32 city_id = 3[default = 0];	
+	repeated one_buzhen_wujiang_brief_list all_buzhen_wujiang_brief_list = 4;
+}
+
+message req_def_buzhen_info /// 请求自己的所有布阵信息
+{
+
+}
+message rsp_def_buzhen_info
+{
+	optional int32 result = 1[default = 0];
+	optional int32 buzhen_num_limit = 2[default = 0];
+	repeated one_def_buzhen def_buzhen_list = 3;	
+}
+
+message req_inner_user_def_buzhen_city // 服务器内部使用 gamesvr -> crosssvr
+{
+	optional uint32 uid = 1[default = 0];
+}
+
+message rsp_inner_user_def_buzhen_city // 服务器内部使用 crosssvr -> gamesvr
+{
+	message one_buzhen_in_city
+	{
+		optional int32 buzhen_id = 1[default = 0];
+		optional int32 city_id = 2[default = 0];
+	}
+	optional int32 result = 1[default = 0];
+	optional int32 buzhen_num_limit = 2[default = 0];
+	repeated one_buzhen_in_city  buzhen_in_city_list = 3;
+}
+
+message one_buzhen_formation
+{
+	optional int32 buzhen_id = 1[default = 0];
+
+	optional common.one_battle_formation battle_formation = 11; // 直接用 formation
+}
+
+message req_set_def_buzhen
+{
+	repeated common.one_buzhen buzhen_info_list = 1;
+
+	/// 下面的数据 由服务器补充
+	repeated one_buzhen_formation buzhen_formation_list = 11;
+}
+
+message rsp_set_def_buzhen
+{
+	optional int32 result = 1[default = 0];
+	repeated common.one_buzhen buzhen_info_list = 2;
+	optional int32 buzhen_num_limit = 3[default = 0];
+}
+
+message req_send_def_buzhen_to_city
+{
+	optional int32 city_id = 1[default = 0];
+
+	optional common.one_buzhen buzhen_info = 2;
+
+	/// 下面的数据 由服务器补充
+	optional one_buzhen_formation buzhen_formation = 11;
+}
+
+message rsp_send_def_buzhen_to_city
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_player_curr_fighting_info
+{
+
+}
+
+message rsp_player_curr_fighting_info
+{
+	optional int32 result = 1[default = 0];
+
+	repeated one_wujiang_status wujiang_status_list = 2;  // 武将剩余状态
+
+	optional one_rival_info curr_rival_info = 3;  /// 当前对手
+}
+
+message req_enter_fight
+{
+
+	optional int32 city_id = 1[default = 0];
+	optional common.one_buzhen buzhen_info = 3;
+
+	/// 以下由服务器填
+	repeated common.one_battle_wujiang battle_wujiang_list = 10;
+	optional common.one_battle_formation battle_formation = 11; // 直接用 formation
+}
+
+message rsp_enter_fight
+{
+	optional int32 result=1[default = 0];
+	optional battle.battle_info battle_info = 10;	// battle.battle_info 
+	optional one_guild_brief rival_guild_brief = 11;
+	optional one_user_info rival_info = 12;
+	optional int32 offence_left_time = 13[default = 0];  /// 进攻阶段剩余时间 秒
+	optional int32 rival_guild_left_member_num = 14[default = 0];
+
+}
+
+message req_finish_fight
+{
+	optional battle.battle_info battle_info = 1;		///battle.battle_info 
+    optional battle.result_info battle_result = 2;
+}
+
+message rsp_finish_fight
+{
+	optional int32 result = 1[default = 0];//
+    optional int32 add_jungong = 2[default = 0];
+    optional int32 left_atk_count = 3[default = 0];
+
+
+    optional battle.result_info battle_result = 20;
+}
+
+message ntf_entry_day_stat
+{
+    optional int32 new_stat = 4[default = 0];
+}
+
+message req_update_guild_info_to_crosssvr   //gamesvr to crosssvr
+{
+	optional uint32 guild_id = 1[default = 0];
+	optional one_guild_info guild_info = 2;
+}
+
+message rsp_update_guild_info_to_crosssvr   // crosssvr to gamesvr 
+{
+	optional int32 result = 1[default = 0];
+	optional uint32 guild_id = 2[default = 0];
+}
+
+message ntf_player_no_default_battle_data  // crosssvr to gamesvr
+{
+	optional uint32 uid = 1[default = 0];	
+}
+
+message ntf_inner_player_first_update
+{
+	optional uint32 uid = 1[default = 0];	
+}
+
+message req_update_player_info_to_crosssvr   //gamesvr to crosssvr
+{
+	optional uint32 uid = 1[default = 0];
+	optional one_user_brief_ex user_brief_ex = 2;
+	optional int32 action = 3[default = 0]; /// 1 表示上线时， 2表示下线时
+
+	optional common.one_battle_formation default_def_formation = 6; 
+}
+
+message ntf_player_chg_in_cross // crosssvr to gamesvr
+{
+	optional uint32 uid = 1[default = 0];
+	optional uint32 guild_id = 2[default = 0];
+
+	optional int32  jungong = 3[default = 0];
+	optional int32  user_title = 4[default = 0];
+}
+
+message ntf_guild_chg_in_cross // crosssvr to gamesvr
+{
+	optional uint32 guild_id = 1[default = 0];
+	optional int32 warcraftscore = 2[default = 0];
+	optional int32 guild_husong_progress = 3[default = 0];
+	optional int32 guild_husong_progress_max = 4[default = 0];
+	optional int32 battle_start_time = 5[default = 0];
+	optional int32 battle_finished_time = 6[default = 0];
+}
+
+message rsp_update_player_info_to_crosssvr   // crosssvr to gamesvr
+{
+	optional int32 result = 1[default = 0];
+	optional uint32 uid = 2[default = 0];
+}
+
+//-crosssvr 统计玩家所有的需要的武将seq发给gamesvr
+message ntf_player_wujiang_seq_list_to_crosssvr // crosssvr to gamesvr
+{
+	optional uint32 uid = 2[default = 0];
+	repeated int32 wujiang_seq_list = 3;
+}
+
+//gamesvr 把武将的战斗数据更新到crosssvr
+message ntf_player_battle_wujiang_to_crosssvr //gamesvr to crosssvr
+{
+	optional uint32 uid  = 1[default = 0];	
+	repeated common.one_battle_wujiang battle_wujiang_list = 2;
+}
+
+message req_city_info
+{
+	optional int32 city_id = 1[default = 0];
+}
+
+message rsp_city_info
+{
+	optional int32 result = 1[default = 0];//
+	optional one_city_brief city_brief = 2;
+	repeated one_user_info def_user_list = 3; 
+	repeated int32 buff_list = 4;
+}
+
+message req_warcraft_rank_list
+{
+}
+
+message one_guild_rank_info
+{
+	optional one_guild_brief guild_brief = 1;
+	optional int32 occ_city_num = 2 [default = 0];
+	optional int32 rank = 3[default = 0];
+}
+message rsp_warcraft_rank_list
+{
+	optional int32 result = 1[default = 0];//
+	optional uint32 curr_week_end_time = 2[default = 0];//
+	optional uint32 next_week_start_time = 3[default = 0];//
+	repeated one_guild_rank_info curr_room_rank_list = 10;
+	repeated one_guild_rank_info self_server_rank_list = 11;
+	repeated one_guild_rank_info all_server_rank_list = 12;
+}
+
+message ntf_city_fighting_news
+{
+	optional int32 city_id = 1[default = 0];
+	optional uint32 offence_uid = 2[default = 0];
+	optional string offence_user_name = 3[default = ''];
+	optional uint32 def_uid = 4[default = 0];
+	optional string def_user_name = 5[default = ''];
+	optional uint32 winner_uid = 6[default = 0];
+
+	optional uint32 def_guild_id = 10[default = 0];
+	optional string def_guild_name = 11[default = ''];
+	optional uint32 def_guild_left_member_num = 12[default = 0];
+}
+
+message ntf_city_fighting_news_inner // crosssvr to gamesvr
+{
+	repeated uint32 uid_list = 1;	
+	optional uint32 atk_guild_id = 10[default = 0];
+	optional ntf_city_fighting_news news_info = 2;
+}
+
+message ntf_offence_city_battle_end
+{
+	optional int32 city_id = 1[default = 0];
+	optional uint32 atk_guild_id = 2[default = 0];
+	optional uint32 def_guild_id = 3[default = 0];
+	optional int32 room_id = 4[default = 0];
+	optional uint32 winner_guild_id = 5[default = 0];
+	optional one_guild_brief atk_guild_brief = 6;
+	optional one_guild_brief def_guild_brief = 7;
+
+	optional int32 cfg_offence_win_award_coin = 20[default = 0];
+	optional int32 cfg_defence_win_award_coin = 21[default = 0];
+}
+
+message ntf_offence_city_result
+{
+
+	message one_user_offence_result
+	{
+		optional common.one_user_brief user_brief = 1;
+		repeated one_break_info break_info_list = 8; 
+		optional int32 award_jungong = 9[default = 0];
+		optional int32 rank = 10[default = 0];
+	}
+
+	optional int32 offence_result = 1[default = 0]; // 0 失败  1 成功	
+	repeated one_user_offence_result user_offence_result_list = 2;
+	optional int32 city_id = 3[default = 0];
+	optional uint32 offence_end_time = 4[default = 0];
+}
+
+message req_buy_buff
+{
+	optional int32 buff_id = 1[default = 0];
+}
+message rsp_buy_buff
+{
+	optional int32 result = 1[default = 0];
+	optional int32 buff_id = 2[default = 0];
+	repeated int32 buff_list = 4;
+}
+
+message ntf_guild_warcraft_daily_output // 服务器内部使用
+{
+	message member_jungong_info
+	{
+		optional uint32 uid = 1[default = 0];
+		optional int32 today_jungong = 2[default = 0];
+	}
+	optional uint32 guild_id = 1[default = 0];
+	optional int32 guild_today_sum_jungong = 2[default = 0];
+	optional int64 guild_output_coin = 3[default = 0];
+	repeated member_jungong_info member_jungong_info_list = 4;
+
+}
+
+message ntf_guild_week_rank_award_inner // 服务器内部使用
+{
+	optional uint32 guild_id = 1[default = 0];
+	optional int32 rank = 2[default = 0];
+	optional int32 own_city_num = 3[default = 0];
+	optional int32 warcraftscore = 4[default = 0];
+	optional int32 occ_city_num = 5[default = 0];
+}
+
+message ntf_guild_season_rank_list_award_inner /// 服务器内部使用
+{
+	// 发给一整个服务器的
+	message one_rank
+	{
+		optional uint32 guild_id = 1[default = 0];
+		optional int32 rank = 2[default = 0];
+		optional int32 own_city_num = 3[default = 0];
+		optional int32 warcraftscore = 4[default = 0];
+	}
+
+	repeated one_rank rank_list = 1;
+}
+
+
+//==================================================================
+
+message req_husong_pannel
+{
+}
+
+message rsp_husong_pannel
+{
+	optional int32 result = 1[default = 0];//
+
+	repeated one_husong_mission husong_misson_list = 2;
+
+	optional one_husong_mission curr_husong_misson = 3;
+
+	optional int32 today_husong_count = 4[default = 0];
+	optional int32 today_husong_count_limit = 5[default = 0];
+	optional int32 today_rob_count = 8[default = 0];
+
+	optional int32 today_accept_hufa_count = 6[default = 0];
+	optional int32 today_accept_hufa_count_limit = 7[default = 0];
+	optional int32 today_rob_count_limit = 9[default = 0];
+
+	optional one_husong_mission curr_searched_husong_misson = 10;
+
+	optional int32 guild_husong_progress = 15[default = 0]; 
+	optional int32 guild_husong_progress_max = 16[default = 0]; 
+}
+
+message ntf_player_curr_husong
+{
+	optional uint32 uid = 1[default = 0];
+	optional one_husong_mission curr_husong_misson = 3;
+}
+
+message req_accept_husong_mission
+{
+	optional int32 husong_id = 1[default = 0];//
+}
+
+message rsp_accept_husong_mission
+{
+	optional int32 result = 1[default = 0];//
+	optional one_husong_mission misson_info = 2;
+}
+
+message req_invite_member_list
+{
+
+}
+
+message rsp_invite_member_list
+{
+	optional int32 result = 1[default = 0];//
+	repeated common.one_user_brief user_brief_list = 2;
+	optional int32 user_title = 3[default = 0];
+}
+
+message req_invite_hufa
+{
+	repeated uint32 uid_list = 1;
+}
+
+message rsp_invite_hufa
+{
+	optional int32 result = 1[default = 0];//
+
+	repeated uint32 uid_list = 2;// 邀请成功的uid
+}
+
+message ntf_be_invited_hufa
+{
+	optional uint32 from_uid = 1[default = 0];
+
+	optional common.one_user_brief from_user_brief = 2;
+}
+
+message req_accept_invite_hufa
+{
+	optional uint32 uid = 1[default = 0];
+}
+
+message rsp_accept_invite_hufa
+{
+	optional int32 result = 1[default = 0];//
+	optional one_husong_mission misson_info = 2;
+}
+
+message ntf_accept_invite_hufa
+{	
+	optional uint32 uid = 1[default = 0];
+	optional one_husong_mission misson_info = 2;
+}
+
+message req_search_husong_mission
+{
+
+}
+
+message rsp_search_husong_mission
+{
+	optional int32 result = 1[default = 0];//
+	optional one_husong_mission misson_info = 2;
+}
+
+message req_rob_husong
+{
+	optional uint32 rob_uid = 1[default = 0];
+	optional int32  stage = 2[default = 0];  // 阶段  1: 开始拦截  2：表示已经打败护法现在去打护送者了
+	optional common.one_buzhen buzhen_info = 3;
+
+	/// 以下由服务器填
+    optional common.one_battle_formation rober_formation = 10;
+}
+
+message rsp_rob_husong
+{
+	optional int32 result = 1[default = 0];//
+
+	optional battle.battle_info battle_info = 10;	// battle.battle_info 
+}
+
+message req_finish_rob_husong
+{
+	optional uint32 rob_uid = 1[default = 0];
+	optional int32  stage = 2[default = 0];  // 
+	optional battle.battle_info battle_info = 3;		///battle.battle_info 
+    optional battle.result_info battle_result = 4;
+}
+
+message rsp_finish_rob_husong
+{
+	optional int32 result = 1[default = 0];//
+	optional int32 has_next_fight = 2[default = 0]; /// 是否还有下一场
+	optional int32 rob_seccess = 3[default = 0]; /// 拦截是否成功，成功了就没有下一场
+
+	repeated common.award_info drop_list = 4; /// 奖励
+	optional int32 add_jungong = 5[default = 0]; /// 军功
+
+    optional battle.result_info battle_result = 20;
+}
+
+message req_take_husong_award
+{
+	optional int32 husong_id = 1[default = 0];
+}
+
+message rsp_take_husong_award
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 4; /// 奖励
+	optional one_husong_mission husong_misson_info = 5; 
+}
+
+message ntf_rob_husong_info
+{
+	optional one_husong_mission misson_info = 1;
+	optional common.one_user_brief rober_brief = 2;
+	optional int32 rob_result = 3;  /// 0失败  1成功
+}
+
+message ntf_player_husong_complete
+{
+	optional uint32 uid = 1[default = 0];
+	optional uint32 guild_id = 2[default = 0];
+	optional int32 husong_id = 3[default = 0];
+	optional uint32 hufa_uid = 6[default = 0];
+
+	optional int32 guild_husong_progress = 4[default = 0];
+	optional int32 guild_husong_progress_max = 5[default = 0];
+
+}
+
+message ntf_guild_husong_complete  /// 服务器使用
+{
+	optional uint32 guild_id = 2[default = 0];
+	optional int32 guild_husong_progress = 4[default = 0];
+	optional int32 guild_husong_progress_max = 5[default = 0];
+}
+

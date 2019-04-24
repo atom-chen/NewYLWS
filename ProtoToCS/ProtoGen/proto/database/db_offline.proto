@@ -1,0 +1,163 @@
+package db;
+
+import 'db_common.proto';
+
+message guild_apply_del
+{
+	optional uint32 gid = 1[default = 0];
+	optional int32 result = 2[default = 0];//0是拒绝，1是加入
+	optional int32 time = 3[default = 0];
+}
+
+message guild_exit
+{
+	optional uint32 gid = 1[default = 0];
+	optional int32 time = 2[default = 0];
+}
+
+
+message offline_bg_operation
+{
+	optional uint32 uid = 1 [default = 0];
+	optional int32 opcode = 2[default = 0]; // |设置玩家等级|删除武将|设置技能等级|设置玩家游戏币
+	optional int32 param1 = 3[default = 0]; // |玩家等级    |武将id  |武将id      |金币数
+	optional int32 param2 = 4[default = 0]; // |            |        |技能id      |
+	optional int32 param3 = 5[default = 0]; // |            |        |技能等级    |
+	optional string str1 = 6[default = '']; // |            |        |            |游戏币名称 
+	optional string str2 = 7[default = ''];
+	optional string str3 = 8[default = ''];
+}
+message one_offline
+{
+	optional int32 event = 1[default = 0];	//离线事件的类型
+	optional int32 deleted = 2[default = 0];	//标记是否必须删除的
+	optional guild_apply_del guild_apply_del_info = 3;
+	optional guild_exit guild_exit_info = 4;
+	optional offline_bg_operation bg_operation = 9;
+}
+
+message chat_complaint_info
+{
+	optional int32 record_time = 1[default = 0];		//记录的开始时间
+	optional int32 last_complaint_time = 2[default = 0];	//禁言开始时间
+	repeated uint32 uids_list = 3; 
+}
+
+message one_value_record
+{
+	optional int32 sub_type = 1[default = 0];
+	optional int32 curr_value = 2[default = 0];
+}
+
+message personal_sevenday_act
+{
+	optional int32 act_id = 1[default = 0];
+	repeated one_value_record value_record_list = 2;
+	optional int32 award_flag = 3[default = 0];
+	optional int32 start_time = 4[default = 0];
+	optional int32 end_time = 5[default = 0];
+}
+
+message one_guild_award
+{
+	optional int32 reason = 3[default = 0];
+	optional uint32 from_uid = 4[default = 0];
+	optional int32 award_yuanbao = 5[default = 0];
+	repeated one_item item_list = 6;
+	optional uint32 time = 7[default = 0];
+}
+
+message one_guild_husong_invitation
+{
+	optional uint32 from_uid = 1[default = 0];
+	optional uint32 time = 7[default = 0];
+}
+
+message offline_task_info
+{
+	repeated uint32 friend_list = 1;//离线时添加的好友
+	repeated uint32 guild_list = 2;//离线时加入的家族
+	optional int32 qunxiongzhulu_battle_times = 3[default = 0];
+	optional int32 finish_husong_times = 4[default = 0];
+	repeated int32 liezhuan_team_country_list = 5;
+	repeated int32 friend_relation_chg_list = 6;
+}
+
+message one_warcraft_info
+{
+	///optional int32  have_been_war = 1[default = 0];  
+
+	optional one_buzhen_info def_buzhen1 = 10;
+	optional one_buzhen_info def_buzhen2 = 11;
+	optional one_buzhen_info def_buzhen3 = 12;
+}
+
+message racing_info
+{
+	message one_racing_report
+	{
+		optional uint32 time = 1[default = 0];
+		optional int32  horse_id = 2[default = 0];
+		optional int32  horse_stage = 3[default = 0];
+		optional int32  rank = 4[default = 0];
+		optional string video_id = 10[default = ''];
+	}
+	repeated one_racing_report recently_report_list = 1;
+}
+
+message qunxiongzhulu_info
+{
+	message one_wujiang_win_times //一个武将的胜势
+	{
+		optional int32 wujiang_index = 1[default = 0];
+		optional int32 win_times = 2[default = 0];//等于0删除
+	}
+	message one_season_record
+	{
+		optional int32 season = 1[default = 0];
+		optional int32 total_times = 2[default = 0];
+		optional int32 win_times = 3[default = 0];
+		optional int32 world_rank = 4[default = 0];
+	}
+	
+	message one_battle_record
+	{
+		optional int32 battle_result = 1[default = 0];//1胜利0失败  //有需要可表示详细类别
+		optional int32 score_chg = 2[default = 0];
+		optional int32 time = 3[default = 0];
+		optional one_user_brief user_brief = 4; 
+		optional string video_id = 5[default = ""];	//录像ID
+	}
+	
+	repeated one_wujiang_win_times wujiang_win_times_list = 1;
+	repeated one_season_record season_record_list = 2;
+	optional int32 max_continue_win_times = 3[default = 0];//最高胜势
+	optional int32 score = 4[default = 0]; 
+	optional int32 total_times = 5[default = 0]; 
+	optional int32 win_times = 6[default = 0]; 
+	optional int32 season = 7[default = 0];
+	repeated one_battle_record battle_record_list = 8;
+}
+
+message Offline
+{
+	repeated one_offline offline_list = 1;
+	optional int32 hongdian_flag = 2[default = 0];//红点标记
+	optional int32 last_apply_guild_time = 3[default = 0];	//最近一次申请入团的时间
+	optional int32 last_leave_guild_time = 4[default = 0];	//最后一次退团时间
+	optional chat_complaint_info complaint_info = 5;
+	optional offline_task_info task_data = 6;
+	optional int32 curr_achievement = 7[default = 0];//当前成就点
+	repeated personal_sevenday_act personal_sevenday_act_list = 27;
+	optional int32 personal_sevenday_act_create_time = 28;
+
+	repeated one_guild_invitation_info guild_invitation_list = 30;
+	repeated one_guild_award  guild_award_list = 31;  /// 家族未领取奖励
+	//optional int32 sum_add_guild_huoyue = 32[default = 0];  /// 对当前家族的总活跃
+	//optional int32 week_add_guild_huoyue = 33[default = 0];  ///  对当前家族的本周活跃
+	repeated one_guild_husong_invitation husong_invitation_list = 34;
+
+	optional one_warcraft_info warcraft_info = 38;
+	optional qunxiongzhulu_info qunxiongzhulu_data = 39;
+	optional racing_info racing_info = 40;
+}

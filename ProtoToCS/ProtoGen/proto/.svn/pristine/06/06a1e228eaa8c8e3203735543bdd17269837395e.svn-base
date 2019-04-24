@@ -1,0 +1,43 @@
+package db;
+
+import 'db_common.proto';
+
+message horse_data 
+{
+	repeated one_horse_info horse_list = 1;
+	optional int32 next_index = 2[default = 1];
+}
+
+message shenshou_data 
+{
+	repeated one_shenshou_info shenshou_list = 1;
+	optional int32 next_index = 2[default = 1];
+}
+
+message inscription_case_data
+{
+	repeated one_inscription_case_info inscription_case_list = 1;
+	optional int32 next_index = 2[default = 1];
+}
+
+message shenbing_data
+{
+	repeated one_shenbing_info shenbing_list = 1;
+	optional int32 next_index = 2[default = 1];
+}
+
+
+message intimacy_data
+{
+	repeated one_intimacy_info intimacy_list = 1;
+}
+
+message Item
+{
+	repeated one_item item_list = 1;
+	optional horse_data horse_part = 3;
+	optional shenshou_data shenshou_part = 4;
+	optional inscription_case_data inscription_case_part = 5;
+	optional shenbing_data shenbing_part = 6;
+	optional intimacy_data intimacy_part = 7;
+}

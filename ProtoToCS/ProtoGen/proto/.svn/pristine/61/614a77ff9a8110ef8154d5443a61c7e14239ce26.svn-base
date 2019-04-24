@@ -1,0 +1,68 @@
+package dragoncopy;
+
+import 'common.proto';
+import 'battle.proto';
+
+
+message req_copy_info
+{
+
+}
+
+message one_dragoncopy_info
+{
+	optional int32 copy_id = 1[default = 0];
+	optional int32 today_count = 2[default = 0];
+	optional int32 dragon_copy_level = 3[default = 0];
+}
+
+message rsp_copy_info
+{
+
+	optional int32 result = 1[default = 0];
+	repeated one_dragoncopy_info dragoncopy_info_list = 2;
+	optional int32 today_challenge_time = 3[default = 0];
+	optional int32 dragoncopy_max_challenge_times = 4[default = 0];
+}
+
+message ntf_notify_dragoncopy_chg
+{
+	optional int32 reason = 1[default = 0];
+	repeated one_dragoncopy_info dragoncopy_info_list = 2;
+	optional int32 today_challenge_time = 3[default = 0];
+}
+
+//请求进入副本
+message req_enter_copy
+{
+	optional int32 copy_id = 1[default = 0]; //dragon_id == copy_id
+	optional common.one_buzhen buzhen_info = 3;
+}
+
+message rsp_enter_copy
+{
+	optional int32 result = 1[default = 0];	//-1次数不够，-2体力不够 -3雇佣武将失败
+	optional battle.battle_info battle_info = 3;///battle.battle_info 
+}
+
+//报告副本通关
+message req_finish_copy
+{
+	optional int32 copy_id = 1[default = 0];	
+	optional int32 take_time = 2[default = 0];	//通关花费的时间
+	optional int32 finish_result = 3[default = 0];	//结果，1,通关第一波，2通关第二波，3通关第三波，0一波都不通
+	optional battle.battle_info battle_info = 4;		///battle.battle_info 
+    optional battle.result_info battle_result = 5;
+}
+
+message rsp_finish_copy
+{
+	optional int32 result = 1[default = 0];//-1异常
+	optional int32 copy_id = 2[default = 0];	
+	optional int32 finish_result = 4[default = 0];	//战斗结果
+	repeated common.one_wujiang_get_exp wujiang_exp_list = 5;	//武将经验列表
+	optional int32 total_exp = 6[default = 0];
+	repeated common.award_info drop_list = 7;	//获得物品列表
+    optional battle.result_info battle_result = 8;
+}
+

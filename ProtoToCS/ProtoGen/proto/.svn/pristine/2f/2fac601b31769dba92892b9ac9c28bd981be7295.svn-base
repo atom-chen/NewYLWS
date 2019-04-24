@@ -1,0 +1,66 @@
+package shenbingcopy;
+
+import "common.proto";
+import "battle.proto";
+
+
+
+
+//查询通关的副本列表
+message req_shenbing_copy_panel
+{
+	
+}
+
+message rsp_shenbing_copy_panel
+{
+	optional int32 result = 1[default = 0];
+	repeated int32 pass_list = 2;	//通关的副本信息
+	optional int32 today_left_challge_time = 3[default = 0];
+}
+
+message ntf_pass_chg
+{
+	optional int32 pass_list = 1;//通知通关副本信息改变
+}
+
+//请求进入副本
+message req_enter_copy
+{
+	optional int32 shenbing_copy_id = 1[default = 0];	//进入副本
+	optional int32 shenbing_copy_seq = 2[default = 0];
+	optional common.one_buzhen buzhen_info = 3;
+
+}
+
+message rsp_enter_copy
+{
+	optional int32 result = 1[default = 0];	//-1次数不够，-2体力不够 -3雇佣武将失败
+	optional uint32 shenbing_copy_seq = 2[default = 0];
+	optional battle.battle_info battle_info = 3;///battle.battle_info 
+	repeated common.one_shenbing_award random_award_list = 4;
+}
+
+//报告副本通关
+message req_finish_copy
+{
+	optional int32 shenbing_copy_id = 1[default = 0];	
+	optional uint32 shenbing_copy_seq = 2[default = 0];
+	optional int32 take_time = 3[default = 0];	//通关花费的时间
+	optional int32 finish_result = 4[default = 0];	//结果，1,通关第一波，2通关第二波，3通关第三波，0一波都不通
+	optional battle.battle_info battle_info = 8;		///battle.battle_info 
+}
+
+message rsp_finish_copy
+{
+	optional int32 result = 1[default = 0];//-1异常
+	optional int32 copy_id = 2[default = 0];	
+	optional uint32 copy_seq = 3[default = 0];
+	optional int32 finish_result = 4[default = 0];	//战斗结果
+	repeated common.one_wujiang_get_exp wujiang_exp_list = 5;	//武将经验列表
+	optional int32 total_exp = 6[default = 0];
+	repeated common.award_info drop_list = 7;	//获得物品列表
+    optional battle.result_info battle_result = 8;
+}
+
+

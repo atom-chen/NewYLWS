@@ -1,0 +1,65 @@
+package fuli;
+
+import "common.proto";
+
+message one_fuli_entry
+{
+	optional string desc = 1[default = ''];
+	optional int32 status = 2[default = 0];		//0不可领取，1可领取，2已领取， 3可补领
+	repeated common.one_item award_list = 3;
+	optional int32 e_param1 = 5[default = 0];	//fuli_id 1签到双倍需要vip(-1没有双倍);3领取体力 起始时间(1130表示11:30); 7基金:当前进度
+	optional int32 e_param2 = 6[default = 0];   //fuli_id 3领取体力 截止时间(1130表示11:30); 7基金:领取条件
+	repeated int32 e_param_list = 7;
+	optional int32 condition = 8[default = 0];	//fuli_id 3领取体力 补领价格;
+	optional int32 index = 9[default = 0];		//序号
+}
+
+message one_fuli
+{
+	optional int32 fuli_id = 2[default = 0]; //1签到 2在线奖励  3领取体力 4登录奖励  5升级  6兑换码 7基金
+	repeated one_fuli_entry entry_list = 3;
+	optional int32 f_param1 = 4[default = 0];//fuli_id 6兑换码:1开放礼包码0不开放; 2在线奖励:累计在线时长; 4登录奖励:登录天数; 7基金:购买所需vip
+	optional int32 f_param2 = 5[default = 0];//7基金:购买所需元宝
+	optional int32 f_param3 = 6[default = 0];//7基金:1已购买
+}
+
+message ntf_fuli_chg
+{
+	optional one_fuli fuli_info = 1;
+}
+
+message req_fuli_list
+{
+
+}
+
+message rsp_fuli_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_fuli fuli_list = 2;
+}
+
+message req_get_fuli_award
+{
+	optional int32 fuli_id = 1[default = 0];
+	optional int32 entry_index = 2[default = 0];
+	optional int32 param1 = 3[default = 0];//fuli_id 3:领取体力时(1补领);
+	optional string str1 = 4[default = ""];//fuli_id 6兑换码
+}
+
+message rsp_get_fuli_award
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 2;
+	optional int32 fuli_id = 3[default = 0];
+}
+
+message req_buy_fund
+{
+
+}
+
+message rsp_buy_fund
+{
+	optional int32 result = 1[default =0];
+}

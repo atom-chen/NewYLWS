@@ -1,0 +1,104 @@
+package yuanmen;
+
+import "common.proto";
+import "battle.proto";
+message one_yuanmen
+{
+    message one_wujiang_result
+		{
+			optional int32 monster_id = 1[default = 0];
+			optional int32 hp = 2[default = 0];	//剩余血量百分比
+			optional int32 nuqi = 3[default = 0];	//剩余怒气
+			optional int32 ops = 4[default = 0]; //位置
+			optional int32 monster_star = 5[default = 0];
+			optional int32 monster_level = 6[default = 0];
+		}
+		optional int32 yuanmen_id = 1[default = 0];
+		optional int32 star_level = 2[default = 0];
+		repeated int32 left_buff_list = 3;
+		repeated int32 right_buff_list = 4;
+		repeated one_wujiang_result right_wujiang_info_list = 5;
+		optional bool  passed = 6[default = false];
+        optional int32 score = 7[default = 0];
+    // TODO 其它效果
+}
+
+message yuanmen_pannel_info
+{
+    optional int32 time_to_next_refresh = 10[default = 0];
+    optional int32 success_battle_count = 11[default = 0];
+    optional int32 best_score = 12[default = 0];
+    optional int32 world_rank = 13[default = 0];
+}
+
+message yuanmen_cfg_info
+{
+    optional int32 cfg_refresh_duration = 1[default = 0];
+    optional int32 cfg_manual_refresh_cost_yuanbao = 2[default = 0];
+    optional int32 cfg_addition_award_need_pass_battle = 3[default = 0];  /// 额外奖励需要通过的关卡数
+    optional int32 cfg_one_battle_cost_coin = 4[default = 0];   /// 单次挑战消耗的挑战令数
+    optional int32 cfg_open_level = 5[default = 0];   /// 玩法开启等级
+}
+
+message req_yuanmen_pannel
+{
+
+}
+
+message rsp_yuanmen_pannel
+{
+	optional int32 result = 1[default = 0];
+    optional yuanmen_pannel_info pannel_info = 2;
+    optional yuanmen_cfg_info cfg_info = 3;
+    repeated one_yuanmen yuanmen_copy_list = 4;
+}
+
+message req_refresh_yuanmen
+{
+
+}
+
+message rsp_refresh_yuanmen
+{
+	optional int32 result = 1[default = 0];
+    optional yuanmen_pannel_info pannel_info = 2;
+}
+
+message req_yuanmen_battle
+{
+    optional int32 yuanmen_id = 1[default = 0];
+    optional common.one_buzhen buzhen_info = 2;
+}
+
+message rsp_yuanmen_battle
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_yuanmen_finish
+{
+    optional int32 yuanmen_id = 1[default = 0];
+    optional int32 finish_result = 2[default = 0];
+    optional battle.battle_info battle_info = 3;		///battle.battle_info 
+    optional battle.result_info battle_result = 4;
+
+}
+
+message rsp_yuanmen_finish
+{
+    optional int32 result = 1[default = 0];//-1异常
+	optional int32 yuanmen_id = 2[default = 0];	
+	optional int32 yuanmen_seq = 3[default = 0];
+	optional int32 finish_result = 4[default = 0];	//战斗结果
+	repeated common.one_wujiang_get_exp wujiang_exp_list = 5;	//武将经验列表
+	optional int32 total_exp = 6[default = 0];
+	repeated common.award_info drop_list = 7;	//获得物品列表
+    optional battle.result_info battle_result = 8;
+
+}
+
+message ntf_yuanmen_chg
+{
+    optional int32 reason = 1[default = 0];
+    repeated one_yuanmen yuanmen_copy_list = 4;
+}

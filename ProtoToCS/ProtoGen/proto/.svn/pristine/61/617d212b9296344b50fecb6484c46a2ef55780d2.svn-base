@@ -1,0 +1,462 @@
+package friend;
+
+import "common.proto";
+import "battle.proto";
+
+message one_friend
+{
+	optional common.one_user_brief friend_brief = 1;
+	optional int32 stamina_status = 2[default = 0];//1:可以赠送体力 2:已赠送 3:可领取 4:不可赠送
+	optional int32 friendship = 3[default = 0]; //关系值
+	optional int32 last_login_time = 4[default = 0];//0:在线
+	optional int32 param1 = 5[default = 0];//blacklist 1:是好友; friendlist 1:在黑名单; recentlist 1是好友 2是好友且在黑名单 3不是好友但在黑名单
+	optional int32 task_enable = 6[default = 0];//1有任务
+	optional int32 unread_msg_count = 7[default = 0];
+}
+
+message one_apply
+{
+	optional common.one_user_brief apply_brief = 1;
+	optional int32 apply_time = 2[default = 0];
+	optional string verification_message = 3[default = ""]; // 验证消息
+}
+
+message one_reply
+{
+	optional common.one_user_brief reply_brief = 1;
+	optional int32 answer = 2[default = 0];
+}
+
+message one_fighting_assist
+{
+	message one_rent_record
+	{
+		optional uint32 renter_uid = 1[default = 0];
+		optional int32 battle_type = 2[default = 0];				// 玩法
+		optional int32 rent_time = 3[default = 0];					
+		optional int32 qingyi_count = 4[default = 0];				// 获得情谊值
+		optional int32 rent_wujiang_id = 5[default = 0];
+		optional string renter_name = 6[default = ""];
+	}
+	optional common.one_wujiang_brief rentout_wujiang_brief = 1;
+	optional int32 be_hired_times = 2[default = 0];			// 武将被雇佣次数
+	optional int32 qingyi_count = 3[default = 0];					// 武将被雇佣获得情谊值
+	optional int32 box_flag = 4[default = 0];						// 武将被雇佣次数宝箱标志
+	repeated one_rent_record rent_record_list = 5;					// 被雇佣记录列表	
+	optional int32 box_need_be_hired_times = 6[default = 0];
+	repeated common.one_item box_item_list = 7;
+}
+
+message one_task
+{
+	optional int32 id = 1[default = 0];
+	optional int32 progress = 2[default = 0];
+	optional int32 status = 3[default = 0];//0未达成 1已达成未领取  2已领取 3可接受 4不可接受 
+}
+
+message req_friend_list
+{
+	
+}
+
+message rsp_friend_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_friend friendlist = 2;
+	optional int32 friend_limit = 3[default = 0];
+}
+
+message req_recent_list
+{
+	
+}
+
+message rsp_recent_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_friend recentlist = 2;
+}
+
+message req_black_list
+{
+	
+}
+
+message rsp_black_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_friend blacklist = 2;
+}
+
+message req_recommend_list
+{
+
+}
+
+message rsp_recommend_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_friend recommend_list = 2;
+	repeated one_apply applylist = 3;
+}
+
+message req_fighting_assist_info
+{
+
+}
+
+message rsp_fighting_assist_info
+{
+	optional int32 result = 1[default = 0];
+	optional one_fighting_assist fighting_assist = 2;
+}
+
+message ntf_fighting_assist_chg
+{
+	optional one_fighting_assist fighting_assist = 1;
+}
+
+message req_search
+{
+	optional string search_string = 1[default = ""];
+}
+
+message rsp_search
+{
+	optional int32 result = 1[default = 0];
+	repeated one_friend search_list = 2;
+}
+
+message req_delete
+{
+	optional uint32 uid = 1[default = 0];
+}
+
+message rsp_delete
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_move_to_blacklist
+{
+	optional uint32 uid = 1[default = 0];
+}
+
+message rsp_move_to_blacklist
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_remove_from_blacklist
+{
+	optional uint32 uid = 1[default = 0];
+}
+
+message rsp_remove_from_blacklist
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_add_friend
+{
+	optional uint32 uid = 1[default = 0];
+	optional string verification_message = 2[default = ""];
+}
+
+message rsp_add_friend
+{
+	optional int32 result = 1[default = 0];
+}
+
+message ntf_friend_chg
+{
+	optional one_friend friend = 1;
+	optional int32 reason = 2[default = 0];
+}
+
+message ntf_delete_friend
+{
+	optional uint32 uid = 1[default = 0];
+}
+
+message req_reply
+{
+	optional uint32 uid = 1[default = 0];
+	optional int32 answer = 2[default = 0];//1通过 
+}
+
+message rsp_reply
+{
+	optional int32 result = 1[default = 0];
+}
+
+message ntf_reply
+{
+	optional one_reply reply = 1;
+}
+
+message ntf_apply
+{
+	optional one_apply apply = 1;
+}
+
+message ntf_delete_apply
+{
+	optional uint32 uid = 1;
+}
+
+message req_set_rentout_wujiang
+{
+	optional int32 wujiang_index = 1[default = 0];//0:移除设置的外租武将
+}
+
+message rsp_set_rentout_wujiang
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_friends_rentout_wujiang_panel
+{
+	
+}
+
+message rsp_friends_rentout_wujiang_panel
+{
+	message one_friend_wujiang
+	{
+		optional common.one_user_brief friend_brief = 1;
+		optional common.one_wujiang_brief rentout_wujiang_brief = 2;
+		optional int32 left_rent_times = 3; //剩余雇佣次数
+	}
+	optional int32 result = 1[default = 0];
+	repeated one_friend_wujiang friends_wujiang_list = 2;
+	optional int32 left_rent_times = 3[default = 0];
+}
+
+message ntf_left_rent_times
+{
+	optional int32 left_rent_times = 1[default = 0];
+}
+
+message req_take_stamina
+{
+	optional uint32 uid = 1[default = 0];//0:所有, 其他:指定好友
+}
+
+message rsp_take_stamina
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_send_stamina
+{
+	optional uint32 uid = 1[default = 0];//0:所有, 其他:指定好友
+}
+
+message rsp_send_stamina
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_send_gift
+{
+	optional uint32 uid = 1[default = 0];
+	optional int32 gift_id = 2[default = 0];
+	optional int32 gift_count = 3[default = 0];
+}
+
+message rsp_send_gift
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_exchange
+{
+	optional int32 item_id = 1[default = 0];
+	optional int32 count = 2[default = 0];
+}
+
+message rsp_exchange
+{	
+	optional int32 result = 1[default = 0];
+}
+
+message req_take_qingyi
+{
+
+}
+
+message rsp_take_qingyi
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 2;
+}
+
+message req_take_box
+{
+
+}
+
+message rsp_take_box
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 2;	
+}
+
+message req_enter_qiecuo
+{
+	optional uint32 uid = 1[default = 0];
+	optional common.one_buzhen buzhen_info = 2; //布阵信息
+}
+
+message rsp_enter_qiecuo
+{
+	optional int32 result = 1[default = 0];
+	optional battle.battle_info battle_info = 2;		///battle.battle_info	
+}
+
+message req_finish_qiecuo
+{
+	optional uint32 uid = 1[default = 0];
+	optional int32 finish_result = 2[default = 0]; //结果，0胜，1负
+}
+
+message rsp_finish_qiecuo
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_invite_to_complete_task
+{
+	repeated uint32 uid_list = 1;
+}
+
+message rsp_invite_to_complete_task
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_reply_invitation
+{
+	optional uint32 uid = 1[default = 0];
+	optional int32 accept = 2[default = 0];//1接受，0拒绝
+}
+
+message rsp_reply_invitation
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_friend_task
+{
+	optional uint32 uid = 1[default = 0];
+	optional int32 floor = 2[default = 0];//0时 返回当前层 其他:指定层
+}
+
+message rsp_friend_task
+{
+	optional int32 result = 1[default = 0];
+	repeated one_task task_list = 2; 
+	optional int32 box_curr_value = 3[default = 0];
+	optional int32 box_status = 4[default = 0];
+	repeated common.one_item item_list = 5; 
+	optional int32 close_time = 6[default = 0];
+	optional int32 box_cond = 7[default = 0];//开箱条件
+	optional int32 curr_floor = 8[default = 0];//任务当前层
+	optional int32 max_floor = 9[default = 0];//任务最大层数
+}
+
+message req_take_task_award
+{
+	optional int32 task_id = 1[default = 0];
+	optional uint32 uid = 2[default = 0];
+	optional int32 floor = 3[default = 1];
+}
+
+message rsp_take_task_award
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 2;
+}
+
+message req_accept_task
+{
+	optional int32 task_id = 1[default = 0];
+	optional uint32 uid = 2[default = 0];
+	optional int32 floor = 3[default = 1];
+}
+
+message rsp_accept_task
+{
+	optional int32 result = 1[default = 0];
+}
+
+message one_invitation
+{
+	optional common.one_user_brief user_brief = 1;
+}
+
+message ntf_new_invitation
+{
+	optional one_invitation invitation = 1;
+}
+
+message ntf_delete_invitation
+{
+	optional uint32 uid = 1[default = 0];//邀请者 0:删除所有邀请
+}
+
+message ntf_reply_invitation
+{
+	optional common.one_user_brief user_brief = 1;
+	optional int32 accept = 2[default = 0];//1接受，0拒绝 
+}
+
+message ntf_close_invite
+{
+	optional int32 close = 1[default = 0];// 1关闭 0:开启
+}
+
+message ntf_task_cp
+{
+	optional int32 reason = 1[default = 0];//1新cp 2删除所有cp
+	optional common.one_user_brief user_brief = 2;//reason==1时 cp信息
+}
+
+message req_can_invite_list
+{
+
+}
+
+message rsp_can_invite_list
+{
+	optional int32 result = 1[default = 0];
+	repeated one_friend friendlist = 2;
+}
+
+message req_take_box_award
+{
+	optional uint32 uid = 1[default = 0];
+	optional int32 floor = 2[default = 1];
+}
+
+message rsp_take_box_award
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 2;
+}
+
+message req_panel_redpoint_info
+{
+
+}
+
+
+message rsp_panel_redpoint_info
+{
+	optional int32 result = 1[default = 0];
+	optional int32 friend_red_count = 2[default = 0];
+	optional int32 recent_red_count = 3[default = 0];
+	optional int32 apply_red_count = 4[default = 0];
+	optional int32 assist_box_enable = 5[default = 0];//1可领
+}

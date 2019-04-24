@@ -1,0 +1,27 @@
+package testbattle;
+import "battle.proto";
+
+
+message req_testbattle_start
+{
+    optional int32  battle_type = 1[default = 0];
+}
+
+message rsp_testbattle_start
+{
+    optional int32 result = 1[default = 0];
+    optional battle.battle_info battle_info = 11;		///battle.battle_info 
+}
+
+message req_testbattle_finish
+{
+    optional battle.battle_info battle_info = 1;		///battle.battle_info 
+    optional battle.result_info battle_result = 2;
+}
+
+message rsp_testbattle_finish
+{
+    optional int32 result = 1[default = 0];
+    optional string battle_id = 2[default = ''];
+    optional battle.result_info battle_result = 3;
+}

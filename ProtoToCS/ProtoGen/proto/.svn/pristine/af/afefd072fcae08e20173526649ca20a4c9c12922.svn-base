@@ -1,0 +1,57 @@
+package gravecopy;
+
+import "common.proto";
+import "battle.proto";
+
+//请求基本信息
+message req_info
+{
+
+}
+
+message rsp_info
+{	
+	optional int32 result = 1[default = 0];
+	optional int32 pass_floor_max = 2[default = 0];//
+	optional int32 left_times = 3[default = 0];//剩余挑战次数
+	optional int32 best_floor = 4[default = 0];
+	optional int32 best_consumed_time = 5[default = 0];
+	optional int32 best_tongqian_count = 6[default = 0];
+	optional int32 rank = 7[default = 0];
+}
+
+message req_enter_gravecopy
+{
+	optional int32 copy_id = 1[default = 0];	
+	optional common.one_buzhen buzhen_info = 2; //布阵信息
+}
+
+message rsp_enter_gravecopy
+{
+	optional int32 result = 1[default = 0];	
+	optional battle.battle_info battle_info = 2;		///battle.battle_info	
+}
+
+//报告副本通关
+message req_finish_gravecopy
+{	
+	optional int32 copy_id = 1[default = 0]; //1-5
+	optional battle.result_info battle_result = 2;
+	optional battle.battle_info battle_info = 3;///battle.battle_info 
+	optional int32 finish_result = 4[default = 0]; //结果，0通关，1不通关
+}
+
+message rsp_finish_gravecopy
+{
+	optional int32 result = 1[default = 0]; //-1异常
+	optional int32 copy_id = 2[default = 0]; //副本id
+	optional int32 finish_result = 3[default = 0]; //战斗结果
+	optional battle.result_info battle_result = 4;
+	optional battle.battle_info battle_info = 5;		///battle.battle_info 
+	optional int32 tongqian_count = 6[default = 0]; //铜钱数量
+	optional int32 consumed_time = 7[default = 0]; //持续时间
+	optional int32 history_best = 8[default = 0]; //1历史最佳
+	repeated common.one_wujiang_get_exp wujiang_exp_list = 10;	//武将经验列表
+	repeated common.award_info drop_list = 11; //奖励列表
+	repeated common.award_info award_list = 12; //奖励列表
+}

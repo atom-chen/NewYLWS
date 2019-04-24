@@ -1,0 +1,90 @@
+package hunt;
+
+import 'common.proto';
+
+message one_ground //一个苑
+{
+	optional int32 id = 1[default = 0];
+	optional int32 level = 2[default = 0];
+	optional int32 status = 3[default = 0];//0已维护 1未解锁  2需维护 3.在升级已维护 4.在升级需维护；10已维护且可升级; 12需维护且可升级（10以下不可升级，10及以上可升级）
+	optional int32 finish_levelup_time = 4[default = 0];//在升级时 升级完成时间
+}
+
+message req_hunt_panel
+{
+
+}
+
+message rsp_hunt_panel
+{
+	optional int32 result = 1[default = 0];
+	repeated one_ground ground_list = 2;
+	optional int32 total_times = 3[default = 0];//可选秀次数
+	optional int32 show_times = 4[default = 0];//已选秀次数
+	optional int32 cd_end_time = 5[default = 0];//cd结束时间
+	optional int32 clear_cd_times = 6[default = 0];
+}
+
+message req_maintain //维护
+{
+
+}
+
+message rsp_maintain
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_levelup //升级
+{
+	optional int32 id = 1[default = 0];
+}
+
+message rsp_levelup
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_clear_levelup_cd //秒cd
+{
+	optional int32 id = 1[default = 0];
+}
+
+message rsp_clear_levelup_cd
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_clear_show_cd
+{
+
+}
+
+message rsp_clear_show_cd
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_horse_show
+{
+
+}
+
+message rsp_horse_show
+{
+	optional int32 result = 1[default = 0];
+	repeated common.one_horse horse_list = 2;
+	optional int32 randomseed = 3[default = 0];
+}
+
+message req_select_horse
+{
+	optional int32 horse_index = 2[default = 0];
+}
+
+message rsp_select_horse
+{
+	optional int32 result = 1[default = 0];
+	optional int32 horse_index = 2[default = 0];
+	repeated common.award_info award_list = 3;
+}

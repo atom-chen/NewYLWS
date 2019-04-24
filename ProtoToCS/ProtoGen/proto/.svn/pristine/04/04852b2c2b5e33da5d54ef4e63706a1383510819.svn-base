@@ -1,0 +1,138 @@
+package task;
+
+import "common.proto";
+
+message one_task
+{
+	optional int32 id = 1[default = 0];
+	optional int32 progress = 2[default = 0];
+	optional int32 status = 3[default = 0];//0未达成 1已达成未领取  2已领取 3可接受 4不可接受 
+}
+
+message one_box 
+{
+	optional int32 id = 1[default = 0];
+	optional int32 status = 2[default = 0];//0未达成 1已达成未领取  2已领取
+}
+
+message req_task_panel
+{
+	
+}
+
+message rsp_task_panel
+{
+	optional int32 result = 1[default = 0];
+	repeated one_task daily_list = 2;
+	repeated one_task weekly_list = 3;
+	repeated one_task main_list = 4;
+	repeated one_task achievement_list = 5;
+}
+
+message req_task_main
+{
+
+}
+
+message rsp_task_main
+{
+	optional int32 result = 1[default = 0];
+	repeated one_task main_list = 2;
+}
+
+message req_task_daily
+{
+	
+}
+
+message rsp_task_daily
+{
+	optional int32 result = 1[default = 0];
+	repeated one_task daily_list = 2;
+	optional int32 box_curr_value = 3[default = 0];
+	repeated one_box box_list = 4;
+	optional int32 box_limit = 5[default = 0];
+}
+
+message req_task_weekly
+{
+	
+}
+
+message rsp_task_weekly
+{
+	optional int32 result = 1[default = 0];
+	repeated one_task weekly_list = 2;
+	optional int32 box_curr_value = 3;
+	repeated one_box box_list = 4;
+	optional int32 box_limit = 5[default = 0];
+}
+
+message req_task_achievement
+{
+	
+}
+
+message rsp_task_achievement
+{
+	optional int32 result = 1[default = 0];
+	repeated one_task achievement_list = 2;
+	optional int32 achievement_curr_value = 3[default = 0];
+	optional int32 achievement_limit = 4[default = 0];
+}
+
+message req_sevenday_info
+{
+	
+}
+
+message rsp_sevenday_info
+{
+	optional int32 result = 1[default = 0];
+	repeated one_task task_list = 2;
+	optional int32 box_curr_value = 3[default = 0];
+	repeated one_box box_list = 4;
+	optional int32 box_limit = 5[default = 0];
+	optional int32 curr_day = 6[default = 0];
+	optional int32 left_days = 7[default = 0];
+}
+
+message ntf_task_chg
+{
+	optional int32 task_type = 1[default = 0];//1:main 2:daily 3:weekly 4:achievement 6:sevenday
+	optional one_task task = 2;
+}
+
+message ntf_task_type_progress_chg
+{
+	optional int32 task_type = 1[default = 0];//2:daily 3:weekly 4:achievement 6:sevenday
+	optional int32 box_curr_value = 2[default = 0];//2:daily 3:weekly 6:sevenday
+	optional int32 box_limit = 3[default = 0];//2:daily 3:weekly 6:sevenday
+	repeated one_box box_list = 4;//2:daily 3:weekly 6:sevenday
+	optional int32 achievement_curr_value = 5[default = 0];//4:achievement
+	optional int32 achievement_limit = 6[default = 0];//4:achievement
+}
+
+message req_take_task_award
+{
+	optional int32 id = 1[default = 0];
+}
+
+message rsp_take_task_award
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 2;
+	optional int32 id = 3[default = 0];//大于0，删除该任务
+	optional int32 task_type = 4[default = 0];//1:main 2:daily 3:weekly 4:achievement 6:sevenday
+}
+
+message req_take_task_box_award
+{
+	optional int32 id = 1[default = 0];
+}
+
+message rsp_take_task_box_award
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 2;
+}

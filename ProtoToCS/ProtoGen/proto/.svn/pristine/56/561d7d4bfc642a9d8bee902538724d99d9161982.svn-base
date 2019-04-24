@@ -1,0 +1,63 @@
+package inscriptioncopy;
+
+import "common.proto";
+import "battle.proto";
+
+//请求基本信息
+message req_info
+{
+
+}
+
+message rsp_info
+{
+	message one_floor
+	{
+		optional int32 floor = 1[default = 0];
+		optional int32 best_score = 2[default = 0];
+		optional int32 best_consumed_time = 3[default = 0];
+	}
+	optional int32 result = 1[default = 0];
+	optional int32 pass_floor_max = 2[default = 0];//
+	optional int32 left_times = 3[default = 0];//剩余挑战次数
+	optional int32 best_floor = 4[default = 0];
+	optional int32 rank = 7[default = 0];
+	repeated one_floor floor_list = 8;
+}
+
+message req_enter_inscriptioncopy
+{
+	optional int32 copy_id = 1[default = 0];	
+	optional common.one_buzhen buzhen_info = 2; //布阵信息
+}
+
+message rsp_enter_inscriptioncopy
+{
+	optional int32 result = 1[default = 0];	
+	optional battle.battle_info battle_info = 2;		///battle.battle_info	
+	optional bool is_guide = 3[default = false];//true:引导
+}
+
+//报告副本通关
+message req_finish_inscriptioncopy
+{	
+	optional int32 copy_id = 1[default = 0]; //1-5
+	optional battle.result_info battle_result = 2;
+	optional battle.battle_info battle_info = 3;///battle.battle_info 
+	optional int32 finish_result = 4[default = 0]; //结果，0通关，1失败，2超时
+}
+
+message rsp_finish_inscriptioncopy
+{
+	optional int32 result = 1[default = 0]; //-1异常
+	optional int32 copy_id = 2[default = 0]; //副本id
+	optional int32 finish_result = 3[default = 0]; //战斗结果
+	optional battle.result_info battle_result = 4;
+	optional int32 history_best = 5[default = 0]; //1历史最佳
+	optional int32 score = 6[default = 0]; //分数
+	optional int32 consumed_time = 7[default = 0]; //持续时间
+	optional int32 history_score_max = 8[default = 0];
+	optional int32 history_rank_best = 9[default = 0];
+	repeated common.one_wujiang_get_exp wujiang_exp_list = 10;	//武将经验列表
+	repeated common.award_info drop_list = 11; //奖励
+}

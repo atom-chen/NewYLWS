@@ -1,0 +1,254 @@
+package db;
+import 'db_common.proto';
+
+message one_huoyue_daily_record
+{
+	optional int32 time = 1[default = 0];	//战功获得的日常起始时间
+	optional int32 huoyue = 2[default = 0];
+}
+
+message one_member_info
+{
+	optional uint32 uid = 1[default = 0];
+	repeated one_huoyue_daily_record huoyue_list = 2;
+	optional int32 sum_add_guild_huoyue = 3;  /// 对家族的总活跃
+	optional int32 week_add_guild_huoyue = 4;  ///  对家族的本周活跃
+	optional uint64 week_boss_sum_harm = 5;
+
+	optional int32 today_husong_count = 7[default = 0]; /// 今日护送次数
+	optional int32 today_accept_hufa_count = 8[default = 0]; /// 今日护法次数
+	optional int32 today_rob_count = 9[default = 0]; /// 今日拦截
+
+	optional int32 last_check_skill_guild_level = 10[default = 0];
+	optional uint32 last_see_skill_time = 11[default = 0];
+	repeated int32 learned_guild_skill_id_list = 12;
+
+	optional uint32 last_update_warcraft_formation_data_time = 20; /// 最后更新争霸阵容数据时间
+}
+
+message one_post_name_info
+{
+	optional string doyen_name = 1[default = ''];	//团长
+	optional string vice_doyen_name = 2[default = ''];	//副团长
+	optional string elder_name = 3[default = ''];	//长老
+}
+
+//职务信息
+message one_post_info
+{
+	repeated uint32 vice_doyen_list = 1;
+	repeated uint32 elder_list = 2;
+}
+
+//军团设置
+message one_setting
+{
+	optional int32 join_type = 1[default = 0];	//验证类型，0需要验证，1不需要验证,2不允许加入
+	optional int32 need_level = 2[default = 1];	//需要的主公等级
+}
+
+
+//申请信息
+message one_apply_list
+{
+	message one_apply
+	{
+		optional uint32 uid = 1[default = 0];	
+		optional uint32 apply_time = 2[default = 0];	
+	}
+	repeated uint32 apply_list = 1;
+	//repeated one_apply apply_info_list = 2;
+}
+
+message one_member_list
+{
+	repeated one_member_info member_list = 1;
+}
+
+message one_boss_rank_player_info
+{
+	optional int32 uid = 1[default = 0];
+	optional int32 kill_soldier_count = 2[default = 0];
+	optional int32 update_time = 3[default = 0];
+}
+
+message guild_daily
+{
+	optional int32 curr_time = 1[default = 0];
+	optional uint32 uid1 = 2[default = 0];
+	optional uint32 uid2 = 3[default = 0];
+	optional uint32 uid3 = 4[default = 0];
+
+	optional int32 daily_type = 7[default = 0];
+
+	optional uint32 gid1 = 20[default = 0];
+	optional uint32 gid2 = 21[default = 0];
+
+	optional uint32 param1 = 16 [default = 0];
+	optional uint32 param2 = 17 [default = 0];
+	optional uint32 param3 = 18 [default = 0];
+	optional uint32 param4 = 19 [default = 0];
+
+	optional string str1 = 23 [default = ''];
+	optional string str2 = 24 [default = ''];
+	optional string str3 = 25 [default = ''];
+	optional string str4 = 26 [default = ''];
+
+
+	optional int32 chgpost = 5[default = 0];
+
+	optional int32 reset_copy = 6[default = 0];
+	optional int32 allot_item = 8[default = 0];
+
+	optional int32 post1 = 10[default = 0];
+	optional int32 post2 = 11[default = 0];
+	optional int32 post3 = 12[default = 0];
+}
+
+message daily_list
+{
+	repeated guild_daily one_guild_daily_list = 1;//军团日志表
+}
+
+message guild_atk_boss_player
+{
+	message fight_record
+	{
+		optional string battle_id = 1[default = ''];
+		optional int32 sum_hurt = 2[default =0];
+	}
+	optional uint32 uid = 1[default = 0];
+	optional int32 atk_count = 2[default = 0];
+	optional int32 sum_hurt = 3[default =0];
+	optional float atk_percent = 4[default = 0]; //杀伤的百分比
+	repeated fight_record fight_record_list = 5;
+}
+
+message one_guild_boss
+{
+	optional int32 index = 1[default =0];  /// 第几个
+	optional int32 cfg_id = 2[default =0]; /// lua_guild_boss 表 id
+	optional int32 boss_id = 3[default =0]; /// boss怪物id
+	optional int32 curr_hp = 4[default = 0]; /// 剩余血量
+	optional int32 max_hp = 5[default = 0]; /// 最大血量
+	optional int32 status = 7; //boss状态  0:未激活  1: 激活状态 2: 激活并且被攻击状态  3: 已经被击杀 
+
+	repeated guild_atk_boss_player atk_player_list = 8;
+
+	optional int32 create_world_level = 9[default = 0];
+}
+
+message guild_boss_info
+{
+	optional int32 create_world_level = 4[default = 0];
+	repeated one_guild_boss boss_list = 5;
+	optional int32 boss_round = 7[default = 0]; //BOSS轮数，每周增加1
+	optional int32 reset_count = 8[default = 0]; //本周重置次数
+	optional uint64 week_sum_harm = 9;  /// 本周累计伤害
+
+	optional guild_boss_atk_player_list boss_atk_list = 24;  //打过BOSS的人
+	repeated one_boss_rank_player_info user_rank_list = 57;
+}
+
+message guild_boss_atk_player_list
+{
+  repeated uint32 player_list = 1;  //打过BOSS的人  
+}
+
+message explore_team_member
+{
+	optional uint32 uid = 1[default = 0];//用户id
+	//optional one_wujiang_full_info wujiang_full_info = 2;//派出的武将
+	optional int32 power = 3[default = 0];//战斗力
+}
+
+message explore_team
+{
+	optional int32 team_id = 1[default = 0];
+	repeated int32 event_list = 2;
+	repeated explore_team_member member_list = 3;
+}
+
+message guild_explore_info
+{
+	repeated explore_team explore_team_list = 1;
+}
+
+message one_guild_report
+{
+	optional int32 report_id = 1[default = 0];
+	optional uint32 from_uid = 2[default = 0];
+	optional uint32 report_time = 3[default = 0];
+	optional int32 is_read = 4[default = 0];
+	//optional one_fight_report fight_report = 5;
+}
+
+message one_guild_report_list
+{
+	repeated one_guild_report guild_report_list = 30;
+}
+
+message guild_invitation_info
+{
+	repeated one_guild_invitation_info  invitation_list = 1;  /// 邀请的列表
+}
+
+message one_guild_skill
+{
+	optional int32 skill_id = 1[default = 0];
+	optional int32 is_unlocked = 2[default = 0]; 
+	optional uint32 unlocked_by_uid = 3[default = 0];
+	optional uint32 unlock_time = 4[default = 0];
+}
+
+message guild_skill_info
+{
+	repeated one_guild_skill skill_list = 1;
+}
+
+message Guild
+{
+	optional uint32 uid = 1[default = 0];   //unique identifier
+	optional int32 level = 2[default = 1];
+	optional int32 icon = 3[default = 0];	//军团的标记
+	optional int32 flag_icon = 4[default = 0];  //军团的旗帜
+	optional string name = 5[default = ''];
+	optional string recruit_declaration = 6[default = ''];	//招募宣言
+	optional string declaration = 7[default = ''];	//宣言
+	optional uint32 creator = 8[default = 0];		//创建者的ID
+	optional int32 huoyue = 9[default = 0];
+
+	optional one_member_list member_list = 10;
+	optional one_post_name_info post_name_info = 11;	//职务名字信息
+	optional one_post_info post_info = 12;				//职务信息
+	optional int32 resource = 13[default = 0];	//军团资源
+	optional int32 doyen = 14[default = 0];	//团长
+	optional int32 create_time = 15[default = 0];	//创建时间
+	optional int32 deleted = 16[default = 0];	//是否已经被删除
+	optional one_setting setting_info = 17;	//设置信息
+	optional one_apply_list apply_list = 18;
+	optional int32 huoyue_time = 19[default = 0];
+	optional daily_list guild_daily_list = 20;
+
+	optional int32 today_guild_huoyue = 22;//当天军团的活跃增长量
+
+	optional guild_boss_info boss_data = 23;
+
+	optional int32 max_report_id = 29[default = 0];	//report id记数
+	optional one_guild_report_list guild_report_list_obj = 30;	//report list
+	optional int32 last_report_time = 34[default = 0]; 			//最新的一封战报的时间
+
+	optional guild_invitation_info  invitation_info = 35;  /// 邀请
+
+	optional guild_skill_info skill_info = 36;
+
+	optional int32 guild_yuanbao = 40[default = 0]; //
+	optional int32 guild_coin = 41[default = 0];
+
+	optional uint32 dist_id = 56[default = 0]; 
+	optional string str_dist_id = 57[default = ''];
+	optional string dist_name = 58[default = ''];
+
+	optional uint32 last_update_to_cross_time = 60[default = 0]; /// 最后一次上报给跨服的时间
+
+}

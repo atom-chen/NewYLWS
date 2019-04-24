@@ -1,0 +1,14 @@
+package game;
+
+
+/// 去跨服注册
+message req_gamesvr_register
+{
+    repeated int32 server_list = 1;
+    optional uint32 server_open_time = 2[default = 0];
+}
+
+message rsp_gamesvr_register
+{
+    optional int32 result = 1 [default = 0];
+}

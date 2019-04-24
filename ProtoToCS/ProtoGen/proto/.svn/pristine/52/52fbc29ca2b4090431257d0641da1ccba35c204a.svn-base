@@ -1,0 +1,57 @@
+package vip;
+import "common.proto";
+
+// message req_buy_goods
+// {
+// 	optional int32 goods_id = 1[default = 0];
+// }
+
+// message rsp_buy_goods
+// {
+// 	optional int32 result = 1[default = 0];
+// 	optional int32 goods_id = 2[default = 0];
+// }
+
+// message req_vip_shop_info
+// {
+// 	// optional int32 phone_type = 1[default = 0];		// 机器类型 0,未知; 1,苹果; 2,安卓(只有确认识别出苹果机型的，才会屏蔽掉高充值项)
+// 	// optional string terrace = 2;					// 渠道
+// }
+
+// message rsp_vip_shop_info
+// {
+// 	optional int32 result = 1[default = 0];
+// 	repeated int32 goods_id_list = 2;							//可购买商品
+// 	optional int32 yulong_yueka_left_day = 3[default = 0];		//月卡剩余天数
+// 	optional int32 wushuang_yueka_left_day = 4[default = 0];	//月卡剩余天数
+// 	repeated int32 show_goods_id_list = 6;						//显示购买商品列表
+
+// 	message one_goods_cfg
+// 	{
+// 		optional int32 goods_id = 1[default = 0];
+// 		optional double price = 2[default = 0.0];
+// 	}
+
+// 	repeated one_goods_cfg goods_cfg_list = 5;
+// }
+
+// message req_charging_poll
+// {
+// }
+
+// message rsp_charging_poll
+// {
+// 	optional int32 result = 1[default = 0];
+// }
+
+message req_take_viplevelgift_award
+{
+	optional int32 vip_level = 1[default = 0];
+}
+
+message rsp_take_viplevelgift_award
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 2;
+	optional int32 viplevelgift_taken_flag = 55 [default = 0];	//vip等级特权礼包标志
+}

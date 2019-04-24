@@ -1,0 +1,69 @@
+package dragon;
+
+import 'common.proto';
+
+message req_dragon_list
+{
+
+}
+
+message rsp_dragon_list
+{
+	optional int32 result = 1[default = 0];
+	repeated common.one_dragon dragon_list = 2;
+}
+
+message req_improve_dragon
+{
+	optional int32 dragon_id = 1[default = 0];
+	optional common.one_item need_item = 2;
+}
+
+message rsp_improve_dragon
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_awakening_dragon
+{
+	optional int32 dragon_id = 1[default = 0];
+}
+
+message rsp_awakening_dragon
+{
+	optional int32 result = 1[default = 0];
+}
+
+message req_active_talent
+{
+	optional int32 dragon_id = 1[default = 0];
+	optional int32 horse_index = 2[default = 0];
+	optional int32 talent_seq = 3[default = 0];//面板第几个天赋槽
+}
+
+message rsp_active_talent
+{
+	optional int32 result = 4[default = 0];
+	optional int32 dragon_id = 1[default = 0];
+	optional int32 horse_index = 2[default = 0];
+	optional int32 talent_id = 3[default = 0];
+}
+
+message req_forgot_talent
+{
+	optional int32 talent_seq = 1[default = 0];
+	optional int32 dragon_id = 2[default = 0];
+	repeated common.one_item forgot_talent_item_list = 3;
+}
+
+message rsp_forgot_talent
+{
+	optional int32 result = 1[default = 0];
+}
+
+message ntf_dragon_chg
+{
+	optional int32 reason = 1[default = 0]; //1升级 2激活技能 3可以使用觉醒 4新天赋
+	optional common.one_dragon dragon_info = 2;
+	
+}

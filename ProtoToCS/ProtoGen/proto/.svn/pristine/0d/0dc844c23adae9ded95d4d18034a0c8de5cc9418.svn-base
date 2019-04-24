@@ -1,0 +1,55 @@
+package vip;
+import "common.proto";
+
+message req_buy_goods
+{
+	optional int32 goods_id = 1[default = 0];
+}
+
+message rsp_buy_goods
+{
+	optional int32 result = 1[default = 0];
+	optional int32 goods_id = 2[default = 0];
+}
+
+message req_vip_shop_info
+{
+	optional int32 phone_type = 1[default = 0];		// 机器类型 0,未知; 1,苹果; 2,安卓(只有确认识别出苹果机型的，才会屏蔽掉高充值项)
+	optional string terrace = 2;					// 渠道
+	optional int32 shop_type = 3[default = 0]; //2vips商店，3礼包商店
+}
+
+message rsp_vip_shop_info
+{
+	optional int32 result = 1[default = 0];						//可购买商品
+
+	message one_goods_cfg
+	{
+		optional int32 goods_id = 1[default = 0];
+		optional double price = 2[default = 0.0];
+		optional int32 charged_yuanbao = 3[default = 0];
+		optional int32 normal_charged_yuanbao = 4[default = 0];
+		optional int32 first_charged_yuanbao = 5[default = 0];
+		optional int32 recommend = 6[default = 0];
+		optional string sicon = 7[default = ''];
+		optional string desc = 8[default = ''];
+		optional string appStoreProductID = 9[default = ''];
+		optional string name = 10[default = ''];
+	}
+
+	repeated one_goods_cfg goods_cfg_list = 2;
+
+}
+
+
+message req_take_viplevelgift_award
+{
+	optional int32 vip_level = 1[default = 0];
+}
+
+message rsp_take_viplevelgift_award
+{
+	optional int32 result = 1[default = 0];
+	repeated common.award_info award_list = 2;
+	optional int32 viplevelgift_taken_flag = 55 [default = 0];	//vip等级特权礼包标志
+}

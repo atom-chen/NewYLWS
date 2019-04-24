@@ -1,0 +1,949 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <LangVersion>4</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>10.0.20506</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <RootNamespace>
+    </RootNamespace>
+    <ProjectGuid>{2F9DFF3B-01D8-8724-C3AB-67A0DC5EADDF}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <AssemblyName>Assembly-CSharp</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <BaseDirectory>.</BaseDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Temp\bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE;UNITY_5_3_OR_NEWER;UNITY_5_4_OR_NEWER;UNITY_5_5_OR_NEWER;UNITY_5_6_OR_NEWER;UNITY_2017_1_OR_NEWER;UNITY_2017_2_OR_NEWER;UNITY_2017_3_OR_NEWER;UNITY_2018_1_OR_NEWER;UNITY_2018_1_3;UNITY_2018_1;UNITY_2018;ENABLE_AUDIO;ENABLE_CACHING;ENABLE_CLOTH;ENABLE_MICROPHONE;ENABLE_MULTIPLE_DISPLAYS;ENABLE_PHYSICS;ENABLE_SPRITERENDERER_FLIPPING;ENABLE_SPRITES;ENABLE_GRID;ENABLE_TILEMAP;ENABLE_TERRAIN;ENABLE_RAKNET;ENABLE_DIRECTOR;ENABLE_UNET;ENABLE_LZMA;ENABLE_UNITYEVENTS;ENABLE_WEBCAM;ENABLE_WWW;ENABLE_CLOUD_SERVICES_COLLAB;ENABLE_CLOUD_SERVICES_COLLAB_SOFTLOCKS;ENABLE_CLOUD_SERVICES_ADS;ENABLE_CLOUD_HUB;ENABLE_CLOUD_PROJECT_ID;ENABLE_CLOUD_SERVICES_USE_WEBREQUEST;ENABLE_CLOUD_SERVICES_UNET;ENABLE_CLOUD_SERVICES_BUILD;ENABLE_CLOUD_LICENSE;ENABLE_EDITOR_HUB;ENABLE_EDITOR_HUB_LICENSE;ENABLE_WEBSOCKET_CLIENT;ENABLE_DIRECTOR_AUDIO;ENABLE_DIRECTOR_TEXTURE;ENABLE_TIMELINE;ENABLE_EDITOR_METRICS;ENABLE_EDITOR_METRICS_CACHING;ENABLE_MANAGED_JOBS;ENABLE_MANAGED_TRANSFORM_JOBS;INCLUDE_DYNAMIC_GI;INCLUDE_GI;ENABLE_MONO_BDWGC;PLATFORM_SUPPORTS_MONO;INCLUDE_PUBNUB;ENABLE_PLAYMODE_TESTS_RUNNER;ENABLE_VIDEO;ENABLE_PACKMAN;ENABLE_CUSTOM_RENDER_TEXTURE;ENABLE_LOCALIZATION;PLATFORM_ANDROID;UNITY_ANDROID;UNITY_ANDROID_API;ENABLE_SUBSTANCE;ENABLE_EGL;ENABLE_NETWORK;ENABLE_RUNTIME_GI;ENABLE_CRUNCH_TEXTURE_COMPRESSION;ENABLE_UNITYWEBREQUEST;ENABLE_CLOUD_SERVICES;ENABLE_CLOUD_SERVICES_ANALYTICS;ENABLE_EVENT_QUEUE;ENABLE_CLOUD_SERVICES_PURCHASING;ENABLE_CLOUD_SERVICES_CRASH_REPORTING;ENABLE_CLOUD_SERVICES_NATIVE_CRASH_REPORTING;PLATFORM_SUPPORTS_ADS_ID;UNITY_CAN_SHOW_SPLASH_SCREEN;ENABLE_VR;ENABLE_AR;ENABLE_SPATIALTRACKING;ENABLE_UNITYADS_RUNTIME;UNITY_UNITYADS_API;ENABLE_MONO;NET_2_0_SUBSET;ENABLE_PROFILER;UNITY_ASSERTIONS;UNITY_EDITOR;UNITY_EDITOR_64;UNITY_EDITOR_WIN;ENABLE_UNITY_COLLECTIONS_CHECKS;UNITY_TEAM_LICENSE;ENABLE_VSTU;UNITY_PRO_LICENSE;LOGGER_ON;CLIENT_DEBUG;HOTFIX_ENABLE;UNITY_POST_PROCESSING_STACK_V2;UNITY_HAS_GOOGLEVR;UNITY_HAS_TANGO</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0169</NoWarn>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Temp\bin\Release\</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <NoWarn>0169</NoWarn>
+    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup>
+    <NoConfig>true</NoConfig>
+    <NoStdLib>true</NoStdLib>
+    <AddAdditionalExplicitAssemblyReferences>false</AddAdditionalExplicitAssemblyReferences>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ProjectTypeGuids>{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <UnityProjectGenerator>Unity/VSTU</UnityProjectGenerator>
+    <UnityProjectType>Game:1</UnityProjectType>
+    <UnityBuildTarget>Android:13</UnityBuildTarget>
+    <UnityVersion>2018.1.3f1</UnityVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="UnityEngine">
+      <HintPath>C:\Program Files\Unity\Editor\Data\Managed/UnityEngine/UnityEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor">
+      <HintPath>C:\Program Files\Unity\Editor\Data\Managed/UnityEditor.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Assets\MantisLODEditor\Common\Mantis_Mesh.cs" />
+    <Compile Include="Assets\MantisLODEditor\Common\MantisLODEditorProfessional.cs" />
+    <Compile Include="Assets\MantisLODEditor\Common\ProgressiveMesh.cs" />
+    <Compile Include="Assets\MantisLODEditor\Demo\Scripts\MoveMe.cs" />
+    <Compile Include="Assets\MantisLODEditor\Demo\Scripts\RotateMe.cs" />
+    <Compile Include="Assets\MantisLODEditor\Runtime\ProgressiveMeshRuntime.cs" />
+    <Compile Include="Assets\Reporter\MultiKeyDictionary.cs" />
+    <Compile Include="Assets\Reporter\Reporter.cs" />
+    <Compile Include="Assets\Reporter\ReporterGUI.cs" />
+    <Compile Include="Assets\Reporter\ReporterMessageReceiver.cs" />
+    <Compile Include="Assets\Scripts\Actor\ActorColor.cs" />
+    <Compile Include="Assets\Scripts\Actor\ActorTranslucentColor.cs" />
+    <Compile Include="Assets\Scripts\Actor\MatcapMaker.cs" />
+    <Compile Include="Assets\Scripts\Actor\ObjectExplosion.cs" />
+    <Compile Include="Assets\Scripts\BattleTrigger\ButterFlyController.cs" />
+    <Compile Include="Assets\Scripts\BattleTrigger\ButterFlyTrigger.cs" />
+    <Compile Include="Assets\Scripts\BattleTrigger\HideTrigger.cs" />
+    <Compile Include="Assets\Scripts\BattleTrigger\ShowTrigger.cs" />
+    <Compile Include="Assets\Scripts\Common\CustomDataStruct\BetterDelegate.cs" />
+    <Compile Include="Assets\Scripts\Common\CustomDataStruct\BetterLinkedList.cs" />
+    <Compile Include="Assets\Scripts\Common\CustomDataStruct\BetterLinkedListNode.cs" />
+    <Compile Include="Assets\Scripts\Common\CustomDataStruct\BetterStringBuilder.cs" />
+    <Compile Include="Assets\Scripts\Common\CustomDataStruct\DelegateAction.cs" />
+    <Compile Include="Assets\Scripts\Common\CustomDataStruct\Helper.cs" />
+    <Compile Include="Assets\Scripts\Common\CustomDataStruct\MemoryLeakDetecter.cs" />
+    <Compile Include="Assets\Scripts\Common\CustomDataStruct\ObjPool.cs" />
+    <Compile Include="Assets\Scripts\Common\CustomDataStruct\StreamBufferPool.cs" />
+    <Compile Include="Assets\Scripts\Common\CustomDataStruct\ValueObject.cs" />
+    <Compile Include="Assets\Scripts\Common\Http\HttpInfo.cs" />
+    <Compile Include="Assets\Scripts\Common\Http\SimpleHttp.cs" />
+    <Compile Include="Assets\Scripts\Common\Json\MiniJSON.cs" />
+    <Compile Include="Assets\Scripts\Common\Json\XCModJSON.cs" />
+    <Compile Include="Assets\Scripts\Common\Logger\Logger.cs" />
+    <Compile Include="Assets\Scripts\Common\Logger\LoggerHelper.cs" />
+    <Compile Include="Assets\Scripts\Common\Singleton\MonoSingleton.cs" />
+    <Compile Include="Assets\Scripts\Common\Singleton\Singleton.cs" />
+    <Compile Include="Assets\Scripts\Common\Utility\Bezier.cs" />
+    <Compile Include="Assets\Scripts\Common\Utility\BuildUtils.cs" />
+    <Compile Include="Assets\Scripts\Common\Utility\DataUtils.cs" />
+    <Compile Include="Assets\Scripts\Common\Utility\GameUtility.cs" />
+    <Compile Include="Assets\Scripts\Common\Utility\ItemCurve.cs" />
+    <Compile Include="Assets\Scripts\Config\Setting.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\Command\CommandBehaviour.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\Command\CommandClip.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\Command\CommandClipData.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\Command\CommandTrack.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\CustomAnimTrack\CustomAnimMixer.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\CustomAnimTrack\CustomAnimShot.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\CustomAnimTrack\CustomAnimTrack.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\Dialogue\DialogClipData.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\Dialogue\DialogueBehaviour.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\Dialogue\DialogueClip.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\Dialogue\DialogueTrack.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\Skip\SkipBehaviour.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\Skip\SkipClip.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\Skip\SkipMixerBehaviour.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\Skip\SkipTrack.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\Timeline.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\WaitEvent\WaitEventBehaviour.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\WaitEvent\WaitEventClip.cs" />
+    <Compile Include="Assets\Scripts\CustomTimelineTracks\WaitEvent\WaitEventTrack.cs" />
+    <Compile Include="Assets\Scripts\Framework\AssetBundle\AssetBundleMgr.cs" />
+    <Compile Include="Assets\Scripts\Framework\AssetBundle\AsyncOperation\AssetAsyncLoader.cs" />
+    <Compile Include="Assets\Scripts\Framework\AssetBundle\AsyncOperation\AssetBundleAsyncLoader.cs" />
+    <Compile Include="Assets\Scripts\Framework\AssetBundle\AsyncOperation\EditorAssetAsyncLoader.cs" />
+    <Compile Include="Assets\Scripts\Framework\AssetBundle\AsyncOperation\EditorAssetBundleAsyncLoader.cs" />
+    <Compile Include="Assets\Scripts\Framework\AssetBundle\AsyncOperation\ResourceAsyncOperation.cs" />
+    <Compile Include="Assets\Scripts\Framework\AssetBundle\AsyncOperation\ResourceWebRequester.cs" />
+    <Compile Include="Assets\Scripts\Framework\AssetBundle\Config\AssetBundleConfig.cs" />
+    <Compile Include="Assets\Scripts\Framework\AssetBundle\Config\AssetsPathMapping.cs" />
+    <Compile Include="Assets\Scripts\Framework\AssetBundle\Config\Manifest.cs" />
+    <Compile Include="Assets\Scripts\Framework\AssetBundle\Utility\AssetBundleHelper.cs" />
+    <Compile Include="Assets\Scripts\Framework\AssetBundle\Utility\AssetBundleUtility.cs" />
+    <Compile Include="Assets\Scripts\Framework\Message\CallBack.cs" />
+    <Compile Include="Assets\Scripts\Framework\Message\Message.cs" />
+    <Compile Include="Assets\Scripts\Framework\Message\MessageName.cs" />
+    <Compile Include="Assets\Scripts\Framework\Socket\enum\ESocketError.cs" />
+    <Compile Include="Assets\Scripts\Framework\Socket\HjNetwork\HjNetworkEvt.cs" />
+    <Compile Include="Assets\Scripts\Framework\Socket\HjNetwork\HjSemaphore.cs" />
+    <Compile Include="Assets\Scripts\Framework\Socket\HjNetwork\HjTcpNetwork.cs" />
+    <Compile Include="Assets\Scripts\Framework\Socket\HjNetwork\MessageQueue.cs" />
+    <Compile Include="Assets\Scripts\Framework\Socket\Interface\IMessageQueue.cs" />
+    <Compile Include="Assets\Scripts\Framework\Socket\Interface\IPv6SupportMidleware.cs" />
+    <Compile Include="Assets\Scripts\Framework\UI\UINoticeTip.cs" />
+    <Compile Include="Assets\Scripts\GameLaunch\GameLaunch.cs" />
+    <Compile Include="Assets\Scripts\GameLaunch\LuaAssetbundleUpdater.cs" />
+    <Compile Include="Assets\Scripts\LegacyCode\AssetBundleManager.cs" />
+    <Compile Include="Assets\Scripts\LegacyCode\AssetbundleUpdater.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\BgBlurEffect.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\CameraPostRender.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\CloseUpEffect.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\ColorInvertEffect.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\DepthCamera.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\EyeBlinkEffect.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\EyeVisionEffect.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\FogWithNoise.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\Ghosting.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\GhostingEffect.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\GrayscaleEffect.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\ImageEffectBase.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\Mirror.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\MotionBlurEffect.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\NewCloseUpEffect.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\PostRenderEffectBase.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\RenderTextureMgr.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\ScreenColorEffect.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\ScreenShotEffect.cs" />
+    <Compile Include="Assets\Scripts\ScreenEffect\ScreenSummonEffect.cs" />
+    <Compile Include="Assets\Scripts\SDK\SDKHelper.cs" />
+    <Compile Include="Assets\Scripts\Test\ABLoadTest.cs" />
+    <Compile Include="Assets\Scripts\Test\AssetTest.cs" />
+    <Compile Include="Assets\Scripts\Test\FPS.cs" />
+    <Compile Include="Assets\Scripts\Test\GenerateDepthTexture2.cs" />
+    <Compile Include="Assets\Scripts\Test\GetDepthCameraPosition.cs" />
+    <Compile Include="Assets\Scripts\Test\GetFirePosition.cs" />
+    <Compile Include="Assets\Scripts\Test\GetRenders.cs" />
+    <Compile Include="Assets\Scripts\Test\LuaTest.cs" />
+    <Compile Include="Assets\Scripts\Test\ModelTest.cs" />
+    <Compile Include="Assets\Scripts\Test\TestDepth.cs" />
+    <Compile Include="Assets\Scripts\Test\TestLayerCull.cs" />
+    <Compile Include="Assets\Scripts\Test\TimelineTest.cs" />
+    <Compile Include="Assets\Scripts\Test\Trans.cs" />
+    <Compile Include="Assets\Scripts\TMPro\HX_TextMeshProUGUI.cs" />
+    <Compile Include="Assets\Scripts\UI\LoopHorizontalScrollRect.cs" />
+    <Compile Include="Assets\Scripts\UI\LoopScrollDataSource.cs" />
+    <Compile Include="Assets\Scripts\UI\LoopScrollPrefabSource.cs" />
+    <Compile Include="Assets\Scripts\UI\LoopScrollRect.cs" />
+    <Compile Include="Assets\Scripts\UI\LoopVerticalScrollRect.cs" />
+    <Compile Include="Assets\Scripts\UI\NonBreakingSpaceTextComponent.cs" />
+    <Compile Include="Assets\Scripts\UI\SetCanvasBounds.cs" />
+    <Compile Include="Assets\Scripts\UI\SpringContent.cs" />
+    <Compile Include="Assets\Scripts\UI\TweenAlpha.cs" />
+    <Compile Include="Assets\Scripts\UI\UIClickListener.cs" />
+    <Compile Include="Assets\Scripts\UI\UIDragListener.cs" />
+    <Compile Include="Assets\Scripts\UI\UIEventListener.cs" />
+    <Compile Include="Assets\Scripts\UI\UISliderHelper.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\AssetBundlesAssetAsyncLoaderWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\AssetBundlesAssetBundleAsyncLoaderWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\AssetBundlesAssetBundleConfigWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\AssetBundlesAssetBundleHelperWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\AssetBundlesAssetBundleMgrWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\AssetBundlesAssetBundleUtilityWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\AssetBundlesAssetsPathMappingWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\AssetBundlesManifestWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\AssetBundlesResourceWebRequesterWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\Battle_ActorActorColorWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\Battle_ActorActorTranslucentColorWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\BgBlurEffectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\BinaryWriterExtentionsWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\BuildUtilsWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\CameraPostRenderWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\CinemachineCinemachineBrainWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\CinemachineCinemachineTargetGroupWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\CinemachineCinemachineVirtualCameraWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\CloseUpEffectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\ColorInvertEffectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\CommandBehaviourWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\CommandClipDataWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\CommandClipWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\CommandTrackWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\CustomDataStructStreamBufferPoolWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\CustomDataStructStreamBufferWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\DataUtilsWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\DelegatesGensBridge.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\DialogClipDataWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\DialogueBehaviourWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\DialogueClipWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\DialogueTrackWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\DOTweenDOTweenExtensionsWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\DOTweenDOTweenSettingsWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\DOTweenDOTweenShortcutWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\DOTweenDOTweenWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\EnumWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\EyeBlinkEffectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\EyeVisionEffectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\FlyCurveWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\FogWithNoiseWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\GameLaunchWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\GameUtilityWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\GhostingEffectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\GhostingWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\GrayscaleEffectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\LoggerHelperWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\LoggerWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\LuaAssetbundleUpdaterWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\MatcapMakerWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\MessageNameWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\MotionBlurEffectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\NetworksHjTcpNetworkWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\NewCloseUpEffectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\PackUnpack.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\PostRenderEffectBaseWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\RenderTextureMgrWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\ScreenColorEffectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\ScreenShotEffectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\ScreenSummonEffectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SDKHelperWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SetCanvasBoundsWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SimpleHttpWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SkipBehaviourWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SkipClipWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SkipMixerBehaviourWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SkipTrackWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SpringContentWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SystemActivatorWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SystemArrayWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SystemCollectionsGenericDictionary2SystemStringUnityEngineGameObjectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SystemCollectionsGenericList1SystemInt32Wrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SystemCollectionsIDictionaryWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SystemCollectionsIEnumeratorBridge.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SystemCollectionsIListWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SystemGCWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SystemIOBinaryReaderWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SystemIOBinaryWriterWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SystemIOMemoryStreamWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SystemObjectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\SystemTypeWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\TimelineWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\TMProTextMeshProUGUIWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\TMProTextMeshProWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\TMProTMP_SubMeshUIWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\TMProTMP_TextInfoWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\TMProTMP_TextWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\TMProVertexGradientWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\TweenAlphaWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UIBgTextureAdjustorWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UIClickListenerWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UIDragListenerWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UIEventListenerWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UINoticeTipWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UISliderHelperWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineAnimationClipWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineAnimationCurveWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineAnimatorStateInfoWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineAnimatorWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineApplicationWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineAssetBundleCreateRequestWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineAssetBundleManifestWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineAssetBundleWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineAsyncOperationWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineAudioClipWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineAudioSourceWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineBehaviourWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineBoundsWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineBoxColliderWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineCameraWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineCanvasGroupWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineCanvasWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineColorWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineComponentWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineDebugWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineEventsUnityEventWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineGameObjectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineInputWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineKeyframeWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineLayerMaskWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineMaterialWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineMathfWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineMonoBehaviourWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineObjectExtentionWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineObjectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineParticleSystemWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEnginePhysicsWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEnginePlaneWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEnginePlayablesPlayableDirectorWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEnginePlayerPrefsWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineQualitySettingsWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineQuaternionWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineRaycastHitWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineRayWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineRectOffsetWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineRectTransformUtilityWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineRectTransformWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineRectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineRendererWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineResourceRequestWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineResourcesWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineSceneManagementSceneManagerWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineScreenWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineShaderWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineSkinnedMeshRendererWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineSpriteWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineSystemInfoWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineTextAssetWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineTextMeshWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineTexture2DWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineTimeWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineTouchWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineTransformWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUIButtonButtonClickedEventWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUIButtonWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUICanvasScalerWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUIContentSizeFitterWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUIGraphicRaycasterWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUIGridLayoutGroupWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUIImageWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUIInputFieldWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUILayoutGroupWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUILoopHorizontalScrollRectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUILoopScrollPrefabSourceWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUILoopScrollRectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUILoopScrollSendIndexSourceWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUILoopVerticalScrollRectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUIRectMask2DWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUIScrollbarWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUIScrollRectScrollRectEventWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUIScrollRectWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUISliderWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUITextWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUIToggleGroupWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineUIToggleWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineVector2Wrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineVector3Wrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineVector4Wrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineWaitForEndOfFrameWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineWaitForFixedUpdateWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineWaitForSecondsWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\UnityEngineWWWWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\WaitEventBehaviourWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\WaitEventClipWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\WaitEventTrackWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\WrapPusher.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\XLuaGenAutoRegister.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\XLuaHelperWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\XLuaManagerWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Gen\XLuaMessengerWrap.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\CodeEmit.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\CopyByValue.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\DelegateBridge.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\GenAttributes.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\GenericDelegateBridge.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\InternalGlobals.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\LuaBase.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\LuaDLL.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\LuaEnv.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\LuaException.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\LuaFunction.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\LuaTable.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\MethodWarpsCache.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\ObjectCasters.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\ObjectPool.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\ObjectTranslator.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\ObjectTranslatorPool.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\RawObject.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\SignatureLoader.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\StaticLuaCallbacks.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\TemplateEngine\TemplateEngine.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\TypeExtensions.cs" />
+    <Compile Include="Assets\Scripts\XLua\Scripts\Utils.cs" />
+    <Compile Include="Assets\Scripts\XLua\Support\BinaryWriterExtentions.cs" />
+    <Compile Include="Assets\Scripts\XLua\Support\BuildInInit.cs" />
+    <Compile Include="Assets\Scripts\XLua\Support\CoroutineRunner.cs" />
+    <Compile Include="Assets\Scripts\XLua\Support\LuaFunction.cs" />
+    <Compile Include="Assets\Scripts\XLua\Support\LuaMemoryLeakChecker.cs" />
+    <Compile Include="Assets\Scripts\XLua\Support\LuaUpdater.cs" />
+    <Compile Include="Assets\Scripts\XLua\Support\UnityEngineObjectExtention.cs" />
+    <Compile Include="Assets\Scripts\XLua\Support\XLuaHelper.cs" />
+    <Compile Include="Assets\Scripts\XLua\Support\XLuaMessenger.cs" />
+    <Compile Include="Assets\Scripts\XLua\XLuaManager.cs" />
+    <Compile Include="Assets\Test.cs" />
+    <Compile Include="Assets\VertExmotion\Core\Base\PID.cs" />
+    <Compile Include="Assets\VertExmotion\Core\Base\VertExmotionBase.cs" />
+    <Compile Include="Assets\VertExmotion\Core\Base\VertExmotionColliderBase.cs" />
+    <Compile Include="Assets\VertExmotion\Core\Base\VertExmotionSensorBase.cs" />
+    <Compile Include="Assets\VertExmotion\Core\VertExmotion.cs" />
+    <Compile Include="Assets\VertExmotion\Core\VertExmotionCollider.cs" />
+    <Compile Include="Assets\VertExmotion\Core\VertExmotionSensor.cs" />
+    <Compile Include="Assets\VertExmotion\Core\VertExmotionShare.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Bubble\VertExmotionBubble.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Characters\NextCharacter.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Characters\ScaleAndRotationFX.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Collision2\KillAfterSeconds.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Collision2\LaunchBalls.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Dress\DressRotation.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Gravity\GravityDemo.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Interactions\VertExmotionInteraction.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Interactions\VertExmotionTouchDemo.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\JellyCube\Model\Jump.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Jellyfish\Script\Jellyfish.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Jellyfish\Script\JellyfishSpawn.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Jellyfish\Script\JellyfishTrail.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Scripts\DisableVertexMotion.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Scripts\MotionTest.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Scripts\SetTimeScale.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Scripts\Teleport.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\SimpleMesh\Script\EyeDemo.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\SimpleMesh\Script\LockOnSensorMotion.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\SimpleMesh\Script\SimpleMeshDemo.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\SplashDemo\SplashScript.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Squash\ChangeTime.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Squash\moveQuick.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Squash\TestSquashSpawn.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\Squash\UpDown.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\TimeScale\DemoTimeScale.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\TireDemo\Scripts\MouseOrbit.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\TireDemo\Scripts\RotateWheel.cs" />
+    <Compile Include="Assets\VertExmotion\Demos\TireDemo\TireDeformation.cs" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\BumpedSpecular_3.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\MyMobile Particle ParticleAdd.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Normal-Glossy.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\CloseUpFXMask.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Flare.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\BumpedSpecular_2.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Leading Characters.txt" />
+    <None Include="Assets\AssetsPackage\Shaders\Zone\RainOld.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\TextMesh\TMP_Bitmap-Mobile.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\AlphaTest-SoftEdgeUnlit.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Zone\Mobile-Diffuse2.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Reflect-Bumped.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Alpha-Glossy.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Decal.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Basemap\Basemap.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\RFX4_CutoutBorderMobile.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Diffuse_6.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Mobile\Mobile-Bumped.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\PbrInclude\StandardDSCoreForward.cginc" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Alpha-ParallaxSpec.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\longjuanfeng_bland.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Zone\SkyboxWithFog.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Normal-DiffuseDetail.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Lightmap-Bumped.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\PrepareCircleShader.shader" />
+    <None Include="Assets\VertExmotion\Demos\SplashDemo\SplashPlaneDeform.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\ScreenShotFX.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\TextMesh\TMPro_Surface.cginc" />
+    <None Include="Assets\AssetsPackage\Shaders\TextMesh\TMP_SDF-Surface.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\TextMesh\TMP_SDF.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Normal-BumpSpec.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\MobileParticleAdditive.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Reflect-BumpSpec.shader" />
+    <None Include="Assets\Scripts\XLua\Gen\link.xml" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Illumin-Parallax.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Alpha-BumpSpec.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Illumin-ParallaxSpec.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Unlit\Unlit-Normal.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotionStandardSpecular.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Unlit\Unlit_4.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Alpha-Bumped.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\SEParticlesAdditive.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Zone\RainSplash.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Zone\EnviroMobileAtmosphere.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\BumpedSpecular_4.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\Rimlight_trans.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\PbrInclude\DS_pbr_simple.cginc" />
+    <None Include="Assets\AssetsPackage\Shaders\TextMesh\TMP_SDF-Mobile Overlay.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\TextMesh\TMPro_Properties.cginc" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Mobile\Mobile-Diffuse.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\water.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotionUnityStandardCoreForward.cginc" />
+    <None Include="Assets\VertExmotion\Demos\Dress\dress_model.txt" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Unlit\Unlit-AlphaTest.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotionUnityStandardShadow.cginc" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Diffuse_3.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\PbrInclude\StandardDSCoreTransparentForward.cginc" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Normal-Diffuse.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\ColorInvert.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotionStandardShadow.cginc" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotionStandard.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Bumped_2.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\cginc\T2M_ODL.cginc" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\MyMobile Dissolve Blend.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\TextMesh\TMP_SDF-Surface-Mobile.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Diffuse_6.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Diffuse_8.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Bumped_4.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Normal-Parallax.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Bumped_2.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Normal-ParallaxSpec.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\UI\ActorSelectShader.shader" />
+    <None Include="Assets\link.xml" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Normal-DiffuseFast.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Diffuse_5.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Reflect-Diffuse.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\MotionBlur.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\TextMesh\TMP_SDF Overlay.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Unlit\Unlit_2.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Zone\GenerateDepthTex.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\ParticlesAdditiveCulledForUIClip.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\TextMesh\TMPro.cginc" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Diffuse_2.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\Mobile Particles Additive Culled.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\AlphaTest-BumpSpec.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Bumped_3.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Lightmap-Diffuse.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\MyMobile UV Sine_Blend.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotionUnityStandardCore.cginc" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\MyMobile UV Sine_Add.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Unlit\Unlit-Color.shader" />
+    <None Include="Assets\VertExmotion\Demos\Jellyfish\Jellyfish.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Rim Lit Bumped Specular VertExmotion.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Zone\water_wave_depth.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Reflect-ParallaxSpec.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\cginc\T2M_Deferred.cginc" />
+    <None Include="Assets\StreamingAssets\AssetBundles\updatenotice.txt" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\water_wave.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\TextMesh\TMP_SDF-Mobile Masking.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\StandardRoughnessDS.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\water_add.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\BattonEffect_front.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\TextMesh\TMP_Bitmap.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\longjuanfeng_add2.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\AlphaTest-Diffuse.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\TextMesh\TMP_Sprite.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\front_add.shader" />
+    <None Include="Assets\AssetsPackage\UI\Fonts\c6500.txt" />
+    <None Include="Assets\AssetsPackage\Shaders\TextMesh\TMP_SDF-Mobile.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\MyMobile Particle ParticleBlend.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Zone\EnviroMobileClouds.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Bumped_2.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\EyeVisionFX.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\PbrInclude\StandardDSCoreTransparentForwardAlpha.cginc" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Illumin-Glossy.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\cginc\T2M_Variables.cginc" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Diffuse_4.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Bumped_4.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Unlit\Unlit_7.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\horse_showoff.shader" />
+    <None Include="Assets\TextMesh Pro\Resources\LineBreaking Following Characters.txt" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\longjuanfeng_g.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Zone\FogWithNoise.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Unlit\Unlit_6.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Zone\TreeInWind.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Diffuse_5.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\Mobile-Particle-Alpha.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\LightningMask.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotionStandard.cginc" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Diffuse_5.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Diffuse_7.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Mobile\Mobile-BumpSpec.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotionSprites-Mask.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Diffuse_3.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Unlit\Unlit_5.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Alpha-Diffuse.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\RFX4_ShaderExtension.cginc" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Diffuse_8.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Sprites-Default.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Diffuse_2.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\GrayscaleEffect.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Diffuse_7.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Diffuse_2.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Lightmap-BumpSpec.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Illumin-Bumped.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\AlphaTest-Bumped.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Zone\Scroll2Layers-Sine-AlphaBlend.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\UI\water.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\UI\SummonButton.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Diffuse_7.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Normal-VertexLit.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Unlit\Unlit-Alpha.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Illumin-Diffuse.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\front_blend.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\FluColor.shader" />
+    <None Include="Assets\StreamingAssets\build_info.txt" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\ScreensShotBlurTexShader.shader" />
+    <None Include="Assets\LuaScripts\Config\Data\configsvninfo.txt" />
+    <None Include="Assets\AssetsPackage\Shaders\UI\ParticleClipShader.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\RFX4_Particle.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\UI\SkillSelectorShader.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\chr.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\sceneobj-gpuinst.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\Mobile-Particle-Multiply.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Diffuse_8.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\UI\FlowLightShader.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\StandardRoughnessTransparentDS_Alpha.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Standard\Diffuse_3.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\ScreenSummonShader.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Font.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Normal-Bumped.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Diffuse_6.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\AlphaTest-Glossy.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotionUnityStandardCoreForwardSimple.cginc" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Lightmap-Glossy.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Unlit\Unlit_8.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\UI\PlaneBgShader.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotion.cginc" />
+    <None Include="Assets\VertExmotion\Shaders\VertExMotionSprites-Default.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Bumped_4.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\SE_GaussianBlur.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\StandardRoughnessTransparentDS.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Diffuse_4.shader" />
+    <None Include="Assets\VertExmotion\Demos\Interactions\VertExmotionTessellation_ASE.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotionSprites-Diffuse.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotion_editor.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\PbrInclude\DS_pbr.cginc" />
+    <None Include="Assets\VertExmotion\Demos\Collision2\Models from unity tutorial\Materials\Rim Lit Bumped Specular.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\UI\UI-Default-Gray.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\daoguang.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Bumped_3.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\One Directional Light\Bumped_3.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Normal-Bumped_2Sided.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Alpha-Parallax.shader" />
+    <None Include="Assets\VertExmotion\Demos\ShaderForgeSamples\SHADERFORGE TUTO.txt" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Illumin-BumpSpec.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotionUnityStandardMeta.cginc" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\ParticleAdditiveForUIClip.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Reflect-BumpNolight.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotionStandardRoughnesssetup.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Reflect-Parallax.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotionStandardMeta.cginc" />
+    <None Include="Assets\VertExmotion\Shaders\VertExmotionUnitySprites.cginc" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Mobile\Mobile-BumpSpec-1DirectionalLight.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Legacy Shaders\Diffuse_4.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\cginc\T2M_Unlit.cginc" />
+    <None Include="Assets\AssetsPackage\Shaders\Zone\Mul-skybox.shader" />
+    <None Include="Assets\VertExmotion\Demos\ShaderForgeSamples\VertExmotion_shaderForge_1.35.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Model\water_fast.shader" />
+    <None Include="Assets\VertExmotion\Shaders\VM_builtin_shaders\Reflect-Glossy.shader" />
+    <None Include="Assets\AssetsPackage\Shaders\Effect\SE_EyeBlink.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Shaders\Unlit\Unlit_3.shader" />
+    <None Include="Assets\VacuumShaders\Terrain To Mesh\Packages\ReadMe.txt" />
+    <Reference Include="Assembly-UnityScript-firstpass">
+      <HintPath>G:/NewYLWS/Client/NYlwsTrunk2018/Library/ScriptAssemblies/Assembly-UnityScript-firstpass.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEditor.StandardEvents">
+      <HintPath>G:/NewYLWS/Client/NYlwsTrunk2018/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.PackageManagerUI.Editor">
+      <HintPath>G:/NewYLWS/Client/NYlwsTrunk2018/Library/ScriptAssemblies/Unity.PackageManagerUI.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Postprocessing.Editor">
+      <HintPath>G:/NewYLWS/Client/NYlwsTrunk2018/Library/ScriptAssemblies/Unity.Postprocessing.Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Postprocessing.Runtime">
+      <HintPath>G:/NewYLWS/Client/NYlwsTrunk2018/Library/ScriptAssemblies/Unity.Postprocessing.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AIModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ARModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.ARModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AccessibilityModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AccessibilityModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AnimationModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AnimationModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AssetBundleModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.AudioModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.AudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.BaselibModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.BaselibModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ClothModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.ClothModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CloudWebServicesModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.CloudWebServicesModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.CoreModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.CrashReportingModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.CrashReportingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.DirectorModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.DirectorModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.FacebookModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.FacebookModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.GameCenterModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.GameCenterModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.GridModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.GridModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.HotReloadModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.HotReloadModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.IMGUIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.ImageConversionModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.InputModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.InputModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.JSONSerializeModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.JSONSerializeModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ParticleSystemModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.ParticleSystemModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ParticlesLegacyModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.ParticlesLegacyModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PerformanceReportingModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.PerformanceReportingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.PhysicsModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.PhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Physics2DModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.Physics2DModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.ScreenCaptureModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.ScreenCaptureModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SharedInternalsModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.SharedInternalsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SpatialTrackingModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.SpatialTrackingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SpriteMaskModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.SpriteMaskModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SpriteShapeModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.SpriteShapeModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.StyleSheetsModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.StyleSheetsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SubstanceModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.SubstanceModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TLSModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.TLSModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TerrainModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.TerrainModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TerrainPhysicsModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.TerrainPhysicsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TilemapModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.TilemapModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.TimelineModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.TimelineModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.UIModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIElementsModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.UIElementsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UNETModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.UNETModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UmbraModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.UmbraModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityAnalyticsModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.UnityAnalyticsModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityConnectModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.UnityConnectModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.UnityWebRequestModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAssetBundleModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestAudioModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestTextureModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UnityWebRequestWWWModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VRModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.VRModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VehiclesModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.VehiclesModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.VideoModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.VideoModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.WebModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.WebModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.WindModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.WindModule.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.XRModule">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/UnityEngine/UnityEngine.XRModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Unity.Locator">
+      <HintPath>C:/Program Files/Unity/Editor/Data/Managed/Unity.Locator.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Networking">
+      <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Networking/UnityEngine.Networking.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Timeline">
+      <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/Timeline/RuntimeEditor/UnityEngine.Timeline.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.UIAutomation">
+      <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UIAutomation/UnityEngine.UIAutomation.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.GoogleAudioSpatializer">
+      <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityGoogleAudioSpatializer/RuntimeEditor/UnityEngine.GoogleAudioSpatializer.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.HoloLens">
+      <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnityHoloLens/RuntimeEditor/UnityEngine.HoloLens.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.SpatialTracking">
+      <HintPath>C:/Program Files/Unity/Editor/Data/UnityExtensions/Unity/UnitySpatialTracking/RuntimeEditor/UnityEngine.SpatialTracking.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween">
+      <HintPath>G:/NewYLWS/Client/NYlwsTrunk2018/Assets/Plugins/DOTween/DOTween.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween43">
+      <HintPath>G:/NewYLWS/Client/NYlwsTrunk2018/Assets/Plugins/DOTween/DOTween43.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween46">
+      <HintPath>G:/NewYLWS/Client/NYlwsTrunk2018/Assets/Plugins/DOTween/DOTween46.dll</HintPath>
+    </Reference>
+    <Reference Include="DOTween50">
+      <HintPath>G:/NewYLWS/Client/NYlwsTrunk2018/Assets/Plugins/DOTween/DOTween50.dll</HintPath>
+    </Reference>
+    <Reference Include="TextMeshPro-2017.3-Editor">
+      <HintPath>G:/NewYLWS/Client/NYlwsTrunk2018/Assets/TextMesh Pro/Plugins/Editor DLL/TextMeshPro-2017.3-Editor.dll</HintPath>
+    </Reference>
+    <Reference Include="TextMeshPro-2017.3-Runtime">
+      <HintPath>G:/NewYLWS/Client/NYlwsTrunk2018/Assets/TextMesh Pro/Plugins/Editor DLL/TextMeshPro-2017.3-Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="VacuumShaders.TerrainToMesh">
+      <HintPath>G:/NewYLWS/Client/NYlwsTrunk2018/Assets/VacuumShaders/Terrain To Mesh/Scripts/VacuumShaders.TerrainToMesh.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Analytics">
+      <HintPath>C:/Users/haoxin/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.analytics@2.0.16/UnityEngine.Analytics.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.Purchasing">
+      <HintPath>C:/Users/haoxin/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.purchasing@2.0.1/UnityEngine.Purchasing.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityEngine.StandardEvents">
+      <HintPath>C:/Users/haoxin/AppData/Local/Unity/cache/packages/packages.unity.com/com.unity.standardevents@1.0.13/UnityEngine.StandardEvents.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib">
+      <HintPath>C:/Program Files/Unity/Editor/Data/MonoBleedingEdge/lib/mono/unity/mscorlib.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>C:/Program Files/Unity/Editor/Data/MonoBleedingEdge/lib/mono/unity/System.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core">
+      <HintPath>C:/Program Files/Unity/Editor/Data/MonoBleedingEdge/lib/mono/unity/System.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.Serialization">
+      <HintPath>C:/Program Files/Unity/Editor/Data/MonoBleedingEdge/lib/mono/unity/System.Runtime.Serialization.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml">
+      <HintPath>C:/Program Files/Unity/Editor/Data/MonoBleedingEdge/lib/mono/unity/System.Xml.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <HintPath>C:/Program Files/Unity/Editor/Data/MonoBleedingEdge/lib/mono/unity/System.Xml.Linq.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityScript">
+      <HintPath>C:/Program Files/Unity/Editor/Data/MonoBleedingEdge/lib/mono/unity/UnityScript.dll</HintPath>
+    </Reference>
+    <Reference Include="UnityScript.Lang">
+      <HintPath>C:/Program Files/Unity/Editor/Data/MonoBleedingEdge/lib/mono/unity/UnityScript.Lang.dll</HintPath>
+    </Reference>
+    <Reference Include="Boo.Lang">
+      <HintPath>C:/Program Files/Unity/Editor/Data/MonoBleedingEdge/lib/mono/unity/Boo.Lang.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="Assembly-CSharp-firstpass.csproj">
+      <Project>{05D08A43-1D86-F69E-26E7-6E42F0B3F6A8}</Project>
+      <Name>Assembly-CSharp-firstpass</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="GenerateTargetFrameworkMonikerAttribute" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
